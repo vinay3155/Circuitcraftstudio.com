@@ -1,0 +1,405 @@
+/* CircuitCraft Studio Design System & Styling */
+
+/* Core Variables */
+:root {
+  /* Theme Colors (Dark Cyberpunk by default) */
+  --bg-primary: #0a0e17;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1f2937;
+  --border-color: rgba(0, 229, 255, 0.15);
+  --border-focus: #00e5ff;
+  
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  
+  /* Brand accents */
+  --accent-cyan: #00e5ff;
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+  --accent-yellow: #fbbf24;
+  --accent-purple: #8b5cf6;
+  
+  /* Glow Shadows */
+  --glow-cyan: 0 0 15px rgba(0, 229, 255, 0.4);
+  --glow-cyan-strong: 0 0 25px rgba(0, 229, 255, 0.7);
+  --glow-blue: 0 0 15px rgba(59, 130, 246, 0.4);
+  --glow-green: 0 0 15px rgba(16, 185, 129, 0.4);
+  
+  /* Fonts */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-sans: 'Inter', sans-serif;
+  
+  /* Transition speed */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light Mode Overrides */
+[data-theme="light"] {
+  --bg-primary: #f9fafb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f3f4f6;
+  --border-color: rgba(59, 130, 246, 0.15);
+  --border-focus: #3b82f6;
+  
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  
+  --accent-cyan: #0284c7;
+  --accent-blue: #2563eb;
+  --accent-green: #059669;
+  --accent-yellow: #d97706;
+  
+  --glow-cyan: 0 4px 12px rgba(2, 132, 199, 0.2);
+  --glow-cyan-strong: 0 6px 20px rgba(2, 132, 199, 0.35);
+  --glow-blue: 0 4px 12px rgba(37, 99, 235, 0.2);
+  --glow-green: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
+
+/* Global Reset & Base Styling */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  line-height: 1.5;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-cyan);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Circuit Grid Overlay Background */
+.circuit-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(var(--border-color) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0,229,255,0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,229,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px, 80px 80px, 80px 80px;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.circuit-glow-orb {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 70%);
+  top: -100px;
+  right: -100px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  animation: orb-float 20s infinite alternate ease-in-out;
+}
+
+.circuit-glow-orb-2 {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.04) 0%, transparent 70%);
+  bottom: -100px;
+  left: -100px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  animation: orb-float-reverse 25s infinite alternate ease-in-out;
+}
+
+/* CSS Animations */
+@keyframes orb-float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-80px, 80px) scale(1.1); }
+}
+
+@keyframes orb-float-reverse {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(80px, -80px) scale(1.15); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes flow-line {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes slide-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+@keyframes circuit-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Dynamic Classes */
+.animate-slide-in {
+  animation: slide-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+/* Glassmorphism card template */
+.glass-panel {
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+
+[data-theme="light"] .glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border-color);
+}
+
+.glass-panel:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+.glow-btn {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+  color: #000;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.glow-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-cyan-strong);
+}
+
+.glow-btn:active {
+  transform: translateY(0);
+}
+
+/* Cyber Terminal / Code Styles */
+.cyber-terminal {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #05070c;
+  color: var(--accent-cyan);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.15);
+  position: relative;
+}
+
+.cyber-terminal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+}
+
+/* Custom Checkbox / Toggle styling */
+.custom-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  margin-right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+.checkmark::after {
+  content: "";
+  display: none;
+  width: 5px;
+  height: 10px;
+  border: solid #000;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.custom-checkbox input:checked ~ .checkmark::after {
+  display: block;
+}
+
+/* Credit Card Flip Layout */
+.card-container {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 340px;
+  height: 200px;
+  margin: 0 auto 1.5rem;
+}
+
+.credit-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform var(--transition-slow);
+}
+
+.credit-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.card-front {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
+.card-back {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: rotateY(180deg);
+}
+
+.card-magnetic-strip {
+  height: 40px;
+  background: #000;
+  margin: 0 -1.5rem;
+}
+
+.card-signature-cvv {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  color: #000;
+  padding: 0.5rem;
+  border-radius: 4px;
+  justify-content: flex-end;
+  font-family: var(--font-display);
+  font-weight: bold;
+}
+
+.cvv-number {
+  background: #f3f4f6;
+  padding: 2px 6px;
+  letter-spacing: 2px;
+}
+
+/* Badge Glow Layout */
+.badge-glow {
+  background: rgba(0, 229, 255, 0.05);
+  border: 1px solid var(--accent-cyan);
+  box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.1), var(--glow-cyan);
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem !important;
+  }
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
