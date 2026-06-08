@@ -16,6 +16,7 @@ export default function Navbar({
     { id: 'services', label: 'Services' },
     { id: 'projects', label: 'Projects' },
     { id: 'builder', label: 'DIY Configurator' },
+    { id: 'gallery', label: 'Gallery' },
     { id: 'contact', label: 'Contact Us' }
   ];
 

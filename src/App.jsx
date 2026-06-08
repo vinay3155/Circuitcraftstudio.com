@@ -4,8 +4,10 @@ import HeroSection from './components/HeroSection';
 import ServicesSection from './components/ServicesSection';
 import ProjectExplorer from './components/ProjectExplorer';
 import ProjectBuilder from './components/ProjectBuilder';
+import GallerySection from './components/GallerySection';
 import PaymentGateway from './components/PaymentGateway';
 import CircuitBot from './components/CircuitBot';
+import WhatsAppButton from './components/WhatsAppButton';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -21,7 +23,7 @@ export default function App() {
 
   // Scroll observer to update Navbar highlight automatically based on viewport scroll position
   useEffect(() => {
-    const sections = ['home', 'services', 'projects', 'builder', 'contact'];
+    const sections = ['home', 'services', 'projects', 'builder', 'gallery', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -118,7 +120,13 @@ export default function App() {
 
         {/* Custom Project DIY Configurator Section */}
         <ProjectBuilder onAddCustomToCart={handleAddToCart} />
+
+        {/* Gallery Section */}
+        <GallerySection />
       </main>
+
+      {/* Floating WhatsApp Chat Button */}
+      <WhatsAppButton />
 
       {/* Floating Chatbot Assistant */}
       <CircuitBot 
