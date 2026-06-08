@@ -554,18 +554,17 @@ export default function PaymentGateway({
                         boxShadow: '0 4px 15px rgba(0,0,0,0.25)' 
                       }}
                     >
-                      {/* Dynamic UPI Payment QR Code Generator */}
+                      {/* PhonePe QR Code Image */}
                       <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-                          `upi://pay?pa=vinaynbodravla315@okaxis&pn=CircuitCraft%20Studio&am=${calculateSubtotal()}&cu=INR&tn=Order%20${orderId}`
-                        )}`}
-                        alt="Scan to Pay via UPI"
+                        src="/phonepe-qr.jpg"
+                        alt="Scan to Pay via PhonePe"
                         style={{ 
                           width: '180px', 
                           height: '180px', 
                           display: 'block',
                           borderRadius: '4px',
-                          margin: '0 auto'
+                          margin: '0 auto',
+                          objectFit: 'cover'
                         }}
                       />
                     </div>
