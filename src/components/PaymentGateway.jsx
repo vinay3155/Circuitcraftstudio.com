@@ -554,34 +554,20 @@ export default function PaymentGateway({
                         boxShadow: '0 4px 15px rgba(0,0,0,0.25)' 
                       }}
                     >
-                      {/* Stylized QR placeholder with logo inside */}
-                      <div 
+                      {/* Dynamic UPI Payment QR Code Generator */}
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+                          `upi://pay?pa=vinaynbodravla315@okaxis&pn=CircuitCraft%20Studio&am=${calculateSubtotal()}&cu=INR&tn=Order%20${orderId}`
+                        )}`}
+                        alt="Scan to Pay via UPI"
                         style={{ 
                           width: '180px', 
                           height: '180px', 
-                          border: '4px solid #000',
-                          borderRadius: '8px',
-                          background: '#fff',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          position: 'relative'
+                          display: 'block',
+                          borderRadius: '4px',
+                          margin: '0 auto'
                         }}
-                      >
-                        {/* Mock QR lines */}
-                        <div style={{ position: 'absolute', top: '10px', left: '10px', width: '35px', height: '35px', border: '5px solid #000' }} />
-                        <div style={{ position: 'absolute', top: '10px', right: '10px', width: '35px', height: '35px', border: '5px solid #000' }} />
-                        <div style={{ position: 'absolute', bottom: '10px', left: '10px', width: '35px', height: '35px', border: '5px solid #000' }} />
-                        <div style={{ width: '70px', height: '70px', border: '2px solid var(--accent-blue)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold', fontSize: '0.7rem' }}>
-                          <span style={{ fontSize: '0.5rem', color: '#6b7280' }}>PAY TO</span>
-                          <span>CCS</span>
-                        </div>
-                        {/* QR abstract dots */}
-                        <div style={{ position: 'absolute', top: '70px', left: '30px', width: '10px', height: '40px', background: '#000' }} />
-                        <div style={{ position: 'absolute', bottom: '30px', right: '35px', width: '40px', height: '10px', background: '#000' }} />
-                        <div style={{ position: 'absolute', top: '50px', right: '50px', width: '20px', height: '20px', background: '#000' }} />
-                        <div style={{ position: 'absolute', bottom: '60px', left: '60px', width: '15px', height: '30px', background: '#000' }} />
-                      </div>
+                      />
                     </div>
 
                     <div style={{ marginBottom: '1.25rem' }}>
