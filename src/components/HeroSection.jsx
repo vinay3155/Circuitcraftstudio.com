@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Lightbulb, Edit, Code, Rocket, ArrowRight, Wrench } from 'lucide-react';
+import { Lightbulb, Edit, Code, Rocket, ArrowRight, Wrench, BookOpen } from 'lucide-react';
 
-export default function HeroSection({ onStartConfigurator, onExploreCatalog }) {
+export default function HeroSection({ onStartConfigurator, onExploreCatalog, onOpenStudyHub }) {
   const canvasRef = useRef(null);
   const [typedText, setTypedText] = useState('');
   const slogan = "Transforming Engineering Ideas into Reality...";
@@ -327,6 +327,36 @@ export default function HeroSection({ onStartConfigurator, onExploreCatalog }) {
           >
             DIY Project Builder
             <ArrowRight size={18} />
+          </button>
+          
+          <button 
+            onClick={onOpenStudyHub}
+            style={{
+              padding: '0.85rem 1.75rem',
+              borderRadius: '30px',
+              fontSize: '1rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+              background: 'linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%)',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#fff',
+              boxShadow: '0 0 15px rgba(139, 92, 246, 0.4)',
+              transition: 'transform var(--transition-fast), box-shadow var(--transition-fast)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 0 25px rgba(139, 92, 246, 0.7)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(139, 92, 246, 0.4)';
+            }}
+          >
+            <BookOpen size={18} />
+            VTU Notes / Study Hub
           </button>
           
           <button 

@@ -11,11 +11,13 @@ import CircuitBot from './components/CircuitBot';
 import WhatsAppButton from './components/WhatsAppButton';
 import AdSenseUnit from './components/AdSenseUnit';
 import Footer from './components/Footer';
+import StudyHubModal from './components/StudyHubModal';
 
 export default function App() {
   const [theme, setTheme] = useState('dark');
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isStudyHubOpen, setIsStudyHubOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
 
   // Sync theme attribute with DOM
@@ -101,6 +103,7 @@ export default function App() {
         toggleCart={() => setIsCartOpen(!isCartOpen)} 
         activeTab={activeTab}
         setActiveTab={scrollToSection}
+        onOpenStudyHub={() => setIsStudyHubOpen(true)}
       />
 
       {/* Main Content Sections */}
@@ -109,6 +112,7 @@ export default function App() {
         <HeroSection 
           onStartConfigurator={() => scrollToSection('builder')} 
           onExploreCatalog={() => scrollToSection('projects')} 
+          onOpenStudyHub={() => setIsStudyHubOpen(true)}
         />
 
         {/* Services Grid Section */}
@@ -154,6 +158,12 @@ export default function App() {
         cart={cart}
         onRemoveFromCart={handleRemoveFromCart}
         onClearCart={handleClearCart}
+      />
+
+      {/* Study Hub Modal Portal */}
+      <StudyHubModal 
+        isOpen={isStudyHubOpen} 
+        onClose={() => setIsStudyHubOpen(false)} 
       />
     </div>
   );

@@ -7,7 +7,8 @@ export default function Navbar({
   cartCount, 
   toggleCart, 
   activeTab, 
-  setActiveTab 
+  setActiveTab,
+  onOpenStudyHub
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -18,10 +19,16 @@ export default function Navbar({
     { id: 'builder', label: 'DIY Configurator' },
     { id: 'gallery', label: 'Gallery' },
     { id: 'blog', label: 'Hackathon Guide' },
+    { id: 'study-hub', label: 'VTU Study Hub' },
     { id: 'contact', label: 'Contact Us' }
   ];
 
   const handleNavClick = (id) => {
+    if (id === 'study-hub') {
+      onOpenStudyHub();
+      setIsOpen(false);
+      return;
+    }
     setActiveTab(id);
     setIsOpen(false);
     
