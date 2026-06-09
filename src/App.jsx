@@ -5,6 +5,7 @@ import ServicesSection from './components/ServicesSection';
 import ProjectExplorer from './components/ProjectExplorer';
 import ProjectBuilder from './components/ProjectBuilder';
 import GallerySection from './components/GallerySection';
+import HackathonGuide from './components/HackathonGuide';
 import PaymentGateway from './components/PaymentGateway';
 import CircuitBot from './components/CircuitBot';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -24,7 +25,7 @@ export default function App() {
 
   // Scroll observer to update Navbar highlight automatically based on viewport scroll position
   useEffect(() => {
-    const sections = ['home', 'services', 'projects', 'builder', 'gallery', 'contact'];
+    const sections = ['home', 'services', 'projects', 'builder', 'gallery', 'blog', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -127,7 +128,11 @@ export default function App() {
 
         {/* Gallery Section */}
         <GallerySection />
+
+        {/* Hackathon Guide Blog Section */}
+        <HackathonGuide />
       </main>
+
 
 
       {/* Floating WhatsApp Chat Button */}

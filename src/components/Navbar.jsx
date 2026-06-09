@@ -17,6 +17,7 @@ export default function Navbar({
     { id: 'projects', label: 'Projects' },
     { id: 'builder', label: 'DIY Configurator' },
     { id: 'gallery', label: 'Gallery' },
+    { id: 'blog', label: 'Hackathon Guide' },
     { id: 'contact', label: 'Contact Us' }
   ];
 
