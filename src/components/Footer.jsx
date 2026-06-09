@@ -150,7 +150,7 @@ export default function Footer({ onOpenOwnerConsole }) {
  
             {/* Instagram */}
             <a 
-              href="https://instagram.com/circuitcraft_studio"
+              href="https://instagram.com/circuitcraftstudio"
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -165,7 +165,7 @@ export default function Footer({ onOpenOwnerConsole }) {
               className="hover-cyan-link"
             >
               <InstagramIcon size={16} style={{ color: 'var(--accent-cyan)' }} />
-              @circuitcraft_studio
+              @circuitcraftstudio
             </a>
           </div>
         </div>
