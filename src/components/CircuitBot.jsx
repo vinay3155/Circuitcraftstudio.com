@@ -25,6 +25,13 @@ export default function CircuitBot({ onOpenBuilder, onOpenProjects }) {
     }
   }, [messages, isOpen]);
 
+  // Open chatbot drawer on external trigger event
+  useEffect(() => {
+    const handleOpenBot = () => setIsOpen(true);
+    window.addEventListener('open-circuitbot', handleOpenBot);
+    return () => window.removeEventListener('open-circuitbot', handleOpenBot);
+  }, []);
+
   const dialogTree = {
     electronics: {
       text: "Excellent! Electronics is the heart of hardware. What microcontroller/domain are you most interested in?",

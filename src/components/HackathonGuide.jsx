@@ -1,9 +1,22 @@
-import React, { useState } from 'react';
-import { Award, Map, Lightbulb, FolderOpen, FileText, History, Copy, Check } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Award, Map, Lightbulb, FolderOpen, FileText, History, Copy, Check, Search, X, BookOpen, Layers, MessageCircle, ExternalLink, Cpu } from 'lucide-react';
 
 export default function HackathonGuide() {
   const [activeTab, setActiveTab] = useState('winning');
   const [copiedText, setCopiedText] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsSearchFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleCopy = (text, key) => {
     navigator.clipboard.writeText(text);
@@ -77,6 +90,193 @@ Production cost: ₹950. Target price: ₹1499. Payback period: 6 months.
 # SLIDE 6: Future Scope & Roadmap
 Edge-AI prediction of soil decay, mesh network compatibility.`;
 
+  const suggestionsDb = [
+    {
+      id: 'blueprint',
+      label: "The Winner's Blueprint: Hackathon Domination",
+      category: "Guides & Roadmaps",
+      actionType: "tab",
+      target: "winning",
+      description: "Learn team dynamics, idea validation, and pitching.",
+      keywords: ["win", "hackathon", "blueprint", "team", "idea", "validation", "pitching", "presentation"]
+    },
+    {
+      id: 'roadmap-tab',
+      label: "Hour-by-Hour Hackathon Roadmap",
+      category: "Guides & Roadmaps",
+      actionType: "tab",
+      target: "roadmap",
+      description: "A complete 36-hour guide from kickoff to pitch rehearsal.",
+      keywords: ["roadmap", "schedule", "timeline", "hours", "time", "preparation"]
+    },
+    {
+      id: 'ideas-tab',
+      label: "High-Scoring Project Categories",
+      category: "Guides & Roadmaps",
+      actionType: "tab",
+      target: "ideas",
+      description: "Arduino, IoT, AI, Smart Ag, and Healthcare project ideas.",
+      keywords: ["ideas", "projects", "arduino", "iot", "ai", "agriculture", "healthcare", "robotics"]
+    },
+    {
+      id: 'resources-tab',
+      label: "Project Report & Git Templates",
+      category: "Guides & Roadmaps",
+      actionType: "tab",
+      target: "resources",
+      description: "GitHub structure and project synopsis document templates.",
+      keywords: ["templates", "resources", "github", "synopsis", "report", "document", "structure"]
+    },
+    {
+      id: 'experience-tab',
+      label: "My Experience: Mistakes to Avoid",
+      category: "Guides & Roadmaps",
+      actionType: "tab",
+      target: "experience",
+      description: "Lessons learned, over-engineering warnings, and design tips.",
+      keywords: ["experience", "mistakes", "lessons", "tips", "design", "learned"]
+    },
+    {
+      id: 'slides-tab',
+      label: "Winning Pitch Deck Slide Outline",
+      category: "Guides & Roadmaps",
+      actionType: "tab",
+      target: "slides",
+      description: "6 essential slides: problem, solution, architecture, demo, market, roadmap.",
+      keywords: ["pitch", "deck", "slide", "template", "presentation", "outline", "pitching"]
+    },
+    {
+      id: 'git-structure',
+      label: "Standard Git Directory Structure",
+      category: "Free Templates",
+      actionType: "tab",
+      target: "resources",
+      description: "Organize firmware, hardware, and client app code cleanly.",
+      keywords: ["git", "github", "structure", "folders", "code", "directory"]
+    },
+    {
+      id: 'synopsis-template',
+      label: "Project Synopsis & Documentation Layout",
+      category: "Free Templates",
+      actionType: "tab",
+      target: "resources",
+      description: "Abstract, block diagram, components, and cost estimation outline.",
+      keywords: ["synopsis", "report", "documentation", "abstract", "layout", "format"]
+    },
+    {
+      id: 'project-kits',
+      label: "Ready-to-Deploy Project Kits (₹500 - ₹2500)",
+      category: "Product Solutions",
+      actionType: "scroll",
+      target: "projects",
+      description: "Browse 100% working engineering projects in ECE, IoT, AI & ML.",
+      keywords: ["kits", "projects", "solutions", "buy", "working", "models", "electronics", "price"]
+    },
+    {
+      id: 'custom-configurator',
+      label: "Tailored DIY Custom Prototype Builder",
+      category: "Product Solutions",
+      actionType: "scroll",
+      target: "builder",
+      description: "Select MCU, sensor modules, and IoT services for direct quote.",
+      keywords: ["diy", "builder", "configurator", "custom", "quote", "configure", "tailor"]
+    },
+    {
+      id: 'whatsapp-expert',
+      label: "WhatsApp Chat: Hackathon Project Mentor",
+      category: "Live Expert Help",
+      actionType: "whatsapp",
+      target: "Hello CircuitCraft Studio! 🚀 I'm preparing for a hackathon and need project mentoring support. Can you help me?",
+      description: "Stuck with sensor coding, wiring issues, or API integration? Connect with our engineers.",
+      keywords: ["whatsapp", "expert", "mentor", "help", "support", "chat", "calibration", "debugging"]
+    },
+    {
+      id: 'circuitbot-guide',
+      label: "CircuitBot AI Project Assistant",
+      category: "Live Expert Help",
+      actionType: "bot",
+      target: "",
+      description: "Instantly search code boilerplates, database schemas, or branch guides.",
+      keywords: ["bot", "circuitbot", "ai", "assistant", "chat", "boilerplates", "schemas"]
+    }
+  ];
+
+  const handleSuggestionSelect = (item) => {
+    setSearchQuery('');
+    setIsSearchFocused(false);
+
+    if (item.actionType === 'tab') {
+      setActiveTab(item.target);
+      const element = document.getElementById('blog');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else if (item.actionType === 'scroll') {
+      const element = document.getElementById(item.target);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else if (item.actionType === 'whatsapp') {
+      const text = `${item.target}`;
+      window.open(`https://api.whatsapp.com/send?phone=918123265315&text=${encodeURIComponent(text)}`, '_blank');
+    } else if (item.actionType === 'bot') {
+      window.dispatchEvent(new CustomEvent('open-circuitbot'));
+    }
+  };
+
+  const filteredSuggestions = searchQuery.trim() === ''
+    ? suggestionsDb.filter(item => 
+        ['blueprint', 'roadmap-tab', 'slides-tab', 'whatsapp-expert', 'circuitbot-guide'].includes(item.id)
+      )
+    : suggestionsDb.filter(item => {
+        const query = searchQuery.toLowerCase();
+        return (
+          item.label.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query) ||
+          item.keywords.some(kw => kw.toLowerCase().includes(query))
+        );
+      });
+
+  const groupedSuggestions = filteredSuggestions.reduce((groups, item) => {
+    const category = item.category;
+    if (!groups[category]) {
+      groups[category] = [];
+    }
+    groups[category].push(item);
+    return groups;
+  }, {});
+
+  const getCategoryIcon = (category) => {
+    switch (category) {
+      case 'Guides & Roadmaps':
+        return <BookOpen size={14} style={{ color: 'var(--accent-cyan)' }} />;
+      case 'Free Templates':
+        return <FileText size={14} style={{ color: 'var(--accent-blue)' }} />;
+      case 'Product Solutions':
+        return <Layers size={14} style={{ color: 'var(--accent-green)' }} />;
+      case 'Live Expert Help':
+        return <MessageCircle size={14} style={{ color: 'var(--accent-purple)' }} />;
+      default:
+        return <Lightbulb size={14} style={{ color: 'var(--accent-yellow)' }} />;
+    }
+  };
+
+  const getActionBadge = (actionType) => {
+    switch (actionType) {
+      case 'tab':
+        return <span className="search-action-badge badge-tab">Switch Tab</span>;
+      case 'scroll':
+        return <span className="search-action-badge badge-scroll">Scroll to Section</span>;
+      case 'whatsapp':
+        return <span className="search-action-badge badge-whatsapp">WhatsApp</span>;
+      case 'bot':
+        return <span className="search-action-badge badge-bot">Open Chat</span>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <section 
       id="blog" 
@@ -127,6 +327,67 @@ Edge-AI prediction of soil decay, mesh network compatibility.`;
         >
           Comprehensive roadmaps, verified project lists, and copyable slide structures to guide engineering students to victory.
         </p>
+      </div>
+
+      {/* Dynamic Search & Suggestion Engine */}
+      <div className="search-wrapper" ref={searchRef}>
+        <div className="search-bar-container">
+          <Search size={18} style={{ color: isSearchFocused ? 'var(--accent-cyan)' : 'var(--text-muted)', transition: 'color 0.2s' }} />
+          <input
+            type="text"
+            className="search-input-field"
+            placeholder="Search guides, roadmaps, templates, or kits (e.g. 'how to win', 'pitch', 'IoT')..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0.25rem' }}
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+
+        {/* Suggestion Dropdown Panel */}
+        {isSearchFocused && (
+          <div className="search-dropdown-menu">
+            {Object.keys(groupedSuggestions).length > 0 ? (
+              Object.entries(groupedSuggestions).map(([category, items]) => (
+                <div key={category} style={{ marginBottom: '0.75rem' }}>
+                  <div className="search-category-title">
+                    {getCategoryIcon(category)}
+                    {category}
+                  </div>
+                  {items.map((item) => (
+                    <div
+                      key={item.id}
+                      className="search-suggestion-item"
+                      onMouseDown={() => handleSuggestionSelect(item)}
+                    >
+                      <div className="search-item-left">
+                        <div className="search-item-info">
+                          <span className="search-item-title">{item.label}</span>
+                          <span className="search-item-desc">{item.description}</span>
+                        </div>
+                      </div>
+                      {getActionBadge(item.actionType)}
+                    </div>
+                  ))}
+                </div>
+              ))
+            ) : (
+              <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                🔍 No guides or solutions found for "{searchQuery}".<br />
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.5rem' }}>
+                  Try searching for: <strong>roadmap</strong>, <strong>pitch</strong>, <strong>templates</strong>, <strong>IoT</strong>, or <strong>kits</strong>.
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Grid Layout: Tabs Navigation + Content Display */}
@@ -488,7 +749,309 @@ Edge-AI prediction of soil decay, mesh network compatibility.`;
         </div>
       </div>
 
+      {/* 🔧 Hackathon Accelerator Suggested Resources */}
+      <div className="accelerator-container">
+        <h3 className="accelerator-title">
+          🚀 Hackathon Winner's Accelerator Pack
+        </h3>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', maxWidth: '600px', margin: '-0.5rem auto 2.5rem auto', lineHeight: '1.5' }}>
+          Accelerate your development cycle, avoid simple design flaws, and ensure a working physical prototype before judging.
+        </p>
+
+        <div className="accelerator-grid">
+          {/* Card 1: Ready-made Kits */}
+          <div className="glass-panel accelerator-card" style={{ borderLeft: '3px solid var(--accent-green)' }}>
+            <div className="accelerator-card-icon" style={{ background: 'rgba(16, 185, 129, 0.05)', borderColor: 'var(--accent-green)', color: 'var(--accent-green)' }}>
+              <Layers size={20} />
+            </div>
+            <h4 className="accelerator-card-title">Pre-Built Project Kits</h4>
+            <p className="accelerator-card-desc">
+              Don't build from scratch. Save time with 100% verified and tested physical project solutions. Complete with documentation and firmware.
+            </p>
+            <button 
+              className="accelerator-card-btn"
+              onClick={() => {
+                const el = document.getElementById('projects');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Browse Solutions (₹500 - ₹2500) <ExternalLink size={14} style={{ display: 'inline' }} />
+            </button>
+          </div>
+
+          {/* Card 2: Custom Configurator */}
+          <div className="glass-panel accelerator-card" style={{ borderLeft: '3px solid var(--accent-cyan)' }}>
+            <div className="accelerator-card-icon" style={{ background: 'rgba(0, 229, 255, 0.05)', borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' }}>
+              <Cpu size={20} />
+            </div>
+            <h4 className="accelerator-card-title">DIY Custom Prototype</h4>
+            <p className="accelerator-card-desc">
+              Have specific problem statements? Use our step-by-step configurator to select microcontrollers, sensor arrays, and IoT cloud platforms.
+            </p>
+            <button 
+              className="accelerator-card-btn"
+              onClick={() => {
+                const el = document.getElementById('builder');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Start Custom Configurator <ExternalLink size={14} style={{ display: 'inline' }} />
+            </button>
+          </div>
+
+          {/* Card 3: WhatsApp Live Support */}
+          <div className="glass-panel accelerator-card" style={{ borderLeft: '3px solid var(--accent-purple)' }}>
+            <div className="accelerator-card-icon" style={{ background: 'rgba(139, 92, 246, 0.05)', borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)' }}>
+              <MessageCircle size={20} />
+            </div>
+            <h4 className="accelerator-card-title">1-on-1 Expert Support</h4>
+            <p className="accelerator-card-desc">
+              Stuck calibrating a sensor or running into compilation errors? Get live troubleshooting from our experienced engineering mentors.
+            </p>
+            <button 
+              className="accelerator-card-btn"
+              onClick={() => {
+                const text = "Hello CircuitCraft Studio! 🚀 I'm participating in a hackathon and need urgent hardware/code support for my prototype.";
+                window.open(`https://api.whatsapp.com/send?phone=918123265315&text=${encodeURIComponent(text)}`, '_blank');
+              }}
+            >
+              Chat with Project Expert <ExternalLink size={14} style={{ display: 'inline' }} />
+            </button>
+          </div>
+
+          {/* Card 4: CircuitBot AI */}
+          <div className="glass-panel accelerator-card" style={{ borderLeft: '3px solid var(--accent-blue)' }}>
+            <div className="accelerator-card-icon" style={{ background: 'rgba(59, 130, 246, 0.05)', borderColor: 'var(--accent-blue)', color: 'var(--accent-blue)' }}>
+              <BookOpen size={20} />
+            </div>
+            <h4 className="accelerator-card-title">CircuitBot AI Assistant</h4>
+            <p className="accelerator-card-desc">
+              Interact with our AI chatbot to find components, project structures, and branch guidance mapped to your specific domain.
+            </p>
+            <button 
+              className="accelerator-card-btn"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-circuitbot'))}
+            >
+              Launch Chat Assistant <ExternalLink size={14} style={{ display: 'inline' }} />
+            </button>
+          </div>
+        </div>
+      </div>
+
       <style>{`
+        .search-wrapper {
+          position: relative;
+          max-width: 650px;
+          margin: 0 auto 3rem auto;
+          z-index: 40;
+        }
+
+        .search-bar-container {
+          display: flex;
+          align-items: center;
+          position: relative;
+          background: rgba(17, 24, 39, 0.65);
+          backdrop-filter: blur(8px);
+          border: 1px solid var(--border-color);
+          border-radius: 30px;
+          padding: 0.35rem 1rem 0.35rem 1.5rem;
+          transition: all var(--transition-normal);
+        }
+
+        .search-bar-container:focus-within {
+          border-color: var(--accent-cyan);
+          box-shadow: var(--glow-cyan);
+        }
+
+        .search-input-field {
+          flex: 1;
+          background: transparent;
+          border: none;
+          color: var(--text-primary);
+          font-size: 1rem;
+          padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+          outline: none;
+          font-family: var(--font-sans);
+        }
+
+        .search-input-field::placeholder {
+          color: var(--text-muted);
+        }
+
+        .search-dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          margin-top: 0.75rem;
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
+          border-radius: 16px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+          max-height: 420px;
+          overflow-y: auto;
+          z-index: 50;
+          padding: 1rem 0;
+          animation: slide-in 0.2s ease;
+        }
+
+        .search-category-title {
+          font-size: 0.7rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          padding: 0.5rem 1.25rem 0.25rem 1.25rem;
+          letter-spacing: 0.05em;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .search-suggestion-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1.25rem;
+          cursor: pointer;
+          transition: all var(--transition-fast);
+          border-left: 3px solid transparent;
+        }
+
+        .search-suggestion-item:hover {
+          background: rgba(0, 229, 255, 0.04);
+          border-left-color: var(--accent-cyan);
+        }
+
+        .search-item-left {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          text-align: left;
+        }
+
+        .search-item-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .search-item-title {
+          color: var(--text-primary);
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+
+        .search-item-desc {
+          color: var(--text-secondary);
+          font-size: 0.75rem;
+          margin-top: 0.15rem;
+        }
+
+        .search-action-badge {
+          font-size: 0.65rem;
+          font-weight: 600;
+          padding: 0.2rem 0.5rem;
+          border-radius: 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .badge-tab {
+          background: rgba(0, 229, 255, 0.1);
+          color: var(--accent-cyan);
+          border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .badge-scroll {
+          background: rgba(59, 130, 246, 0.1);
+          color: var(--accent-blue);
+          border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .badge-whatsapp {
+          background: rgba(16, 185, 129, 0.1);
+          color: var(--accent-green);
+          border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-bot {
+          background: rgba(139, 92, 246, 0.1);
+          color: var(--accent-purple);
+          border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        /* Hackathon Accelerator Cards */
+        .accelerator-container {
+          margin-top: 4rem;
+          border-top: 1px solid var(--border-color);
+          padding-top: 3.5rem;
+        }
+
+        .accelerator-title {
+          font-size: 1.75rem;
+          color: #fff;
+          margin-bottom: 2rem;
+          text-align: center;
+          font-family: var(--font-display);
+        }
+
+        .accelerator-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 1.5rem;
+        }
+
+        .accelerator-card {
+          padding: 1.75rem;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+          height: 100%;
+        }
+
+        .accelerator-card-icon {
+          width: 42px;
+          height: 42px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 1.25rem;
+          border: 1px solid;
+        }
+
+        .accelerator-card-title {
+          font-size: 1.1rem;
+          color: #fff;
+          margin-bottom: 0.5rem;
+        }
+
+        .accelerator-card-desc {
+          font-size: 0.85rem;
+          color: var(--text-secondary);
+          line-height: 1.5;
+          margin-bottom: 1.5rem;
+          flex: 1;
+        }
+
+        .accelerator-card-btn {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--accent-cyan);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+          padding: 0;
+          transition: color var(--transition-fast);
+        }
+
+        .accelerator-card-btn:hover {
+          color: #fff;
+        }
+
         .blog-layout {
           display: grid;
           grid-template-columns: 280px 1fr;
