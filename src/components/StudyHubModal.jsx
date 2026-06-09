@@ -327,31 +327,25 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
         left: 0,
         right: 0,
         bottom: 0,
-        background: 'rgba(10, 14, 23, 0.88)',
+        background: 'rgba(10, 14, 23, 0.95)',
         backdropFilter: 'blur(16px)',
         zIndex: 1000,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1.5rem',
-        animation: 'fade-in 0.25s ease-out'
+        padding: 0
       }}
       onClick={handleOutsideClick}
     >
       <div 
         ref={modalRef}
         style={{
-          width: '100%',
-          maxWidth: '1000px',
-          height: '90vh',
+          width: '100vw',
+          height: '100vh',
           background: 'var(--bg-secondary)',
-          border: '1px solid var(--border-color)',
-          borderRadius: '20px',
-          boxShadow: 'var(--glow-cyan-strong)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          animation: 'slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           position: 'relative'
         }}
       >
@@ -559,7 +553,7 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                     border: '1px solid var(--accent-cyan)'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                     <div>
                       <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.15rem 0.5rem', background: 'rgba(0, 229, 255, 0.1)', color: 'var(--accent-cyan)', borderRadius: '4px' }}>
                         {activeModuleNotes.subjectCode}
@@ -568,14 +562,36 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                         {activeModuleNotes.subjectName} - Module {activeModuleNotes.moduleIndex + 1} notes
                       </h5>
                     </div>
+
+                    <a
+                      href={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)}
+                      download={`${activeModuleNotes.subjectCode}_M${activeModuleNotes.moduleIndex + 1}.pdf`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="glow-btn"
+                      style={{
+                        padding: '0.45rem 1rem',
+                        borderRadius: '20px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        textDecoration: 'none',
+                        color: '#000',
+                        fontWeight: 700,
+                        boxShadow: 'var(--glow-cyan)'
+                      }}
+                    >
+                      <Download size={14} /> Download PDF
+                    </a>
                   </div>
 
                   {/* Embedded PDF Viewer Frame */}
-                  <div style={{ position: 'relative', width: '100%', minHeight: '520px', background: '#111827', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                  <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 350px)', minHeight: '580px', background: '#111827', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
                     <iframe 
                       src={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)} 
                       width="100%" 
-                      height="520px" 
+                      height="100%" 
                       style={{ border: 'none', background: '#fff' }} 
                       title="Notes PDF Viewer"
                     />
