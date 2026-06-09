@@ -21,6 +21,8 @@ export default function PaymentGateway({
   // UPI Timer State
   const [upiTimer, setUpiTimer] = useState(120);
   const [upiStatus, setUpiStatus] = useState('pending'); // pending, checking, success
+  const [utrNumber, setUtrNumber] = useState('');
+  const [utrError, setUtrError] = useState('');
 
   // Billing Form State
   const [billingInfo, setBillingInfo] = useState({
@@ -74,7 +76,9 @@ export default function PaymentGateway({
       college: currentBillingInfo.college || 'Not specified',
       shippingAddress: currentBillingInfo.address,
       itemsOrdered: itemDetailsText,
-      totalPaidAmount: `₹${totalCost.toLocaleString('en-IN')}`
+      totalPaidAmount: `₹${totalCost.toLocaleString('en-IN')}`,
+      paymentMethod: paymentMethod === 'upi' ? 'UPI' : 'Card',
+      utrNumber: paymentMethod === 'upi' ? utrNumber : 'N/A'
     };
 
     fetch('https://formsubmit.co/ajax/vinaynbodravla315@gmail.com', {
@@ -98,7 +102,8 @@ export default function PaymentGateway({
 
   const getWhatsAppLink = () => {
     const totalCost = cart.reduce((sum, item) => sum + item.price, 0);
-    const text = `Hello CircuitCraft Studio! 🚀\nI have just completed my order payment on your website.\n\n*Order ID:* ${orderId}\n*Customer:* ${billingInfo.fullName}\n*Phone:* ${billingInfo.phone}\n*Email:* ${billingInfo.email}\n*College:* ${billingInfo.college || 'N/A'}\n*Total Paid:* ₹${totalCost.toLocaleString('en-IN')}\n\n*Items Ordered:*${cart.map(item => `\n- ${item.title}`).join('')}\n\nPlease confirm my delivery. Thank you!`;
+    const paymentDetails = paymentMethod === 'upi' ? `\n*Payment Method:* UPI\n*UTR Number:* ${utrNumber}` : `\n*Payment Method:* Card`;
+    const text = `Hello CircuitCraft Studio! 🚀\nI have just completed my order payment on your website.\n\n*Order ID:* ${orderId}${paymentDetails}\n*Customer:* ${billingInfo.fullName}\n*Phone:* ${billingInfo.phone}\n*Email:* ${billingInfo.email}\n*College:* ${billingInfo.college || 'N/A'}\n*Total Paid:* ₹${totalCost.toLocaleString('en-IN')}\n\n*Items Ordered:*${cart.map(item => `\n- ${item.title}`).join('')}\n\nPlease confirm my delivery. Thank you!`;
     return `https://api.whatsapp.com/send?phone=918123265315&text=${encodeURIComponent(text)}`;
   };
 
@@ -136,7 +141,18 @@ export default function PaymentGateway({
     return `${mins}:${remaining < 10 ? '0' : ''}${remaining}`;
   };
 
-  const handleSimulateUpiPayment = () => {
+  const handleVerifyUpiPayment = () => {
+    if (utrNumber.length !== 12) {
+      setUtrError('Please enter a valid 12-digit UTR number.');
+      return;
+    }
+    
+    // Check if billing details are filled out
+    if (!billingInfo.fullName || !billingInfo.email || !billingInfo.phone || !billingInfo.address) {
+      alert('Please fill in your billing details on the left first!');
+      return;
+    }
+
     setUpiStatus('checking');
     setTimeout(() => {
       setUpiStatus('success');
@@ -578,24 +594,65 @@ export default function PaymentGateway({
                     </div>
 
                     {upiStatus === 'pending' && (
-                      <div>
-                        <div style={{ color: 'var(--accent-yellow)', fontSize: '0.9rem', fontWeight: 600, marginBottom: '1rem' }}>
+                      <div style={{ maxWidth: '280px', margin: '0 auto', textAlign: 'left' }}>
+                        <div style={{ color: 'var(--accent-yellow)', fontSize: '0.9rem', fontWeight: 600, marginBottom: '1rem', textAlign: 'center' }}>
                           Timer: {formatTimer(upiTimer)}
                         </div>
+                        
+                        <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.4rem' }}>
+                          Enter 12-Digit UPI UTR / Ref Number *
+                        </label>
+                        <input 
+                          type="text" 
+                          placeholder="e.g. 612345678901 (12 digits)" 
+                          value={utrNumber}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            if (val.length <= 12) {
+                              setUtrNumber(val);
+                              setUtrError('');
+                            }
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '0.6rem 0.75rem',
+                            borderRadius: '6px',
+                            background: 'rgba(255,255,255,0.03)',
+                            border: `1px solid ${utrError ? '#ef4444' : 'var(--border-color)'}`,
+                            color: '#fff',
+                            fontSize: '0.9rem',
+                            outline: 'none',
+                            marginBottom: '0.5rem',
+                            fontFamily: 'monospace',
+                            letterSpacing: '1px'
+                          }}
+                        />
+                        {utrError && (
+                          <span style={{ color: '#ef4444', fontSize: '0.75rem', display: 'block', marginBottom: '0.75rem' }}>
+                            {utrError}
+                          </span>
+                        )}
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.4' }}>
+                          Please scan the QR code above, make the payment, and enter your 12-digit bank reference UTR number to verify.
+                        </p>
+                        
                         <button
                           type="button"
-                          onClick={handleSimulateUpiPayment}
+                          onClick={handleVerifyUpiPayment}
                           style={{
-                            padding: '0.6rem 1.25rem',
-                            borderRadius: '20px',
-                            background: 'rgba(16, 185, 129, 0.1)',
-                            border: '1px solid var(--accent-green)',
-                            color: 'var(--accent-green)',
+                            width: '100%',
+                            padding: '0.75rem',
+                            borderRadius: '30px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
                             fontWeight: 600,
                             cursor: 'pointer'
                           }}
+                          className="glow-btn"
                         >
-                          Simulate Payment Received
+                          <ShieldCheck size={16} /> Submit & Verify
                         </button>
                       </div>
                     )}
@@ -884,6 +941,16 @@ export default function PaymentGateway({
                       <span>Subtotal:</span>
                       <span>₹{calculateSubtotal().toLocaleString('en-IN')}</span>
                     </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>Payment Method:</span>
+                      <span>{paymentMethod === 'upi' ? 'UPI' : 'Card'}</span>
+                    </div>
+                    {paymentMethod === 'upi' && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span>UTR Number:</span>
+                        <span>{utrNumber}</span>
+                      </div>
+                    )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #ccc', paddingTop: '8px', fontWeight: 'bold', fontSize: '16px' }}>
                       <span>Amount Paid:</span>
                       <span>₹{calculateSubtotal().toLocaleString('en-IN')}</span>
