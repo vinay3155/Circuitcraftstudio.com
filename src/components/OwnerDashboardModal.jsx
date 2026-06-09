@@ -19,7 +19,7 @@ const GitHubIcon = ({ size = 20, ...props }) => (
   </svg>
 );
 
-export default function OwnerDashboardModal({ isOpen, onClose }) {
+export default function OwnerDashboardModal({ isOpen, onClose, isRoadmapUnlocked, onToggleRoadmapUnlock }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [passcodeError, setPasscodeError] = useState('');
@@ -703,6 +703,33 @@ export default function OwnerDashboardModal({ isOpen, onClose }) {
                     <option key={sem} value={sem}>{sem}st Sem</option>
                   ))}
                 </select>
+              </div>
+
+              {/* Roadmap Bundle Bypass Toggle */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '180px' }}>
+                <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Roadmap Bypass State</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.35rem 0.5rem', height: '38px', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: isRoadmapUnlocked ? 'var(--accent-green)' : 'var(--text-muted)' }}>
+                    {isRoadmapUnlocked ? 'UNLOCKED' : 'LOCKED'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={onToggleRoadmapUnlock}
+                    style={{
+                      background: isRoadmapUnlocked ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 229, 255, 0.1)',
+                      border: '1px solid',
+                      borderColor: isRoadmapUnlocked ? '#ef4444' : 'var(--accent-cyan)',
+                      color: isRoadmapUnlocked ? '#ef4444' : 'var(--accent-cyan)',
+                      padding: '0.15rem 0.5rem',
+                      borderRadius: '4px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {isRoadmapUnlocked ? 'Lock' : 'Unlock'}
+                  </button>
+                </div>
               </div>
 
               {/* Token warning if not setup */}

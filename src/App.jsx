@@ -13,6 +13,8 @@ import AdSenseUnit from './components/AdSenseUnit';
 import Footer from './components/Footer';
 import StudyHubModal from './components/StudyHubModal';
 import OwnerDashboardModal from './components/OwnerDashboardModal';
+import RoadmapShowcase from './components/RoadmapShowcase';
+import RoadmapModal from './components/RoadmapModal';
 
 export default function App() {
   const [theme, setTheme] = useState('light');
@@ -21,6 +23,12 @@ export default function App() {
   const [isStudyHubOpen, setIsStudyHubOpen] = useState(false);
   const [isOwnerDashboardOpen, setIsOwnerDashboardOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+
+  // Roadmap State (loaded from localStorage)
+  const [isRoadmapUnlocked, setIsRoadmapUnlocked] = useState(() => {
+    return localStorage.getItem('cc_roadmap_unlocked') === 'true';
+  });
+  const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
 
   // Sync theme attribute with DOM
   useEffect(() => {
@@ -90,6 +98,30 @@ export default function App() {
     }
   };
 
+  const handleUnlockRoadmap = () => {
+    const exists = cart.some(item => item.id.startsWith('roadmap-bundle'));
+    if (!exists) {
+      const roadmapItem = {
+        id: 'roadmap-bundle',
+        title: 'VTU Placement & Career Roadmap Bundle',
+        price: 99,
+        category: 'Placement & Career',
+        microcontroller: 'Career Guide & Mentorship'
+      };
+      handleAddToCart(roadmapItem);
+    } else {
+      setIsCartOpen(true);
+    }
+  };
+
+  const handleToggleRoadmapUnlock = () => {
+    setIsRoadmapUnlocked(prev => {
+      const newState = !prev;
+      localStorage.setItem('cc_roadmap_unlocked', newState ? 'true' : 'false');
+      return newState;
+    });
+  };
+
   return (
     <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Background Graphic Orbs */}
@@ -126,6 +158,13 @@ export default function App() {
         {/* Categories Catalog Section */}
         <ProjectExplorer onAddToCart={handleAddToCart} />
 
+        {/* Placement & Career Roadmap Bundle Showcase */}
+        <RoadmapShowcase 
+          isUnlocked={isRoadmapUnlocked}
+          onUnlockClick={handleUnlockRoadmap}
+          onOpenClick={() => setIsRoadmapOpen(true)}
+        />
+
         {/* Custom Project DIY Configurator Section */}
         <ProjectBuilder onAddCustomToCart={handleAddToCart} />
 
@@ -138,8 +177,6 @@ export default function App() {
         {/* Hackathon Guide Blog Section */}
         <HackathonGuide />
       </main>
-
-
 
       {/* Floating WhatsApp Chat Button */}
       <WhatsAppButton />
@@ -160,6 +197,10 @@ export default function App() {
         cart={cart}
         onRemoveFromCart={handleRemoveFromCart}
         onClearCart={handleClearCart}
+        onUnlockRoadmap={() => {
+          setIsRoadmapUnlocked(true);
+          localStorage.setItem('cc_roadmap_unlocked', 'true');
+        }}
       />
 
       {/* Study Hub Modal Portal */}
@@ -172,6 +213,14 @@ export default function App() {
       <OwnerDashboardModal 
         isOpen={isOwnerDashboardOpen} 
         onClose={() => setIsOwnerDashboardOpen(false)} 
+        isRoadmapUnlocked={isRoadmapUnlocked}
+        onToggleRoadmapUnlock={handleToggleRoadmapUnlock}
+      />
+
+      {/* Roadmap Modal Portal */}
+      <RoadmapModal 
+        isOpen={isRoadmapOpen}
+        onClose={() => setIsRoadmapOpen(false)}
       />
     </div>
   );

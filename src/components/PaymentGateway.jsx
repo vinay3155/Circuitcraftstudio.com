@@ -6,7 +6,8 @@ export default function PaymentGateway({
   onClose, 
   cart, 
   onRemoveFromCart, 
-  onClearCart 
+  onClearCart,
+  onUnlockRoadmap
 }) {
   const [checkoutStep, setCheckoutStep] = useState('cart'); // cart, billing, success
   const [paymentMethod, setPaymentMethod] = useState('card'); // card, upi
@@ -97,6 +98,13 @@ export default function PaymentGateway({
   useEffect(() => {
     if (checkoutStep === 'success' && orderId && cart.length > 0) {
       sendNotifications(orderId, cart, billingInfo);
+      
+      // If the cart contains the roadmap bundle, trigger the unlock callback
+      if (cart.some(item => item.id.startsWith('roadmap-bundle'))) {
+        if (typeof onUnlockRoadmap === 'function') {
+          onUnlockRoadmap();
+        }
+      }
     }
   }, [checkoutStep]);
 
