@@ -45,7 +45,7 @@ export default function StudyHubModal({ isOpen, onClose }) {
 
   const handlePdfUpload = (subjectCode, moduleIndex, file) => {
     if (!file) return;
-    if (file.type !== 'application/pdf') {
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       alert("Please select a valid PDF file.");
       return;
     }
