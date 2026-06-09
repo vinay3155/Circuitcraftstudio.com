@@ -13,36 +13,36 @@ export default function ProjectBuilder({ onAddCustomToCart }) {
 
   // Data Definition
   const domains = [
-    { id: 'iot', name: 'IoT & Smart Systems', basePrice: 2000, description: 'Cloud connected sensors and logging.' },
-    { id: 'robotics', name: 'Robotics & Automation', basePrice: 2500, description: 'Motors, wheel chassis, path controllers.' },
-    { id: 'embedded', name: 'Embedded Systems', basePrice: 1500, description: 'Low-level RTOS, display interfaces, bare-metal.' },
-    { id: 'aiml', name: 'AI & Machine Learning', basePrice: 3000, description: 'Edge cameras, image sorting, local inference.' }
+    { id: 'iot', name: 'IoT & Smart Systems', basePrice: 500, description: 'Cloud connected sensors and logging.' },
+    { id: 'robotics', name: 'Robotics & Automation', basePrice: 600, description: 'Motors, wheel chassis, path controllers.' },
+    { id: 'embedded', name: 'Embedded Systems', basePrice: 400, description: 'Low-level RTOS, display interfaces, bare-metal.' },
+    { id: 'aiml', name: 'AI & Machine Learning', basePrice: 700, description: 'Edge cameras, image sorting, local inference.' }
   ];
 
   const microcontrollers = [
-    { id: 'arduino', name: 'Arduino Uno R3', price: 600, pinCount: 14, interface: 'I2C/SPI/UART' },
-    { id: 'esp32', name: 'ESP32 NodeMCU (WiFi+BT)', price: 950, pinCount: 36, interface: 'WiFi / BLE' },
-    { id: 'pico', name: 'Raspberry Pi Pico W', price: 700, pinCount: 26, interface: 'WiFi / SPI' },
-    { id: 'stm32', name: 'STM32 BluePill Cortex M3', price: 850, pinCount: 32, interface: 'DMA / SPI' }
+    { id: 'arduino', name: 'Arduino Uno R3', price: 150, pinCount: 14, interface: 'I2C/SPI/UART' },
+    { id: 'esp32', name: 'ESP32 NodeMCU (WiFi+BT)', price: 250, pinCount: 36, interface: 'WiFi / BLE' },
+    { id: 'pico', name: 'Raspberry Pi Pico W', price: 200, pinCount: 26, interface: 'WiFi / SPI' },
+    { id: 'stm32', name: 'STM32 BluePill Cortex M3', price: 220, pinCount: 32, interface: 'DMA / SPI' }
   ];
 
   const modules = [
-    { id: 'dht22', name: 'DHT22 Temp & Humidity Sensor', price: 250, type: 'sensor' },
-    { id: 'ultrasonic', name: 'HC-SR04 Ultrasonic Sensor', price: 200, type: 'sensor' },
-    { id: 'pir', name: 'PIR Motion Sensor', price: 180, type: 'sensor' },
-    { id: 'mq135', name: 'MQ-135 Gas & Air Quality Sensor', price: 300, type: 'sensor' },
-    { id: 'servo', name: 'SG90 Micro Servo Motor', price: 250, type: 'actuator' },
-    { id: 'dc_motors', name: 'Dual DC Motors + L298N Driver', price: 750, type: 'actuator' },
-    { id: 'oled', name: '0.96 inch I2C OLED Display', price: 350, type: 'display' },
-    { id: 'bluetooth', name: 'HC-05 Serial Bluetooth Module', price: 400, type: 'wireless' },
-    { id: 'solar', name: '5V Solar Panel + Charge Circuit', price: 850, type: 'power' }
+    { id: 'dht22', name: 'DHT22 Temp & Humidity Sensor', price: 60, type: 'sensor' },
+    { id: 'ultrasonic', name: 'HC-SR04 Ultrasonic Sensor', price: 50, type: 'sensor' },
+    { id: 'pir', name: 'PIR Motion Sensor', price: 40, type: 'sensor' },
+    { id: 'mq135', name: 'MQ-135 Gas & Air Quality Sensor', price: 70, type: 'sensor' },
+    { id: 'servo', name: 'SG90 Micro Servo Motor', price: 60, type: 'actuator' },
+    { id: 'dc_motors', name: 'Dual DC Motors + L298N Driver', price: 150, type: 'actuator' },
+    { id: 'oled', name: '0.96 inch I2C OLED Display', price: 80, type: 'display' },
+    { id: 'bluetooth', name: 'HC-05 Serial Bluetooth Module', price: 90, type: 'wireless' },
+    { id: 'solar', name: '5V Solar Panel + Charge Circuit', price: 200, type: 'power' }
   ];
 
   const services = [
-    { id: 'pcb', name: 'Custom PCB Layout Routing', price: 1200 },
-    { id: 'report', name: 'Synopsis & Standard Project Report', price: 1000 },
-    { id: 'casing', name: '3D Printed Structural Case Enclosure', price: 1500 },
-    { id: 'mentorship', name: '1-on-1 Zoom Mentorship Support (2 Hours)', price: 1800 }
+    { id: 'pcb', name: 'Custom PCB Layout Routing', price: 300 },
+    { id: 'report', name: 'Synopsis & Standard Project Report', price: 250 },
+    { id: 'casing', name: '3D Printed Structural Case Enclosure', price: 350 },
+    { id: 'mentorship', name: '1-on-1 Zoom Mentorship Support (2 Hours)', price: 400 }
   ];
 
   // Logic Calculations
