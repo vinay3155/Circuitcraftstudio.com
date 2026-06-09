@@ -12,12 +12,14 @@ import WhatsAppButton from './components/WhatsAppButton';
 import AdSenseUnit from './components/AdSenseUnit';
 import Footer from './components/Footer';
 import StudyHubModal from './components/StudyHubModal';
+import OwnerDashboardModal from './components/OwnerDashboardModal';
 
 export default function App() {
   const [theme, setTheme] = useState('dark');
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isStudyHubOpen, setIsStudyHubOpen] = useState(false);
+  const [isOwnerDashboardOpen, setIsOwnerDashboardOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
 
   // Sync theme attribute with DOM
@@ -149,7 +151,7 @@ export default function App() {
       />
 
       {/* Footer and Badges */}
-      <Footer />
+      <Footer onOpenOwnerConsole={() => setIsOwnerDashboardOpen(true)} />
 
       {/* Checkout Sidebar/Modal Portal */}
       <PaymentGateway 
@@ -164,6 +166,12 @@ export default function App() {
       <StudyHubModal 
         isOpen={isStudyHubOpen} 
         onClose={() => setIsStudyHubOpen(false)} 
+      />
+
+      {/* Owner Dashboard Modal Portal */}
+      <OwnerDashboardModal 
+        isOpen={isOwnerDashboardOpen} 
+        onClose={() => setIsOwnerDashboardOpen(false)} 
       />
     </div>
   );

@@ -23,7 +23,7 @@ const InstagramIcon = ({ size = 16, ...props }) => (
   </svg>
 );
 
-export default function Footer() {
+export default function Footer({ onOpenOwnerConsole }) {
   const [inquiryText, setInquiryText] = useState('');
 
   const badges = [
@@ -88,7 +88,7 @@ export default function Footer() {
           </div>
         ))}
       </div>
-
+ 
       {/* 2. Contact details & Quick Inquiry Form */}
       <div 
         id="contact"
@@ -110,7 +110,7 @@ export default function Footer() {
           <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', maxWidth: '450px', lineHeight: '1.6' }}>
             We specialize in hardware prototyping, embedded firmware development, and complete research project mentoring. Let us turn your ideas into functional working models.
           </p>
-
+ 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
             {/* Phone */}
             <a 
@@ -129,7 +129,7 @@ export default function Footer() {
               <Phone size={16} style={{ color: 'var(--accent-cyan)' }} />
               +91 81232 65315
             </a>
-
+ 
             {/* Email */}
             <a 
               href="mailto:vinaynbodravla315@gmail.com"
@@ -147,7 +147,7 @@ export default function Footer() {
               <Mail size={16} style={{ color: 'var(--accent-cyan)' }} />
               vinaynbodravla315@gmail.com
             </a>
-
+ 
             {/* Instagram */}
             <a 
               href="https://instagram.com/circuitcraft_studio"
@@ -169,7 +169,7 @@ export default function Footer() {
             </a>
           </div>
         </div>
-
+ 
         {/* Quick Inquiry Email Trigger */}
         <div>
           <h4 style={{ color: '#fff', fontSize: '1.1rem', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>
@@ -178,7 +178,7 @@ export default function Footer() {
           <p style={{ fontSize: '0.8rem', marginBottom: '1rem' }}>
             Have a custom requirement? Describe your project below and click send to query our developer mail channel.
           </p>
-
+ 
           <form onSubmit={handleInquirySubmit} style={{ display: 'flex', gap: '0.5rem' }}>
             <input 
               type="text" 
@@ -221,7 +221,7 @@ export default function Footer() {
           </form>
         </div>
       </div>
-
+ 
       {/* 3. Bottom Credits */}
       <div 
         style={{
@@ -237,7 +237,14 @@ export default function Footer() {
         className="footer-bottom"
       >
         <span>&copy; {new Date().getFullYear()} CircuitCraft Studio. All rights reserved.</span>
-        <div style={{ display: 'flex', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          <span 
+            onClick={onOpenOwnerConsole} 
+            style={{ cursor: 'pointer', color: 'var(--text-muted)' }} 
+            className="hover-cyan-link"
+          >
+            🛡️ Owner Console
+          </span>
           <span>QUALITY WORK</span>
           <span>ON-TIME DELIVERY</span>
           <span>INNOVATION FIRST</span>
