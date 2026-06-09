@@ -1,13 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, BookOpen, FileText, Check, Copy, ExternalLink, Download, MessageCircle, ArrowRight, Award, Cpu, Star } from 'lucide-react';
+import { X, BookOpen, FileText, Check, Copy, ExternalLink, Download, Upload, MessageCircle, ArrowRight, Award, Cpu, Star, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function StudyHubModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('notes'); // 'notes' or 'placement'
   const [selectedBranch, setSelectedBranch] = useState('CSE');
   const [selectedSem, setSelectedSem] = useState('3');
-  const [expandedQA, setExpandedQA] = useState(null);
+  const [expandedSubject, setExpandedSubject] = useState(null); // track expanded subject code
+  const [activeModuleNotes, setActiveModuleNotes] = useState(null); // { subjectCode, subjectName, moduleIndex }
   const [copiedText, setCopiedText] = useState('');
+  const [isImporterOpen, setIsImporterOpen] = useState(false);
+  const [jsonInput, setJsonInput] = useState('');
+  const [importError, setImportError] = useState('');
+  const [importSuccess, setImportSuccess] = useState(false);
+  
+  // Custom imported notes database from localStorage
+  const [customNotes, setCustomNotes] = useState({});
+
   const modalRef = useRef(null);
+
+  // Load custom notes on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('circuitcraft_custom_notes');
+      if (saved) {
+        setCustomNotes(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error("Failed to load custom notes from localStorage", e);
+    }
+  }, []);
 
   // Close on Escape key press
   useEffect(() => {
@@ -37,170 +58,375 @@ export default function StudyHubModal({ isOpen, onClose }) {
     setTimeout(() => setCopiedText(''), 2000);
   };
 
+  const handleJsonImport = (inputString) => {
+    try {
+      setImportError('');
+      setImportSuccess(false);
+      
+      if (!inputString.trim()) {
+        setImportError('Please enter valid JSON string content.');
+        return;
+      }
+      
+      const parsed = JSON.parse(inputString);
+      
+      // Update state and save
+      const merged = { ...customNotes, ...parsed };
+      setCustomNotes(merged);
+      localStorage.setItem('circuitcraft_custom_notes', JSON.stringify(merged));
+      
+      setImportSuccess(true);
+      setJsonInput('');
+      setTimeout(() => {
+        setImportSuccess(false);
+        setIsImporterOpen(false);
+      }, 1500);
+    } catch (e) {
+      setImportError(`Invalid JSON format: ${e.message}`);
+    }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      handleJsonImport(event.target.result);
+    };
+    reader.onerror = () => {
+      setImportError('Failed to read notes file.');
+    };
+    reader.readAsText(file);
+  };
+
+  const handleClearCustomNotes = () => {
+    if (window.confirm("Are you sure you want to clear all imported custom notes?")) {
+      setCustomNotes({});
+      localStorage.removeItem('circuitcraft_custom_notes');
+    }
+  };
+
   if (!isOpen) return null;
 
-  // VTU Syllabus and Q&A Database
-  const vtuNotesDb = {
+  // VTU Syllabus and Subject Database based on user details
+  const vtuSubjectsDb = {
     CSE: {
-      1: [
-        {
-          code: "21PHY12",
-          name: "Engineering Physics",
-          modules: [
-            "Module 1: Oscillations and Waves (SHM, Damped & Forced Oscillations, Shock waves)",
-            "Module 2: Lasers & Optical Fibers (Einstein coefficients, Population inversion, Optical fibers TIR)",
-            "Module 3: Quantum Mechanics (De-Broglie hypothesis, Uncertainty principle, Schrodinger Wave Equation)",
-            "Module 4: Electrical Properties (Free electron theory, Band theory, Hall effect)",
-            "Module 5: Physics of Semiconductor Devices (Fermi level, p-n junction diode, Solar cells)"
-          ],
-          qa: [
-            { q: "Derive Schrodinger's time-independent wave equation.", a: "Schrodinger's time-independent equation is derived by substituting de-Broglie's wavelength (λ = h/p) into the classical wave function and applying conservation of total energy (E = K + V). The resulting equation is: -ħ²/(2m) ∇²Ψ + VΨ = EΨ, where ħ is h/2π, m is mass, V is potential energy, and E is total energy." },
-            { q: "Explain the working principle of Optical Fibers.", a: "Optical fibers operate on the principle of Total Internal Reflection (TIR). Light launched into the core propagates by continuously bouncing off the cladding boundary. For TIR to occur: 1) The core refractive index (n1) must be greater than cladding (n2), and 2) The angle of incidence must exceed the critical angle θc = sin⁻¹(n2/n1)." }
-          ]
-        },
-        {
-          code: "21MAT11",
-          name: "Engineering Mathematics-I",
-          modules: [
-            "Module 1: Calculus (Polar curves, Angle between radius vector and tangent, Curvature)",
-            "Module 2: Series Expansion & Multivariable Calculus (Taylor's series, Maclaurin's series, Partial derivatives)",
-            "Module 3: Vector Calculus (Gradient, Divergence, Curl, Solenoidal and Irrotational vectors)",
-            "Module 4: Linear Algebra (System of linear equations, Rank of matrix, Gauss-elimination, Eigenvalues)",
-            "Module 5: Differential Equations (Linear ODEs of first order, Bernoulli's equations, Orthogonal trajectories)"
-          ],
-          qa: [
-            { q: "What is the condition for a vector field to be Solenoidal or Irrotational?", a: "A vector field F is Solenoidal if its divergence is zero: ∇ · F = 0 (net flux through any closed surface is zero). F is Irrotational if its curl is zero: ∇ × F = 0 (the field has no rotational or vortex component)." }
-          ]
-        }
-      ],
       3: [
-        {
-          code: "21CS32",
-          name: "Data Structures and Applications",
-          modules: [
-            "Module 1: Pointers & Memory Management (malloc, calloc, realloc, structures, representations)",
-            "Module 2: Stacks & Queues (Push/Pop operations, Infix to Postfix conversion, Circular & Double Ended Queues)",
-            "Module 3: Linked Lists (Singly, Doubly, and Circular linked lists operations, insertion, deletion, polynomial addition)",
-            "Module 4: Trees (Binary Tree traversals, Binary Search Tree insertion/deletion, AVL Trees, Threaded Binary Trees)",
-            "Module 5: Graphs & Hashing (Adjacency Matrix/Lists, BFS and DFS traversals, Hash functions, Collision resolution)"
-          ],
-          qa: [
-            { q: "Write a C function to reverse a singly linked list.", a: "To reverse a list, we traverse it and adjust the pointers: \n\nNode* reverse(Node* head) {\n  Node *prev = NULL, *current = head, *next = NULL;\n  while (current != NULL) {\n    next = current->next;\n    current->next = prev;\n    prev = current;\n    current = next;\n  }\n  return prev;\n}" },
-            { q: "Compare Binary Search Trees (BST) and AVL Trees.", a: "A Binary Search Tree (BST) has nodes ordered such that left child < root < right child. However, a BST can become skewed, leading to O(N) lookup time. An AVL tree is a self-balancing BST where the height difference (balance factor) between left and right subtrees is at most 1, guaranteeing O(log N) lookup time for all operations via rotations." }
-          ]
-        },
-        {
-          code: "21CS33",
-          name: "Analog and Digital Electronics",
-          modules: [
-            "Module 1: Optoelectronic Devices & Wave Shaping (Photo diodes, solar cells, Clippers and Clampers)",
-            "Module 2: Combinational Logic Circuits (Karnaugh Maps simplification, Quine-McCluskey method, multiplexers)",
-            "Module 3: Decoders & Adders (Decoders, encoders, Full Adder, Multiplexers, Programmable Logic Arrays)",
-            "Module 4: Latches & Flip-Flops (SR, JK, D, and T Flip-Flops, Master-Slave configuration)",
-            "Module 5: Counters & Shift Registers (Asynchronous/Synchronous Counters, Ring Counter, Johnson Counter)"
-          ],
-          qa: [
-            { q: "Explain JK Flip-Flop race-around condition and how to solve it.", a: "A race-around condition occurs in JK Flip-Flops when J=1 and K=1, and the clock pulse width (tp) is larger than the propagation delay of the flip-flop (td). The output toggles repeatedly within a single clock cycle, resulting in an unpredictable final state. Solutions: 1) Reduce clock pulse width (edge-triggering), 2) Use a Master-Slave JK Flip-Flop configuration." }
-          ]
-        }
+        { code: "BCS301", name: "Mathematics for Computer Science" },
+        { code: "BCS302", name: "Digital Design and Computer Organization" },
+        { code: "BCS303", name: "Operating Systems" },
+        { code: "BCS304", name: "Data Structures and Applications" },
+        { code: "BCS306A", name: "Object Oriented Programming with JAVA" }
+      ],
+      4: [
+        { code: "BCS401", name: "Analysis and Design of Algorithms" },
+        { code: "BCS402", name: "Microcontrollers" },
+        { code: "BCS405A", name: "Discrete Mathematical Structures" },
+        { code: "BCSL456D", name: "Technical Writing using LaTex" },
+        { code: "BBOC407", name: "Biology for Engineers" },
+        { code: "BUHK408", name: "Universal Human values" },
+        { code: "BCS405B", name: "Graph theory" }
       ],
       5: [
-        {
-          code: "21CS52",
-          name: "Database Management System",
-          modules: [
-            "Module 1: Introduction (Three-schema architecture, ER model constructs, Entity relationships)",
-            "Module 2: Relational Model & SQL (Relational algebra operations, SELECT/FROM/WHERE, JOINS, nested queries)",
-            "Module 3: SQL Advanced & Application design (Triggers, assertions, views, embedded SQL, cursor loops)",
-            "Module 4: Normalization Theory (Functional dependencies, 1NF, 2NF, 3NF, BCNF decomposition)",
-            "Module 5: Transaction & Recovery (ACID properties, serializability schedules, two-phase locking, log recovery)"
-          ],
-          qa: [
-            { q: "Explain the ACID properties of a Database Transaction.", a: "Transactions must satisfy four properties:\n1. Atomicity: All operations in the transaction succeed, or the entire transaction is rolled back (All-or-Nothing).\n2. Consistency: A transaction transitions the database from one valid state to another, preserving integrity constraints.\n3. Isolation: Concurrent transactions execute without interfering with each other.\n4. Durability: Once committed, updates persist even in the event of system failures." },
-            { q: "What is BCNF and how does it differ from 3NF?", a: "A relation is in Boyce-Codd Normal Form (BCNF) if for every functional dependency X -> Y, X is a superkey. BCNF is stricter than 3NF. In 3NF, X -> Y is allowed if Y is a prime attribute (part of a candidate key), even if X is not a superkey. BCNF eliminates this, resolving anomalies that 3NF might miss." }
-          ]
-        },
-        {
-          code: "21CS53",
-          name: "Computer Networks",
-          modules: [
-            "Module 1: Application Layer Protocols (HTTP, FTP, SMTP, DNS, Peer-to-Peer architecture)",
-            "Module 2: Transport Layer (UDP segment structure, TCP connection management, Congestion control, Flow control)",
-            "Module 3: Network Layer Data Plane (IP routing, IPv4 and IPv6 addressing schemes, Subnetting, NAT)",
-            "Module 4: Network Layer Control Plane (Routing algorithms OSPF and BGP, Software Defined Networking)",
-            "Module 5: Link Layer (Error detection parity/CRC, Multiple access CSMA/CD, Ethernet switches, ARP)"
-          ],
-          qa: [
-            { q: "Explain the difference between TCP and UDP.", a: "TCP (Transmission Control Protocol) is connection-oriented, reliable, guarantees packet ordering, handles flow/congestion control, and uses a 3-way handshake. UDP (User Datagram Protocol) is connectionless, unreliable (best-effort delivery), fast, does not order packets, and is ideal for real-time video streaming or gaming." }
-          ]
-        }
+        { code: "BCS501", name: "Software Engineering and Project Management" },
+        { code: "BCS502", name: "Computer Networks" },
+        { code: "BCS503", name: "Theory of Computation" },
+        { code: "BCSL504", name: "Web Technology Lab" },
+        { code: "BAI515A", name: "Computer Graphics" },
+        { code: "BCS515C", name: "Unix System Programming" },
+        { code: "BRMK557", name: "Research Methodology and IPR" },
+        { code: "BESK508", name: "Environmental Studies" }
+      ],
+      6: [
+        { code: "BCS601", name: "Cloud Computing" },
+        { code: "BCS602", name: "Machine Learning" },
+        { code: "BIS601", name: "Full Stack Development" },
+        { code: "BCS613A", name: "Blockchain Technology" },
+        { code: "BCS613C", name: "Compiler Design" },
+        { code: "BCS613B", name: "Computer Vision" },
+        { code: "BAIL657C", name: "Generative AI" },
+        { code: "BCSL657D", name: "Devops" },
+        { code: "BCS613D", name: "Advanced Java" },
+        { code: "BCO601", name: "Microcontrollers and Embedded Systems" },
+        { code: "BME654A", name: "Project Management" },
+        { code: "BCV654A", name: "Water Conservation and Rain Water Harvesting" },
+        { code: "BCV654", name: "Integrated Waste Management for a Smart City" },
+        { code: "BME654B", name: "Renewable Energy Power Plants" },
+        { code: "BCS658", name: "Natural language processing" },
+        { code: "BCS659", name: "Indian knowledge system" },
+        { code: "BCS660", name: "Consumer electronics" },
+        { code: "BCS661", name: "Cryptography And Network" }
+      ]
+    },
+    AI: {
+      3: [
+        { code: "BCS301", name: "Mathematics for Computer Science" },
+        { code: "BCS302", name: "Digital Design and Computer Organization" },
+        { code: "BCS303", name: "Operating System" },
+        { code: "BCS304", name: "Data Structures and Applications" },
+        { code: "BCS3068", name: "Oops with c++" },
+        { code: "BCS358A", name: "Data Analytics with Excel" },
+        { code: "BCS358C", name: "Project Management with Git" },
+        { code: "BCS306A", name: "Object Oriented Programming with JAVA" }
+      ],
+      4: [
+        { code: "BAD402", name: "Artificial Intelligence" },
+        { code: "BAI405D", name: "Algorithmic Game Theory" },
+        { code: "BDS456B", name: "mongoDB Labarotary" },
+        { code: "BCSL456D", name: "Technical Writing using Latex" },
+        { code: "BUHK408", name: "UHV" },
+        { code: "BCS401", name: "Analysis and Design of Algorithms" },
+        { code: "BCS403", name: "Database Management System" },
+        { code: "BCS405A", name: "Discrete Mathematical Structures" }
+      ],
+      5: [
+        { code: "BAIL504", name: "Data Visualization Lab" },
+        { code: "BAD515B", name: "Data Warehousing" },
+        { code: "BCS501", name: "Software Engineering and project Management" },
+        { code: "BCS502", name: "Computer Networks" },
+        { code: "BCS503", name: "Theory of Computation" },
+        { code: "BCS515C", name: "Unix System Programme" },
+        { code: "BRMK557", name: "Research Methodology and IPR" },
+        { code: "BESK508", name: "Environmental Studies" }
+      ],
+      6: [
+        { code: "BAIL657C", name: "Generative AI" },
+        { code: "BCO601", name: "Microcontroller and Embedded System" },
+        { code: "BIS613D", name: "Cloud computing and security" },
+        { code: "BAD613B", name: "Natural language processing" },
+        { code: "BAI602", name: "Machine Learning-I" },
+        { code: "BCSL657D", name: "Devops" },
+        { code: "BCS613X", name: "Big data analytics" },
+        { code: "BCS613A", name: "Block chain Technology" },
+        { code: "BME654A", name: "Project Management" },
+        { code: "BEE654B", name: "Technologies of Renewable Energy Sources" },
+        { code: "BCV654A", name: "Water conservation and Rain harvesting" },
+        { code: "BCV654C", name: "Integrated Waste management for smart city" }
       ]
     },
     ECE: {
       3: [
-        {
-          code: "21EC32",
-          name: "Network Analysis",
-          modules: [
-            "Module 1: Basic nodal and mesh analysis, Super-node and Super-mesh configurations",
-            "Module 2: Network Theorems (Superposition, Thevenin's, Norton's, Maximum Power Transfer Theorem)",
-            "Module 3: Transient Behavior (RL, RC, RLC circuits analysis under DC and AC excitations)",
-            "Module 4: Resonance circuits (Series and Parallel resonance, Quality factor, bandwidth)",
-            "Module 5: Two-port networks (z-parameters, y-parameters, h-parameters, transmission parameters)"
-          ],
-          qa: [
-            { q: "State Maximum Power Transfer Theorem for DC networks.", a: "The Maximum Power Transfer Theorem states that maximum power is delivered from a source to a load when the load resistance (RL) is exactly equal to the internal resistance of the source (or Thevenin's equivalent resistance, Rth). i.e. RL = Rth." }
-          ]
-        }
+        { code: "BMATEC301", name: "AV Mathematics-III for EC Engineering" },
+        { code: "BEC302", name: "Digital System Design using Verilog" },
+        { code: "BEC303", name: "Electronic Principles and Circuits" },
+        { code: "BEC304", name: "Network Analysis" },
+        { code: "BEC306C", name: "Computer Organization and Architecture" },
+        { code: "BECL305", name: "Analog and Digital Systems Design Laboratory" }
+      ],
+      4: [
+        { code: "BEC401", name: "ELECTROMAGNETIC THEORY" },
+        { code: "BEC402", name: "PRINCIPLES OF COMMUNICATION SYSTEMS" },
+        { code: "BEC403", name: "Control Systems" },
+        { code: "BEC405A", name: "MICROCONTROLLERS" },
+        { code: "BECL404", name: "Communication Laboratory" }
+      ],
+      5: [
+        { code: "BEC501", name: "Technological Innovation and Management Entrepreneurship" },
+        { code: "BEC502", name: "Digital Signal Processing" },
+        { code: "BEC503", name: "DIGITAL COMMUNICATION" },
+        { code: "BEC515A", name: "Intelligent Systems and Machine Learning Algorithms" }
+      ],
+      6: [
+        { code: "BEC601", name: "Embedded System Design" },
+        { code: "BCE613A", name: "Multimedia Communication" },
+        { code: "BEC602", name: "VLSI Design and Testing" }
+      ]
+    },
+    EEE: {
+      3: [
+        { code: "BEE301", name: "Engineering Mathematics for EEE" },
+        { code: "BEE302", name: "Electric Circuit Analysis" },
+        { code: "BEE303", name: "Analog Electronic Circuits" },
+        { code: "BEE304", name: "Transformers and Generators" },
+        { code: "BEE306A", name: "DIGITAL LOGIC CIRCUITS" },
+        { code: "BEE306B", name: "Electrical Measurements and Instrumentation" }
+      ],
+      4: [
+        { code: "BEE401", name: "ELECTRIC MOTORS" },
+        { code: "BEE402", name: "Transmission and Distribution" },
+        { code: "BEE403", name: "Microcontrollers" },
+        { code: "BBOK407", name: "Biology For Engineers" },
+        { code: "BUHK408", name: "Universal human values course" },
+        { code: "BEE405B", name: "OPAMPS AND LIC" },
+        { code: "BEEL456D", name: "ARDUINO AND RASPBERRY PI" }
+      ],
+      5: [
+        { code: "BEE501", name: "Engineering Management and Entrepreneurship" },
+        { code: "BEE502", name: "Signals & DSP" },
+        { code: "BEE503", name: "Power Electronics" },
+        { code: "BEE515A", name: "High Voltage Engineering" },
+        { code: "BRMK557", name: "RESEARCH METHODOLOGY AND IPR" }
+      ],
+      6: [
+        { code: "BEE601", name: "POWER SYSTEM ANALYSIS I" },
+        { code: "BEE602", name: "CONTROL SYSTEMS (PCC)" },
+        { code: "BEE654B", name: "Technologies of Renewable Energy Sources" },
+        { code: "BEE613B", name: "EMBEDDED SYSTEM DESIGN" }
       ]
     }
   };
 
   // Fallback subjects generator to make sure there's always content
   const getSubjects = (branch, sem) => {
-    if (vtuNotesDb[branch] && vtuNotesDb[branch][sem]) {
-      return vtuNotesDb[branch][sem];
+    // Semester 1 & 2 are common across all branches
+    if (sem === '1') {
+      return [
+        { code: "21MAT11", name: "MATHEMATICS 1" },
+        { code: "21PHY12", name: "PHYSICS" },
+        { code: "21CIV13", name: "CIVIL" },
+        { code: "21ELE14", name: "ELECTRICAL" },
+        { code: "21KAN19", name: "KANNADA" },
+        { code: "21CAED15", name: "caed" }
+      ];
     }
-    // Generic generator
+    if (sem === '2') {
+      return [
+        { code: "21MAT21", name: "MATHEMATICS 2" },
+        { code: "21CHE22", name: "CHEMISTRY" },
+        { code: "21ELN23", name: "ELECTRONICS" },
+        { code: "21POP24", name: "POP(C)" },
+        { code: "21PYT25", name: "PYTHON" },
+        { code: "21IOT26", name: "INTERNET OF THINGS" }
+      ];
+    }
+
+    if (vtuSubjectsDb[branch] && vtuSubjectsDb[branch][sem]) {
+      return vtuSubjectsDb[branch][sem];
+    }
+    // Generic generator for 7th/8th Semesters if selected
     return [
-      {
-        code: `21${branch}${sem}1`,
-        name: `Core ${branch} Engineering Subject`,
-        modules: [
-          "Module 1: Introduction and Fundamental Concepts of the discipline",
-          "Module 2: Core analytical methods, formulas, and baseline configurations",
-          "Module 3: System architecture design, implementation blocks, and parameters",
-          "Module 4: Testing protocols, numerical simulation, and boundary criteria",
-          "Module 5: Advanced application systems, industrial integration, and future scope"
-        ],
-        qa: [
-          { q: "What is the primary objective of this subject?", a: "This subject provides a comprehensive overview of fundamental principles and analytical techniques in this domain, preparing engineering students for hardware and software design architectures." },
-          { q: "How are the modules structured for VTU exams?", a: "VTU exams test conceptual clarity and problem-solving. Modules 1-3 focus on core derivations and models, while Modules 4-5 test application scenarios and schematics." }
-        ]
-      },
-      {
-        code: `21${branch}${sem}2`,
-        name: `${branch} Applied Systems & Analysis`,
-        modules: [
-          "Module 1: Introduction to system nodes and sensor parameters",
-          "Module 2: Data processing methodologies and mathematical transforms",
-          "Module 3: Local telemetry loops, bus protocols, and hardware integration",
-          "Module 4: Power constraints, low-power optimization, and thermal cooling",
-          "Module 5: Solved industrial case-studies and prototype testing routines"
-        ],
-        qa: [
-          { q: "Explain the importance of transient stability in this domain.", a: "Transient stability ensures that systems return to their normal operating equilibrium states following a sudden disturbance or shock load, preventing system failure." }
-        ]
-      }
+      { code: `21${branch}${sem}1`, name: `${branch} Professional Core Subject-I` },
+      { code: `21${branch}${sem}2`, name: `${branch} Professional Core Subject-II` },
+      { code: `21${branch}P${sem}3`, name: "Project Work Phase-A" },
+      { code: `21${branch}I${sem}4`, name: "Technical Internship" }
+    ];
+  };
+
+  const getModulesForSubject = (subjectCode, subjectName) => {
+    const name = subjectName.toLowerCase();
+    if (name.includes("mathematics") || name.includes("math")) {
+      return [
+        "Module 1: Calculus & Curves (Polar curves, tangents, curvatures)",
+        "Module 2: Advanced ODEs & Series (Taylor's, Maclaurin's series expansion)",
+        "Module 3: Vector Calculus (Div, Curl, Gradient vector fields)",
+        "Module 4: Linear Algebra & Matrices (System rank, Gauss elimination, Eigenvalues)",
+        "Module 5: Partial Derivatives & Multiple Integrals"
+      ];
+    }
+    if (name.includes("data structure") || name.includes("dsa")) {
+      return [
+        "Module 1: Pointers & Dynamic Memory (malloc, calloc, realloc, structures)",
+        "Module 2: Stacks & Queues (Push/Pop operations, Infix to Postfix conversions)",
+        "Module 3: Linked Lists (Singly, Doubly, and Circular linked lists operations)",
+        "Module 4: Trees & Binary Search Trees (Traversal algorithms and BST heights)",
+        "Module 5: Graphs & Hashing techniques (BFS/DFS traversals & collision resolution)"
+      ];
+    }
+    if (name.includes("operating system") || name.includes("os")) {
+      return [
+        "Module 1: Introduction to OS Services, System Calls & Interfaces",
+        "Module 2: Process Management (Creation, scheduling algorithms FIFO, SJF, RR)",
+        "Module 3: Process Synchronization, Semaphores & Deadlock avoidance (Banker's)",
+        "Module 4: Memory Management (Paging, segmentation, replacement algorithms)",
+        "Module 5: File Systems, Storage structures, and Disk scheduling algorithms"
+      ];
+    }
+    if (name.includes("database") || name.includes("dbms")) {
+      return [
+        "Module 1: Database System Concepts, Architectures & ER Modeling",
+        "Module 2: Relational Algebra & SQL queries (Select, Join, nested queries)",
+        "Module 3: Database Design rules, assertions & Triggers/Cursors",
+        "Module 4: Functional Dependencies & Normalization (1NF, 2NF, 3NF, BCNF)",
+        "Module 5: Transaction control, ACID properties & lock protocols"
+      ];
+    }
+    if (name.includes("network")) {
+      return [
+        "Module 1: Physical layer & Application protocols (HTTP, SMTP, DNS, P2P)",
+        "Module 2: Transport layer (UDP, TCP handshake, Congestion & Flow control)",
+        "Module 3: Network layer (IPv4/IPv6 subnetting, NAT, Routing algorithms)",
+        "Module 4: Link layer & Local Area Networks (Ethernet, multiple access protocols)",
+        "Module 5: Wireless communication & Network Security (encryption, firewalls)"
+      ];
+    }
+    if (name.includes("microcontroller") || name.includes("embedded") || name.includes("control systems")) {
+      return [
+        "Module 1: Microcontroller/System Architecture, Registers & Pins layout",
+        "Module 2: Assembly & Embedded C Instruction Sets (Arithmetic & Logical)",
+        "Module 3: Timers, Interrupt handling & Serial communication models",
+        "Module 4: Hardware Interfacing (Keyboards, LCDs, motors, sensors)",
+        "Module 5: Real-Time Operating Systems (RTOS) & Signal Control Loops"
+      ];
+    }
+    if (name.includes("python")) {
+      return [
+        "Module 1: Python syntax, variables, operators & control statements",
+        "Module 2: Functions, strings, arrays & recursion",
+        "Module 3: Complex Data structures (Lists, Tuples, Dictionaries, Sets)",
+        "Module 4: File IO systems, Exception handling & OOPS classes",
+        "Module 5: GUI programming (Tkinter) & database connectivity"
+      ];
+    }
+    if (name.includes("programming in c") || name.includes("pop")) {
+      return [
+        "Module 1: Introduction to C compilers, variables & operators",
+        "Module 2: Branching and looping controls (if-else, switch, while, for)",
+        "Module 3: One-dimensional and two-dimensional Arrays & Strings",
+        "Module 4: User-defined Functions, recursion models & scope",
+        "Module 5: Pointers, structures, unions & basic File IO operations"
+      ];
+    }
+    if (name.includes("machine learning") || name.includes("ml") || name.includes("generative ai")) {
+      return [
+        "Module 1: Core concepts, datasets, training models & classifications",
+        "Module 2: Supervised learning algorithms (Linear Regression, Decision Trees)",
+        "Module 3: Unsupervised learning (Clustering, K-Means, PCA dimensional reduction)",
+        "Module 4: Artificial Neural Networks, Backpropagation & deep learning layers",
+        "Module 5: Model evaluations, validation tests & Generative foundations"
+      ];
+    }
+    
+    // Default fallback
+    return [
+      "Module 1: Core Concepts & Principles of " + subjectName,
+      "Module 2: Technical Formulations and System Architectures",
+      "Module 3: Practical implementation methods & coding interfaces",
+      "Module 4: Diagnostics, Performance testing and testing protocols",
+      "Module 5: Industrial deployment scenarios, Case-Studies & Future scopes"
     ];
   };
 
   const currentSubjects = getSubjects(selectedBranch, selectedSem);
 
-  const handlePdfRequest = (subjectName) => {
-    const text = `Hello CircuitCraft Studio! 🚀 I am a VTU student looking to download the complete Module 1-5 Handwritten Notes & Solved Question Papers PDF for the subject "${subjectName}" (${selectedBranch} - Sem ${selectedSem}). Please send me the file.`;
-    window.open(`https://api.whatsapp.com/send?phone=918123265315&text=${encodeURIComponent(text)}`, '_blank');
+  // Retrieve notes content (check custom imported, else return null)
+  const getNotesContent = (subjectCode, moduleIndex) => {
+    const moduleKey = `Module ${moduleIndex + 1}`;
+    if (
+      customNotes[selectedBranch] &&
+      customNotes[selectedBranch][selectedSem] &&
+      customNotes[selectedBranch][selectedSem][subjectCode] &&
+      customNotes[selectedBranch][selectedSem][subjectCode][moduleKey]
+    ) {
+      return customNotes[selectedBranch][selectedSem][subjectCode][moduleKey];
+    }
+    return null;
   };
+
+  // JSON Template example for notes import
+  const jsonTemplateStr = `{
+  "CSE": {
+    "3": {
+      "BCS304": {
+        "Module 1": "Pointers are variables storing memory addresses...\\n\\nAllocation methods:\\n- malloc(): allocates raw bytes.\\n- calloc(): allocates zeroed memory.",
+        "Module 2": "A Stack is a LIFO structure. Core operations: push() and pop(). Circular Queues avoid memory waste.",
+        "Module 3": "Linked lists use nodes referencing next elements. List reversal prev/curr algorithm.",
+        "Module 4": "Trees order left child < root < right child. Traversal: Inorder yields sorted keys.",
+        "Module 5": "Graphs represent connections. DFS uses recursion while BFS implements dynamic Queue."
+      }
+    }
+  }
+}`;
 
   // LaTeX fresher resume template
   const resumeTemplate = `% LaTeX Fresher Resume Template - CircuitCraft Studio
@@ -241,7 +467,7 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
 - 1st Place in College Techfest Robot-Sumo Design Challenge
 \\end{document}`;
 
-  // Top 10 coding questions
+  // Top 9 coding questions
   const codingQuestions = [
     { name: "Two Sum", difficulty: "Easy", dsa: "Arrays / Hashing", link: "https://leetcode.com/problems/two-sum/" },
     { name: "Valid Parentheses", difficulty: "Easy", dsa: "Stacks", link: "https://leetcode.com/problems/valid-parentheses/" },
@@ -335,49 +561,104 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
             display: 'flex',
             background: 'rgba(0,0,0,0.2)',
             borderBottom: '1px solid var(--border-color)',
-            padding: '0 1rem'
+            padding: '0 1rem',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap'
           }}
         >
-          <button
-            onClick={() => setActiveTab('notes')}
-            style={{
-              padding: '1rem 1.5rem',
-              background: 'none',
-              border: 'none',
-              borderBottom: '2px solid',
-              borderColor: activeTab === 'notes' ? 'var(--accent-cyan)' : 'transparent',
-              color: activeTab === 'notes' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.2s'
-            }}
-          >
-            <BookOpen size={16} />
-            VTU Subject Notes
-          </button>
-          <button
-            onClick={() => setActiveTab('placement')}
-            style={{
-              padding: '1rem 1.5rem',
-              background: 'none',
-              border: 'none',
-              borderBottom: '2px solid',
-              borderColor: activeTab === 'placement' ? 'var(--accent-cyan)' : 'transparent',
-              color: activeTab === 'placement' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.2s'
-            }}
-          >
-            <FileText size={16} />
-            Placement Support Prep
-          </button>
+          <div style={{ display: 'flex' }}>
+            <button
+              onClick={() => {
+                setActiveTab('notes');
+                setActiveModuleNotes(null);
+              }}
+              style={{
+                padding: '1rem 1.5rem',
+                background: 'none',
+                border: 'none',
+                borderBottom: '2px solid',
+                borderColor: activeTab === 'notes' ? 'var(--accent-cyan)' : 'transparent',
+                color: activeTab === 'notes' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s'
+              }}
+            >
+              <BookOpen size={16} />
+              VTU Subject Notes
+            </button>
+            <button
+              onClick={() => setActiveTab('placement')}
+              style={{
+                padding: '1rem 1.5rem',
+                background: 'none',
+                border: 'none',
+                borderBottom: '2px solid',
+                borderColor: activeTab === 'placement' ? 'var(--accent-cyan)' : 'transparent',
+                color: activeTab === 'placement' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s'
+              }}
+            >
+              <FileText size={16} />
+              Placement Support Prep
+            </button>
+          </div>
+
+          {activeTab === 'notes' && (
+            <div style={{ padding: '0.5rem 1rem', display: 'flex', gap: '0.75rem' }}>
+              <button 
+                onClick={() => setIsImporterOpen(!isImporterOpen)}
+                style={{
+                  background: 'rgba(0, 229, 255, 0.05)',
+                  border: '1px solid var(--accent-cyan)',
+                  color: 'var(--accent-cyan)',
+                  padding: '0.4rem 0.85rem',
+                  borderRadius: '15px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--accent-cyan)';
+                  e.currentTarget.style.color = '#000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 229, 255, 0.05)';
+                  e.currentTarget.style.color = 'var(--accent-cyan)';
+                }}
+              >
+                <Upload size={14} /> Import Notes
+              </button>
+              {Object.keys(customNotes).length > 0 && (
+                <button
+                  onClick={handleClearCustomNotes}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'rgba(239, 68, 68, 0.7)',
+                    fontSize: '0.75rem',
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Reset Imported Notes
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Content Area */}
@@ -386,6 +667,121 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
           {/* TAB 1: VTU NOTES PORTAL */}
           {activeTab === 'notes' && (
             <div>
+              {/* Importer Slide Panel */}
+              {isImporterOpen && (
+                <div 
+                  style={{
+                    background: 'var(--bg-tertiary)',
+                    border: '1px dashed var(--accent-cyan)',
+                    borderRadius: '12px',
+                    padding: '1.5rem',
+                    marginBottom: '1.5rem',
+                    textAlign: 'left'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div>
+                      <h5 style={{ color: '#fff', fontSize: '1rem', margin: 0 }}>Import VTU Notes (JSON Utility)</h5>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                        Paste notes in JSON format below, or upload a JSON file to add study guides directly onto the website.
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleCopy(jsonTemplateStr, 'json_template')}
+                      style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
+                    >
+                      {copiedText === 'json_template' ? <Check size={12} /> : <Copy size={12} />}
+                      {copiedText === 'json_template' ? 'Copied Template!' : 'Copy JSON Format Template'}
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {/* File Picker */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                      <label 
+                        style={{
+                          background: 'rgba(255,255,255,0.05)',
+                          border: '1px solid var(--border-color)',
+                          padding: '0.5rem 1rem',
+                          borderRadius: '6px',
+                          color: '#fff',
+                          fontSize: '0.8rem',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.35rem'
+                        }}
+                      >
+                        <Upload size={14} /> Choose JSON File
+                        <input type="file" accept=".json" onChange={handleFileUpload} style={{ display: 'none' }} />
+                      </label>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Files must end in .json</span>
+                    </div>
+
+                    <textarea
+                      placeholder="Or paste JSON raw string here (e.g. { 'CSE': { '3': { 'BCS304': { 'Module 1': 'Note content...' } } } } )"
+                      value={jsonInput}
+                      onChange={(e) => setJsonInput(e.target.value)}
+                      rows={5}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        color: 'var(--accent-cyan)',
+                        fontSize: '0.8rem',
+                        fontFamily: 'monospace',
+                        outline: 'none'
+                      }}
+                    />
+
+                    {importError && (
+                      <div style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: 600 }}>
+                        ⚠️ {importError}
+                      </div>
+                    )}
+                    {importSuccess && (
+                      <div style={{ color: 'var(--accent-green)', fontSize: '0.75rem', fontWeight: 600 }}>
+                        ✓ Notes imported and merged successfully!
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                      <button
+                        onClick={() => handleJsonImport(jsonInput)}
+                        style={{
+                          background: 'var(--accent-cyan)',
+                          color: '#000',
+                          border: 'none',
+                          padding: '0.5rem 1.25rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Submit JSON Notes
+                      </button>
+                      <button
+                        onClick={() => setIsImporterOpen(false)}
+                        style={{
+                          background: 'transparent',
+                          color: 'var(--text-secondary)',
+                          border: '1px solid var(--border-color)',
+                          padding: '0.5rem 1rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Selectors Bar */}
               <div 
                 style={{
@@ -404,7 +800,11 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                   <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Select Branch</label>
                   <select 
                     value={selectedBranch}
-                    onChange={(e) => setSelectedBranch(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedBranch(e.target.value);
+                      setExpandedSubject(null);
+                      setActiveModuleNotes(null);
+                    }}
                     style={{
                       padding: '0.6rem',
                       background: 'var(--bg-secondary)',
@@ -416,7 +816,7 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                     }}
                   >
                     <option value="CSE">CSE (Computer Science)</option>
-                    <option value="ISE">ISE (Information Science)</option>
+                    <option value="AI">AI (Artificial Intelligence)</option>
                     <option value="ECE">ECE (Electronics & Comm)</option>
                     <option value="EEE">EEE (Electrical & Electronics)</option>
                   </select>
@@ -427,7 +827,11 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                   <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Select Semester</label>
                   <select 
                     value={selectedSem}
-                    onChange={(e) => setSelectedSem(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedSem(e.target.value);
+                      setExpandedSubject(null);
+                      setActiveModuleNotes(null);
+                    }}
                     style={{
                       padding: '0.6rem',
                       background: 'var(--bg-secondary)',
@@ -445,130 +849,209 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                 </div>
               </div>
 
-              {/* Subject Display Grid */}
-              <h4 style={{ color: '#fff', fontSize: '1.2rem', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>
-                📚 Subjects for {selectedBranch} - Semester {selectedSem}
+              {/* Subject display area */}
+              <h4 style={{ color: '#fff', fontSize: '1.2rem', marginBottom: '1rem', fontFamily: 'var(--font-display)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>📚 Subjects for {selectedSem === '1' || selectedSem === '2' ? 'Common First Year' : `${selectedBranch} - Semester ${selectedSem}`}</span>
+                {activeModuleNotes && (
+                  <button
+                    onClick={() => setActiveModuleNotes(null)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--accent-cyan)',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    ← Back to Modules list
+                  </button>
+                )}
               </h4>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                {currentSubjects.map((subject) => (
-                  <div 
-                    key={subject.code} 
-                    className="glass-panel" 
-                    style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', transition: 'border-color 0.2s' }}
-                  >
-                    {/* Subject Card Header */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      <div>
-                        <span 
-                          style={{
-                            fontSize: '0.7rem',
-                            fontWeight: 700,
-                            padding: '0.2rem 0.5rem',
-                            borderRadius: '4px',
-                            background: 'rgba(0, 229, 255, 0.1)',
-                            border: '1px solid rgba(0, 229, 255, 0.2)',
-                            color: 'var(--accent-cyan)',
-                            marginRight: '0.5rem'
-                          }}
-                        >
-                          {subject.code}
-                        </span>
-                        <h5 style={{ display: 'inline-block', fontSize: '1.1rem', color: '#fff', margin: 0 }}>{subject.name}</h5>
-                      </div>
-                      <button 
-                        className="glow-btn"
-                        onClick={() => handlePdfRequest(subject.name)}
+              {/* Notes Content Reader Panel */}
+              {activeModuleNotes ? (
+                <div 
+                  className="glass-panel"
+                  style={{
+                    padding: '2rem',
+                    textAlign: 'left',
+                    background: '#070a10',
+                    border: '1px solid var(--accent-cyan)'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.15rem 0.5rem', background: 'rgba(0, 229, 255, 0.1)', color: 'var(--accent-cyan)', borderRadius: '4px' }}>
+                        {activeModuleNotes.subjectCode}
+                      </span>
+                      <h5 style={{ color: '#fff', fontSize: '1.15rem', margin: '0.25rem 0 0 0' }}>
+                        {activeModuleNotes.subjectName} - Module {activeModuleNotes.moduleIndex + 1} Study Notes
+                      </h5>
+                    </div>
+                    
+                    {getNotesContent(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex) && (
+                      <button
+                        onClick={() => handleCopy(getNotesContent(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex), 'module_notes')}
                         style={{
+                          background: 'rgba(255,255,255,0.05)',
+                          border: '1px solid var(--border-color)',
+                          color: '#fff',
                           padding: '0.45rem 1rem',
                           borderRadius: '20px',
                           fontSize: '0.8rem',
+                          cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.35rem'
                         }}
                       >
-                        <Download size={14} /> Request PDF Notes
+                        {copiedText === 'module_notes' ? <Check size={14} /> : <Copy size={14} />}
+                        {copiedText === 'module_notes' ? 'Copied notes!' : 'Copy Module Notes'}
                       </button>
-                    </div>
+                    )}
+                  </div>
 
-                    {/* Syllabus Outlines */}
-                    <div style={{ padding: '0.85rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
-                        Syllabus Breakdown (Modules 1 - 5)
-                      </span>
-                      <ul style={{ listStyleType: 'none', paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                        {subject.modules.map((mod, index) => (
-                          <li key={index} style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', display: 'flex', gap: '0.5rem' }}>
-                            <span style={{ color: 'var(--accent-cyan)' }}>•</span> {mod}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Solved Q&A Exam Questions */}
-                    {subject.qa && subject.qa.length > 0 && (
-                      <div>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
-                          🔑 Solved High-Frequency Exam Questions
-                        </span>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                          {subject.qa.map((qaItem, idx) => {
-                            const isExpanded = expandedQA === `${subject.code}-${idx}`;
-                            return (
-                              <div 
-                                key={idx} 
-                                style={{
-                                  background: 'var(--bg-tertiary)',
-                                  border: '1px solid var(--border-color)',
-                                  borderRadius: '6px',
-                                  overflow: 'hidden'
-                                }}
-                              >
-                                <button
-                                  onClick={() => setExpandedQA(isExpanded ? null : `${subject.code}-${idx}`)}
-                                  style={{
-                                    width: '100%',
-                                    textAlign: 'left',
-                                    padding: '0.6rem 1rem',
-                                    background: 'none',
-                                    border: 'none',
-                                    color: '#fff',
-                                    fontWeight: 600,
-                                    fontSize: '0.85rem',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
-                                  }}
-                                >
-                                  <span>Q{idx+1}: {qaItem.q}</span>
-                                  <span style={{ color: 'var(--accent-cyan)' }}>{isExpanded ? '−' : '+'}</span>
-                                </button>
-                                {isExpanded && (
-                                  <div 
-                                    style={{
-                                      padding: '0.75rem 1rem',
-                                      borderTop: '1px solid var(--border-color)',
-                                      background: 'rgba(0,0,0,0.15)',
-                                      fontSize: '0.8rem',
-                                      color: 'var(--text-secondary)',
-                                      lineHeight: '1.5',
-                                      whiteSpace: 'pre-line'
-                                    }}
-                                  >
-                                    {qaItem.a}
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
+                  {/* Dynamic Notes Content display */}
+                  <div 
+                    style={{
+                      color: 'var(--text-primary)',
+                      fontSize: '0.925rem',
+                      lineHeight: '1.7',
+                      whiteSpace: 'pre-line',
+                      fontFamily: 'var(--font-sans)',
+                      minHeight: '200px'
+                    }}
+                  >
+                    {getNotesContent(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex) ? (
+                      getNotesContent(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)
+                    ) : (
+                      <div style={{ color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ fontWeight: 600, color: '#fff' }}>📝 Syllabus Topic Focus Outline:</div>
+                        <div>{activeModuleNotes.topicText}</div>
+                        <div style={{ marginTop: '1rem', fontSize: '0.85rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1rem', color: 'var(--accent-cyan)' }}>
+                          💡 <strong>Notes content not imported yet!</strong> <br />
+                          To display the full study notes here, click the **"Import Notes"** button at the top and upload the notes JSON.
                         </div>
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                /* Subjects List view */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  {currentSubjects.map((subject) => {
+                    const isSubjectExpanded = expandedSubject === subject.code;
+                    const subjectModules = getModulesForSubject(subject.code, subject.name);
+                    return (
+                      <div 
+                        key={subject.code}
+                        className="glass-panel"
+                        style={{
+                          padding: '1.25rem 1.5rem',
+                          transition: 'all 0.25s',
+                          borderLeft: isSubjectExpanded ? '3px solid var(--accent-cyan)' : '1px solid var(--border-color)'
+                        }}
+                      >
+                        {/* Subject card toggle trigger */}
+                        <div 
+                          onClick={() => setExpandedSubject(isSubjectExpanded ? null : subject.code)}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left' }}>
+                            <span 
+                              style={{
+                                fontSize: '0.7rem',
+                                fontWeight: 700,
+                                padding: '0.2rem 0.5rem',
+                                borderRadius: '4px',
+                                background: 'rgba(0, 229, 255, 0.1)',
+                                border: '1px solid rgba(0, 229, 255, 0.2)',
+                                color: 'var(--accent-cyan)'
+                              }}
+                            >
+                              {subject.code}
+                            </span>
+                            <span style={{ fontWeight: 600, color: '#fff', fontSize: '1.05rem' }}>{subject.name}</span>
+                          </div>
+                          <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
+                            {isSubjectExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                          </button>
+                        </div>
+
+                        {/* Modules container details */}
+                        {isSubjectExpanded && (
+                          <div 
+                            style={{ 
+                              marginTop: '1.25rem', 
+                              paddingTop: '1.25rem', 
+                              borderTop: '1px solid rgba(255,255,255,0.05)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '1rem',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block' }}>
+                              Syllabus Modules (Click a module to view notes)
+                            </span>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                              {subjectModules.map((moduleText, idx) => (
+                                <div 
+                                  key={idx}
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '0.75rem 1rem',
+                                    background: 'var(--bg-tertiary)',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--border-color)',
+                                    flexWrap: 'wrap',
+                                    gap: '0.75rem'
+                                  }}
+                                >
+                                  <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', flex: 1 }}>
+                                    {moduleText}
+                                  </span>
+                                  
+                                  <button
+                                    className="glow-btn"
+                                    onClick={() => setActiveModuleNotes({
+                                      subjectCode: subject.code,
+                                      subjectName: subject.name,
+                                      moduleIndex: idx,
+                                      topicText: moduleText
+                                    })}
+                                    style={{
+                                      padding: '0.35rem 0.85rem',
+                                      borderRadius: '15px',
+                                      fontSize: '0.75rem',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '0.25rem'
+                                    }}
+                                  >
+                                    Read Module Notes <ArrowRight size={12} />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
