@@ -8,27 +8,12 @@ export default function StudyHubModal({ isOpen, onClose }) {
   const [expandedSubject, setExpandedSubject] = useState(null); // track expanded subject code
   const [activeModuleNotes, setActiveModuleNotes] = useState(null); // { subjectCode, subjectName, moduleIndex }
   const [copiedText, setCopiedText] = useState('');
-  const [isImporterOpen, setIsImporterOpen] = useState(false);
-  const [jsonInput, setJsonInput] = useState('');
-  const [importError, setImportError] = useState('');
-  const [importSuccess, setImportSuccess] = useState(false);
   
-  // Custom imported notes database from localStorage
-  const [customNotes, setCustomNotes] = useState({});
+  // Track uploaded PDFs in current session (temporary Object URLs)
+  // Structure: { [subjectCode]: { [moduleIndex]: { url, name } } }
+  const [uploadedPdfs, setUploadedPdfs] = useState({});
 
   const modalRef = useRef(null);
-
-  // Load custom notes on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('circuitcraft_custom_notes');
-      if (saved) {
-        setCustomNotes(JSON.parse(saved));
-      }
-    } catch (e) {
-      console.error("Failed to load custom notes from localStorage", e);
-    }
-  }, []);
 
   // Close on Escape key press
   useEffect(() => {
@@ -58,53 +43,22 @@ export default function StudyHubModal({ isOpen, onClose }) {
     setTimeout(() => setCopiedText(''), 2000);
   };
 
-  const handleJsonImport = (inputString) => {
-    try {
-      setImportError('');
-      setImportSuccess(false);
-      
-      if (!inputString.trim()) {
-        setImportError('Please enter valid JSON string content.');
-        return;
-      }
-      
-      const parsed = JSON.parse(inputString);
-      
-      // Update state and save
-      const merged = { ...customNotes, ...parsed };
-      setCustomNotes(merged);
-      localStorage.setItem('circuitcraft_custom_notes', JSON.stringify(merged));
-      
-      setImportSuccess(true);
-      setJsonInput('');
-      setTimeout(() => {
-        setImportSuccess(false);
-        setIsImporterOpen(false);
-      }, 1500);
-    } catch (e) {
-      setImportError(`Invalid JSON format: ${e.message}`);
-    }
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+  const handlePdfUpload = (subjectCode, moduleIndex, file) => {
     if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      handleJsonImport(event.target.result);
-    };
-    reader.onerror = () => {
-      setImportError('Failed to read notes file.');
-    };
-    reader.readAsText(file);
-  };
-
-  const handleClearCustomNotes = () => {
-    if (window.confirm("Are you sure you want to clear all imported custom notes?")) {
-      setCustomNotes({});
-      localStorage.removeItem('circuitcraft_custom_notes');
+    if (file.type !== 'application/pdf') {
+      alert("Please select a valid PDF file.");
+      return;
     }
+    
+    // Create temporary URL to read file locally
+    const url = URL.createObjectURL(file);
+    setUploadedPdfs(prev => ({
+      ...prev,
+      [subjectCode]: {
+        ...(prev[subjectCode] || {}),
+        [moduleIndex]: { url, name: file.name }
+      }
+    }));
   };
 
   if (!isOpen) return null;
@@ -303,130 +257,7 @@ export default function StudyHubModal({ isOpen, onClose }) {
     ];
   };
 
-  const getModulesForSubject = (subjectCode, subjectName) => {
-    const name = subjectName.toLowerCase();
-    if (name.includes("mathematics") || name.includes("math")) {
-      return [
-        "Module 1: Calculus & Curves (Polar curves, tangents, curvatures)",
-        "Module 2: Advanced ODEs & Series (Taylor's, Maclaurin's series expansion)",
-        "Module 3: Vector Calculus (Div, Curl, Gradient vector fields)",
-        "Module 4: Linear Algebra & Matrices (System rank, Gauss elimination, Eigenvalues)",
-        "Module 5: Partial Derivatives & Multiple Integrals"
-      ];
-    }
-    if (name.includes("data structure") || name.includes("dsa")) {
-      return [
-        "Module 1: Pointers & Dynamic Memory (malloc, calloc, realloc, structures)",
-        "Module 2: Stacks & Queues (Push/Pop operations, Infix to Postfix conversions)",
-        "Module 3: Linked Lists (Singly, Doubly, and Circular linked lists operations)",
-        "Module 4: Trees & Binary Search Trees (Traversal algorithms and BST heights)",
-        "Module 5: Graphs & Hashing techniques (BFS/DFS traversals & collision resolution)"
-      ];
-    }
-    if (name.includes("operating system") || name.includes("os")) {
-      return [
-        "Module 1: Introduction to OS Services, System Calls & Interfaces",
-        "Module 2: Process Management (Creation, scheduling algorithms FIFO, SJF, RR)",
-        "Module 3: Process Synchronization, Semaphores & Deadlock avoidance (Banker's)",
-        "Module 4: Memory Management (Paging, segmentation, replacement algorithms)",
-        "Module 5: File Systems, Storage structures, and Disk scheduling algorithms"
-      ];
-    }
-    if (name.includes("database") || name.includes("dbms")) {
-      return [
-        "Module 1: Database System Concepts, Architectures & ER Modeling",
-        "Module 2: Relational Algebra & SQL queries (Select, Join, nested queries)",
-        "Module 3: Database Design rules, assertions & Triggers/Cursors",
-        "Module 4: Functional Dependencies & Normalization (1NF, 2NF, 3NF, BCNF)",
-        "Module 5: Transaction control, ACID properties & lock protocols"
-      ];
-    }
-    if (name.includes("network")) {
-      return [
-        "Module 1: Physical layer & Application protocols (HTTP, SMTP, DNS, P2P)",
-        "Module 2: Transport layer (UDP, TCP handshake, Congestion & Flow control)",
-        "Module 3: Network layer (IPv4/IPv6 subnetting, NAT, Routing algorithms)",
-        "Module 4: Link layer & Local Area Networks (Ethernet, multiple access protocols)",
-        "Module 5: Wireless communication & Network Security (encryption, firewalls)"
-      ];
-    }
-    if (name.includes("microcontroller") || name.includes("embedded") || name.includes("control systems")) {
-      return [
-        "Module 1: Microcontroller/System Architecture, Registers & Pins layout",
-        "Module 2: Assembly & Embedded C Instruction Sets (Arithmetic & Logical)",
-        "Module 3: Timers, Interrupt handling & Serial communication models",
-        "Module 4: Hardware Interfacing (Keyboards, LCDs, motors, sensors)",
-        "Module 5: Real-Time Operating Systems (RTOS) & Signal Control Loops"
-      ];
-    }
-    if (name.includes("python")) {
-      return [
-        "Module 1: Python syntax, variables, operators & control statements",
-        "Module 2: Functions, strings, arrays & recursion",
-        "Module 3: Complex Data structures (Lists, Tuples, Dictionaries, Sets)",
-        "Module 4: File IO systems, Exception handling & OOPS classes",
-        "Module 5: GUI programming (Tkinter) & database connectivity"
-      ];
-    }
-    if (name.includes("programming in c") || name.includes("pop")) {
-      return [
-        "Module 1: Introduction to C compilers, variables & operators",
-        "Module 2: Branching and looping controls (if-else, switch, while, for)",
-        "Module 3: One-dimensional and two-dimensional Arrays & Strings",
-        "Module 4: User-defined Functions, recursion models & scope",
-        "Module 5: Pointers, structures, unions & basic File IO operations"
-      ];
-    }
-    if (name.includes("machine learning") || name.includes("ml") || name.includes("generative ai")) {
-      return [
-        "Module 1: Core concepts, datasets, training models & classifications",
-        "Module 2: Supervised learning algorithms (Linear Regression, Decision Trees)",
-        "Module 3: Unsupervised learning (Clustering, K-Means, PCA dimensional reduction)",
-        "Module 4: Artificial Neural Networks, Backpropagation & deep learning layers",
-        "Module 5: Model evaluations, validation tests & Generative foundations"
-      ];
-    }
-    
-    // Default fallback
-    return [
-      "Module 1: Core Concepts & Principles of " + subjectName,
-      "Module 2: Technical Formulations and System Architectures",
-      "Module 3: Practical implementation methods & coding interfaces",
-      "Module 4: Diagnostics, Performance testing and testing protocols",
-      "Module 5: Industrial deployment scenarios, Case-Studies & Future scopes"
-    ];
-  };
-
   const currentSubjects = getSubjects(selectedBranch, selectedSem);
-
-  // Retrieve notes content (check custom imported, else return null)
-  const getNotesContent = (subjectCode, moduleIndex) => {
-    const moduleKey = `Module ${moduleIndex + 1}`;
-    if (
-      customNotes[selectedBranch] &&
-      customNotes[selectedBranch][selectedSem] &&
-      customNotes[selectedBranch][selectedSem][subjectCode] &&
-      customNotes[selectedBranch][selectedSem][subjectCode][moduleKey]
-    ) {
-      return customNotes[selectedBranch][selectedSem][subjectCode][moduleKey];
-    }
-    return null;
-  };
-
-  // JSON Template example for notes import
-  const jsonTemplateStr = `{
-  "CSE": {
-    "3": {
-      "BCS304": {
-        "Module 1": "Pointers are variables storing memory addresses...\\n\\nAllocation methods:\\n- malloc(): allocates raw bytes.\\n- calloc(): allocates zeroed memory.",
-        "Module 2": "A Stack is a LIFO structure. Core operations: push() and pop(). Circular Queues avoid memory waste.",
-        "Module 3": "Linked lists use nodes referencing next elements. List reversal prev/curr algorithm.",
-        "Module 4": "Trees order left child < root < right child. Traversal: Inorder yields sorted keys.",
-        "Module 5": "Graphs represent connections. DFS uses recursion while BFS implements dynamic Queue."
-      }
-    }
-  }
-}`;
 
   // LaTeX fresher resume template
   const resumeTemplate = `% LaTeX Fresher Resume Template - CircuitCraft Studio
@@ -479,6 +310,14 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
     { name: "Find Median from Data Stream", difficulty: "Hard", dsa: "Heaps", link: "https://leetcode.com/problems/find-median-from-data-stream/" },
     { name: "Edit Distance", difficulty: "Hard", dsa: "Dynamic Programming", link: "https://leetcode.com/problems/edit-distance/" }
   ];
+
+  // Helper to get PDF URL
+  const getPdfUrl = (subjectCode, moduleIndex) => {
+    const uploaded = uploadedPdfs[subjectCode]?.[moduleIndex];
+    if (uploaded) return uploaded.url;
+    // Default static file path
+    return `/pdfs/${subjectCode}_M${moduleIndex + 1}.pdf`;
+  };
 
   return (
     <div 
@@ -612,53 +451,6 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
               Placement Support Prep
             </button>
           </div>
-
-          {activeTab === 'notes' && (
-            <div style={{ padding: '0.5rem 1rem', display: 'flex', gap: '0.75rem' }}>
-              <button 
-                onClick={() => setIsImporterOpen(!isImporterOpen)}
-                style={{
-                  background: 'rgba(0, 229, 255, 0.05)',
-                  border: '1px solid var(--accent-cyan)',
-                  color: 'var(--accent-cyan)',
-                  padding: '0.4rem 0.85rem',
-                  borderRadius: '15px',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--accent-cyan)';
-                  e.currentTarget.style.color = '#000';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(0, 229, 255, 0.05)';
-                  e.currentTarget.style.color = 'var(--accent-cyan)';
-                }}
-              >
-                <Upload size={14} /> Import Notes
-              </button>
-              {Object.keys(customNotes).length > 0 && (
-                <button
-                  onClick={handleClearCustomNotes}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'rgba(239, 68, 68, 0.7)',
-                    fontSize: '0.75rem',
-                    cursor: 'pointer',
-                    textDecoration: 'underline'
-                  }}
-                >
-                  Reset Imported Notes
-                </button>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Content Area */}
@@ -667,121 +459,6 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
           {/* TAB 1: VTU NOTES PORTAL */}
           {activeTab === 'notes' && (
             <div>
-              {/* Importer Slide Panel */}
-              {isImporterOpen && (
-                <div 
-                  style={{
-                    background: 'var(--bg-tertiary)',
-                    border: '1px dashed var(--accent-cyan)',
-                    borderRadius: '12px',
-                    padding: '1.5rem',
-                    marginBottom: '1.5rem',
-                    textAlign: 'left'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    <div>
-                      <h5 style={{ color: '#fff', fontSize: '1rem', margin: 0 }}>Import VTU Notes (JSON Utility)</h5>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                        Paste notes in JSON format below, or upload a JSON file to add study guides directly onto the website.
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => handleCopy(jsonTemplateStr, 'json_template')}
-                      style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
-                    >
-                      {copiedText === 'json_template' ? <Check size={12} /> : <Copy size={12} />}
-                      {copiedText === 'json_template' ? 'Copied Template!' : 'Copy JSON Format Template'}
-                    </button>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {/* File Picker */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                      <label 
-                        style={{
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid var(--border-color)',
-                          padding: '0.5rem 1rem',
-                          borderRadius: '6px',
-                          color: '#fff',
-                          fontSize: '0.8rem',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.35rem'
-                        }}
-                      >
-                        <Upload size={14} /> Choose JSON File
-                        <input type="file" accept=".json" onChange={handleFileUpload} style={{ display: 'none' }} />
-                      </label>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Files must end in .json</span>
-                    </div>
-
-                    <textarea
-                      placeholder="Or paste JSON raw string here (e.g. { 'CSE': { '3': { 'BCS304': { 'Module 1': 'Note content...' } } } } )"
-                      value={jsonInput}
-                      onChange={(e) => setJsonInput(e.target.value)}
-                      rows={5}
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '6px',
-                        color: 'var(--accent-cyan)',
-                        fontSize: '0.8rem',
-                        fontFamily: 'monospace',
-                        outline: 'none'
-                      }}
-                    />
-
-                    {importError && (
-                      <div style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: 600 }}>
-                        ⚠️ {importError}
-                      </div>
-                    )}
-                    {importSuccess && (
-                      <div style={{ color: 'var(--accent-green)', fontSize: '0.75rem', fontWeight: 600 }}>
-                        ✓ Notes imported and merged successfully!
-                      </div>
-                    )}
-
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
-                      <button
-                        onClick={() => handleJsonImport(jsonInput)}
-                        style={{
-                          background: 'var(--accent-cyan)',
-                          color: '#000',
-                          border: 'none',
-                          padding: '0.5rem 1.25rem',
-                          borderRadius: '6px',
-                          fontSize: '0.8rem',
-                          fontWeight: 600,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Submit JSON Notes
-                      </button>
-                      <button
-                        onClick={() => setIsImporterOpen(false)}
-                        style={{
-                          background: 'transparent',
-                          color: 'var(--text-secondary)',
-                          border: '1px solid var(--border-color)',
-                          padding: '0.5rem 1rem',
-                          borderRadius: '6px',
-                          fontSize: '0.8rem',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Selectors Bar */}
               <div 
                 style={{
@@ -866,7 +543,7 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                       gap: '4px'
                     }}
                   >
-                    ← Back to Modules list
+                    ← Back to Modules
                   </button>
                 )}
               </h4>
@@ -888,55 +565,41 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                         {activeModuleNotes.subjectCode}
                       </span>
                       <h5 style={{ color: '#fff', fontSize: '1.15rem', margin: '0.25rem 0 0 0' }}>
-                        {activeModuleNotes.subjectName} - Module {activeModuleNotes.moduleIndex + 1} Study Notes
+                        {activeModuleNotes.subjectName} - Module {activeModuleNotes.moduleIndex + 1} notes
                       </h5>
                     </div>
-                    
-                    {getNotesContent(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex) && (
-                      <button
-                        onClick={() => handleCopy(getNotesContent(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex), 'module_notes')}
-                        style={{
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid var(--border-color)',
-                          color: '#fff',
-                          padding: '0.45rem 1rem',
-                          borderRadius: '20px',
-                          fontSize: '0.8rem',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.35rem'
-                        }}
-                      >
-                        {copiedText === 'module_notes' ? <Check size={14} /> : <Copy size={14} />}
-                        {copiedText === 'module_notes' ? 'Copied notes!' : 'Copy Module Notes'}
-                      </button>
-                    )}
                   </div>
 
-                  {/* Dynamic Notes Content display */}
+                  {/* Embedded PDF Viewer Frame */}
+                  <div style={{ position: 'relative', width: '100%', minHeight: '520px', background: '#111827', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                    <iframe 
+                      src={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)} 
+                      width="100%" 
+                      height="520px" 
+                      style={{ border: 'none', background: '#fff' }} 
+                      title="Notes PDF Viewer"
+                    />
+                  </div>
+
+                  {/* PDF Setup Instruction Block */}
                   <div 
-                    style={{
-                      color: 'var(--text-primary)',
-                      fontSize: '0.925rem',
-                      lineHeight: '1.7',
-                      whiteSpace: 'pre-line',
-                      fontFamily: 'var(--font-sans)',
-                      minHeight: '200px'
+                    style={{ 
+                      marginTop: '1.25rem', 
+                      padding: '1rem', 
+                      background: 'rgba(0, 229, 255, 0.03)', 
+                      border: '1px solid rgba(0, 229, 255, 0.15)', 
+                      borderRadius: '8px',
+                      fontSize: '0.8rem',
+                      color: 'var(--text-secondary)',
+                      lineHeight: '1.5'
                     }}
                   >
-                    {getNotesContent(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex) ? (
-                      getNotesContent(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)
-                    ) : (
-                      <div style={{ color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ fontWeight: 600, color: '#fff' }}>📝 Syllabus Topic Focus Outline:</div>
-                        <div>{activeModuleNotes.topicText}</div>
-                        <div style={{ marginTop: '1rem', fontSize: '0.85rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1rem', color: 'var(--accent-cyan)' }}>
-                          💡 <strong>Notes content not imported yet!</strong> <br />
-                          To display the full study notes here, click the **"Import Notes"** button at the top and upload the notes JSON.
-                        </div>
-                      </div>
-                    )}
+                    💡 <strong>How to permanently add PDF notes to the website:</strong><br />
+                    To make notes load automatically for this module, simply place your PDF file inside the website's project folder at: <br />
+                    <code style={{ color: 'var(--accent-cyan)', fontFamily: 'monospace', display: 'block', margin: '0.35rem 0', background: 'rgba(0,0,0,0.3)', padding: '0.25rem 0.5rem', borderRadius: '4px', width: 'fit-content' }}>
+                      public/pdfs/{activeModuleNotes.subjectCode}_M{activeModuleNotes.moduleIndex + 1}.pdf
+                    </code>
+                    (For example: <code style={{ color: 'var(--accent-cyan)' }}>public/pdfs/{activeModuleNotes.subjectCode}_M1.pdf</code> for Module 1, then commit and push to GitHub).
                   </div>
                 </div>
               ) : (
@@ -944,7 +607,10 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   {currentSubjects.map((subject) => {
                     const isSubjectExpanded = expandedSubject === subject.code;
-                    const subjectModules = getModulesForSubject(subject.code, subject.name);
+                    
+                    // Simple Module numbers 1 to 5
+                    const modulesList = [0, 1, 2, 3, 4];
+                    
                     return (
                       <div 
                         key={subject.code}
@@ -1000,50 +666,95 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                             }}
                           >
                             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block' }}>
-                              Syllabus Modules (Click a module to view notes)
+                              Select a module to view notes:
                             </span>
                             
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                              {subjectModules.map((moduleText, idx) => (
-                                <div 
-                                  key={idx}
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    padding: '0.75rem 1rem',
-                                    background: 'var(--bg-tertiary)',
-                                    borderRadius: '8px',
-                                    border: '1px solid var(--border-color)',
-                                    flexWrap: 'wrap',
-                                    gap: '0.75rem'
-                                  }}
-                                >
-                                  <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', flex: 1 }}>
-                                    {moduleText}
-                                  </span>
-                                  
-                                  <button
-                                    className="glow-btn"
-                                    onClick={() => setActiveModuleNotes({
-                                      subjectCode: subject.code,
-                                      subjectName: subject.name,
-                                      moduleIndex: idx,
-                                      topicText: moduleText
-                                    })}
+                              {modulesList.map((mIndex) => {
+                                const localFile = uploadedPdfs[subject.code]?.[mIndex];
+                                return (
+                                  <div 
+                                    key={mIndex}
                                     style={{
-                                      padding: '0.35rem 0.85rem',
-                                      borderRadius: '15px',
-                                      fontSize: '0.75rem',
                                       display: 'flex',
+                                      justifyContent: 'space-between',
                                       alignItems: 'center',
-                                      gap: '0.25rem'
+                                      padding: '0.75rem 1rem',
+                                      background: 'var(--bg-tertiary)',
+                                      borderRadius: '8px',
+                                      border: '1px solid var(--border-color)',
+                                      flexWrap: 'wrap',
+                                      gap: '0.75rem'
                                     }}
                                   >
-                                    Read Module Notes <ArrowRight size={12} />
-                                  </button>
-                                </div>
-                              ))}
+                                    <span style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 600 }}>
+                                      Module {mIndex + 1}
+                                    </span>
+                                    
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                      {/* PDF file uploader trigger */}
+                                      <label
+                                        style={{
+                                          background: 'rgba(255, 255, 255, 0.03)',
+                                          border: '1px solid var(--border-color)',
+                                          color: localFile ? 'var(--accent-green)' : 'var(--text-secondary)',
+                                          padding: '0.35rem 0.75rem',
+                                          borderRadius: '15px',
+                                          fontSize: '0.725rem',
+                                          fontWeight: 600,
+                                          cursor: 'pointer',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '0.25rem',
+                                          transition: 'all 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                                          e.currentTarget.style.color = '#fff';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.borderColor = 'var(--border-color)';
+                                          e.currentTarget.style.color = localFile ? 'var(--accent-green)' : 'var(--text-secondary)';
+                                        }}
+                                      >
+                                        {localFile ? <Check size={12} /> : <Upload size={12} />}
+                                        {localFile ? "PDF Uploaded" : "Upload PDF"}
+                                        <input 
+                                          type="file" 
+                                          accept=".pdf" 
+                                          onChange={(e) => handlePdfUpload(subject.code, mIndex, e.target.files[0])}
+                                          style={{ display: 'none' }}
+                                        />
+                                      </label>
+
+                                      {localFile && (
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                          ({localFile.name})
+                                        </span>
+                                      )}
+
+                                      <button
+                                        className="glow-btn"
+                                        onClick={() => setActiveModuleNotes({
+                                          subjectCode: subject.code,
+                                          subjectName: subject.name,
+                                          moduleIndex: mIndex
+                                        })}
+                                        style={{
+                                          padding: '0.35rem 0.85rem',
+                                          borderRadius: '15px',
+                                          fontSize: '0.75rem',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '0.25rem'
+                                        }}
+                                      >
+                                        View notes <ArrowRight size={12} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
