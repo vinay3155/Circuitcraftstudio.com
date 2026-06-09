@@ -8,6 +8,7 @@ import GallerySection from './components/GallerySection';
 import PaymentGateway from './components/PaymentGateway';
 import CircuitBot from './components/CircuitBot';
 import WhatsAppButton from './components/WhatsAppButton';
+import AdSenseUnit from './components/AdSenseUnit';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -121,9 +122,13 @@ export default function App() {
         {/* Custom Project DIY Configurator Section */}
         <ProjectBuilder onAddCustomToCart={handleAddToCart} />
 
+        {/* Google AdSense Display Unit */}
+        <AdSenseUnit adSlot="5955164719" />
+
         {/* Gallery Section */}
         <GallerySection />
       </main>
+
 
       {/* Floating WhatsApp Chat Button */}
       <WhatsAppButton />
