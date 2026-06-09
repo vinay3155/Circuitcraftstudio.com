@@ -132,7 +132,7 @@ export default function Footer({ onOpenOwnerConsole }) {
  
             {/* Email */}
             <a 
-              href="mailto:vinaynbodravla315@gmail.com"
+              href="mailto:circuitcraftstudio@gmail.com"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -145,7 +145,7 @@ export default function Footer({ onOpenOwnerConsole }) {
               className="hover-cyan-link"
             >
               <Mail size={16} style={{ color: 'var(--accent-cyan)' }} />
-              vinaynbodravla315@gmail.com
+              circuitcraftstudio@gmail.com
             </a>
  
             {/* Instagram */}

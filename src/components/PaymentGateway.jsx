@@ -81,7 +81,7 @@ export default function PaymentGateway({
       utrNumber: paymentMethod === 'upi' ? utrNumber : 'N/A'
     };
 
-    fetch('https://formsubmit.co/ajax/vinaynbodravla315@gmail.com', {
+    fetch('https://formsubmit.co/ajax/circuitcraftstudio@gmail.com', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ export default function PaymentGateway({
       body: JSON.stringify(emailPayload)
     })
     .then(response => response.json())
-    .then(data => console.log('Silently emailed order to vinaynbodravla315@gmail.com:', data))
+    .then(data => console.log('Silently emailed order to circuitcraftstudio@gmail.com:', data))
     .catch(error => console.error('Silent email notification failed:', error));
   };
 
@@ -909,7 +909,7 @@ export default function PaymentGateway({
                   <div style={{ textAlign: 'right' }}>
                     <strong>Merchant Details:</strong><br />
                     CircuitCraft Studio<br />
-                    Email: vinaynbodravla315@gmail.com<br />
+                    Email: circuitcraftstudio@gmail.com<br />
                     Phone: +91 81232 65315<br />
                     Date: {new Date().toLocaleDateString()}
                   </div>
