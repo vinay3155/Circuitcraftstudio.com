@@ -71,20 +71,18 @@ export default function Navbar({
             color: 'var(--accent-cyan)'
           }}
         >
-          <div 
+          <img 
+            src="/logo.png" 
+            alt="CircuitCraft Logo" 
             style={{
-              padding: '0.35rem',
-              borderRadius: '8px',
-              background: 'rgba(0, 229, 255, 0.1)',
-              border: '1px solid var(--accent-cyan)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              borderRadius: '6px',
+              objectFit: 'cover',
+              border: '1px solid var(--border-color)',
               animation: 'pulse-ring 2s infinite'
             }}
-          >
-            <Cpu size={20} />
-          </div>
+          />
           <span style={{ color: 'var(--text-primary)' }}>
             CIRCUITCRAFT <span style={{ color: 'var(--accent-cyan)' }}>STUDIO</span>
           </span>
