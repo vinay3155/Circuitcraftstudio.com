@@ -15,7 +15,7 @@ import StudyHubModal from './components/StudyHubModal';
 import OwnerDashboardModal from './components/OwnerDashboardModal';
 
 export default function App() {
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isStudyHubOpen, setIsStudyHubOpen] = useState(false);
