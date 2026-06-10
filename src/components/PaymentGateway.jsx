@@ -233,6 +233,21 @@ export default function PaymentGateway({
     return `https://api.whatsapp.com/send?phone=918123265315&text=${encodeURIComponent(text)}`;
   };
 
+  const isPurelyDigital = cart.every(item => 
+    item.id.startsWith('store-bundle-') || 
+    item.id.startsWith('roadmap-bundle-')
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      if (isPurelyDigital && !billingInfo.address) {
+        setBillingInfo(prev => ({ ...prev, address: 'Digital Download' }));
+      } else if (!isPurelyDigital && billingInfo.address === 'Digital Download') {
+        setBillingInfo(prev => ({ ...prev, address: '' }));
+      }
+    }
+  }, [isPurelyDigital, isOpen]);
+
   if (!isOpen) return null;
 
   const calculateSubtotal = () => {
@@ -477,29 +492,31 @@ export default function PaymentGateway({
               className="checkout-form-grid"
             >
               {/* Form entries */}
-              <div style={{ padding: '1.5rem', overflowY: 'auto', textAlign: 'left' }}>
-                <h4 style={{ color: 'var(--accent-cyan)', marginBottom: '1rem', fontSize: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem' }}>
+              <div style={{ padding: '1.5rem', overflowY: 'auto', textAlign: 'left' }} className="checkout-form-body">
+                <h4 className="checkout-title" style={{ color: 'var(--accent-cyan)', marginBottom: '1rem', fontSize: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem' }}>
                   1. Shipping & Contact Details
                 </h4>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }} className="shipping-grid">
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Full Name *</label>
+                    <label className="checkout-label" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Full Name *</label>
                     <input 
                       type="text" 
                       required 
                       value={billingInfo.fullName}
                       onChange={(e) => setBillingInfo({...billingInfo, fullName: e.target.value})}
+                      className="checkout-input"
                       style={{ width: '100%', padding: '0.55rem', borderRadius: '4px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff' }}
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Email Address *</label>
+                    <label className="checkout-label" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Email Address *</label>
                     <input 
                       type="email" 
                       required 
                       value={billingInfo.email}
                       onChange={(e) => setBillingInfo({...billingInfo, email: e.target.value})}
+                      className="checkout-input"
                       style={{ width: '100%', padding: '0.55rem', borderRadius: '4px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff' }}
                     />
                   </div>
@@ -507,36 +524,57 @@ export default function PaymentGateway({
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }} className="shipping-grid">
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Phone Number *</label>
+                    <label className="checkout-label" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Phone Number *</label>
                     <input 
                       type="tel" 
                       required 
                       value={billingInfo.phone}
                       onChange={(e) => setBillingInfo({...billingInfo, phone: e.target.value})}
+                      className="checkout-input"
                       style={{ width: '100%', padding: '0.55rem', borderRadius: '4px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff' }}
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>College / Organization</label>
+                    <label className="checkout-label" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>College / Org</label>
                     <input 
                       type="text" 
                       value={billingInfo.college}
                       onChange={(e) => setBillingInfo({...billingInfo, college: e.target.value})}
+                      className="checkout-input"
                       style={{ width: '100%', padding: '0.55rem', borderRadius: '4px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff' }}
                     />
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Delivery Address *</label>
-                  <textarea 
-                    required 
-                    rows={2} 
-                    value={billingInfo.address}
-                    onChange={(e) => setBillingInfo({...billingInfo, address: e.target.value})}
-                    style={{ width: '100%', padding: '0.55rem', borderRadius: '4px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff', fontFamily: 'inherit', resize: 'none' }}
-                  />
-                </div>
+                {isPurelyDigital ? (
+                  <div style={{
+                    padding: '0.65rem 0.85rem',
+                    background: 'rgba(16, 185, 129, 0.08)',
+                    border: '1px solid rgba(16, 185, 129, 0.15)',
+                    borderRadius: '6px',
+                    color: 'var(--accent-green)',
+                    fontSize: '0.8rem',
+                    marginBottom: '1.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}>
+                    <ShieldCheck size={14} />
+                    <span>Digital Order: No shipping address required</span>
+                  </div>
+                ) : (
+                  <div style={{ marginBottom: '1.25rem' }} className="shipping-address-container">
+                    <label className="checkout-label" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem' }}>Delivery Address *</label>
+                    <textarea 
+                      required 
+                      rows={2} 
+                      value={billingInfo.address}
+                      onChange={(e) => setBillingInfo({...billingInfo, address: e.target.value})}
+                      className="checkout-input"
+                      style={{ width: '100%', padding: '0.55rem', borderRadius: '4px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff', fontFamily: 'inherit', resize: 'none' }}
+                    />
+                  </div>
+                )}
 
                 <h4 style={{ color: 'var(--accent-cyan)', marginBottom: '1rem', fontSize: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.25rem' }}>
                   2. Payment Method
@@ -1140,8 +1178,32 @@ export default function PaymentGateway({
           .checkout-form-grid {
             grid-template-columns: 1fr !important;
           }
+          .checkout-form-body {
+            padding: 1rem !important;
+          }
           .shipping-grid {
-            grid-template-columns: 1fr !important;
+            grid-template-columns: 1fr 1fr !important; /* Keep side-by-side on mobile */
+            gap: 0.75rem !important;
+            margin-bottom: 0.85rem !important;
+          }
+          .checkout-input {
+            padding: 0.45rem 0.6rem !important;
+            font-size: 0.85rem !important;
+          }
+          .checkout-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+          }
+          .checkout-title {
+            font-size: 0.95rem !important;
+            margin-bottom: 0.75rem !important;
+            margin-top: 0.25rem !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .shipping-grid {
+            gap: 0.5rem !important;
+            margin-bottom: 0.65rem !important;
           }
         }
       `}</style>
