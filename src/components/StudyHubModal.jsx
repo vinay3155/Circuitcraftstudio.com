@@ -15,6 +15,14 @@ export default function StudyHubModal({ isOpen, onClose }) {
 
   const modalRef = useRef(null);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Close on Escape key press
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -586,15 +594,48 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                     </a>
                   </div>
 
-                  {/* Embedded PDF Viewer Frame */}
-                  <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 350px)', minHeight: '580px', background: '#111827', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                    <iframe 
-                      src={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)} 
-                      width="100%" 
-                      height="100%" 
-                      style={{ border: 'none', background: '#fff' }} 
-                      title="Notes PDF Viewer"
-                    />
+                  {/* Embedded PDF Viewer Frame / Mobile Fallback */}
+                  <div style={{ position: 'relative', width: '100%', height: isMobile ? 'auto' : 'calc(100vh - 350px)', minHeight: isMobile ? '320px' : '580px', background: '#111827', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
+                    {isMobile ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '2rem', textAlign: 'center', background: 'var(--bg-tertiary)' }}>
+                        <FileText size={48} style={{ color: 'var(--accent-cyan)', marginBottom: '1.25rem' }} />
+                        <h6 style={{ color: '#fff', fontSize: '1.05rem', marginBottom: '0.5rem', fontWeight: 700 }}>
+                          PDF Preview not supported on mobile browsers
+                        </h6>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '1.5rem', maxWidth: '300px', lineHeight: '1.5' }}>
+                          Mobile browsers do not support embedded inline PDF files. Please open it in a new tab or download it directly to view it.
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.75rem', width: '100%', maxWidth: '280px', flexDirection: 'column' }}>
+                          <button
+                            onClick={() => window.open(getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex), '_blank')}
+                            className="glow-btn"
+                            style={{ width: '100%', padding: '0.6rem 0', borderRadius: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.85rem' }}
+                          >
+                            <ExternalLink size={14} /> View Document Directly
+                          </button>
+                          <a
+                            href={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)}
+                            download={`${activeModuleNotes.subjectCode}_M${activeModuleNotes.moduleIndex + 1}.pdf`}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                              width: '100%', padding: '0.6rem 0', borderRadius: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                              background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600
+                            }}
+                          >
+                            <Download size={14} /> Download PDF Notes
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      <iframe 
+                        src={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)} 
+                        width="100%" 
+                        height="100%" 
+                        style={{ border: 'none', background: '#fff' }} 
+                        title="Notes PDF Viewer"
+                      />
+                    )}
                   </div>
 
                   {/* PDF Setup Instruction Block */}

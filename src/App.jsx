@@ -15,6 +15,7 @@ import StudyHubModal from './components/StudyHubModal';
 import OwnerDashboardModal from './components/OwnerDashboardModal';
 import RoadmapShowcase from './components/RoadmapShowcase';
 import RoadmapModal from './components/RoadmapModal';
+import DomainSelectorModal from './components/DomainSelectorModal';
 
 export default function App() {
   const [theme, setTheme] = useState('light');
@@ -29,6 +30,7 @@ export default function App() {
     return localStorage.getItem('cc_roadmap_unlocked') === 'true';
   });
   const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
+  const [isDomainSelectorOpen, setIsDomainSelectorOpen] = useState(false);
 
   // Sync theme attribute with DOM
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function App() {
 
   // Scroll observer to update Navbar highlight automatically based on viewport scroll position
   useEffect(() => {
-    const sections = ['home', 'services', 'projects', 'builder', 'gallery', 'blog', 'contact'];
+    const sections = ['home', 'services', 'projects', 'gallery', 'blog', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -99,11 +101,16 @@ export default function App() {
   };
 
   const handleUnlockRoadmap = () => {
+    setIsDomainSelectorOpen(true);
+  };
+
+  const handleConfirmDomain = (domainTitle) => {
+    setIsDomainSelectorOpen(false);
     const exists = cart.some(item => item.id.startsWith('roadmap-bundle'));
     if (!exists) {
       const roadmapItem = {
         id: 'roadmap-bundle',
-        title: 'VTU Placement & Career Roadmap Bundle',
+        title: `VTU Career Roadmap: ${domainTitle}`,
         price: 99,
         category: 'Placement & Career',
         microcontroller: 'Career Guide & Mentorship'
@@ -111,6 +118,14 @@ export default function App() {
       handleAddToCart(roadmapItem);
     } else {
       setIsCartOpen(true);
+    }
+  };
+
+  const handleHeroRoadmapClick = () => {
+    if (isRoadmapUnlocked) {
+      setIsRoadmapOpen(true);
+    } else {
+      setIsDomainSelectorOpen(true);
     }
   };
 
@@ -144,7 +159,7 @@ export default function App() {
       <main style={{ flex: 1 }}>
         {/* Hero Area */}
         <HeroSection 
-          onStartConfigurator={() => scrollToSection('builder')} 
+          onRoadmapClick={handleHeroRoadmapClick} 
           onExploreCatalog={() => scrollToSection('projects')} 
           onOpenStudyHub={() => setIsStudyHubOpen(true)}
         />
@@ -165,9 +180,6 @@ export default function App() {
           onOpenClick={() => setIsRoadmapOpen(true)}
         />
 
-        {/* Custom Project DIY Configurator Section */}
-        <ProjectBuilder onAddCustomToCart={handleAddToCart} />
-
         {/* Google AdSense Display Unit */}
         <AdSenseUnit adSlot="5955164719" />
 
@@ -183,7 +195,7 @@ export default function App() {
 
       {/* Floating Chatbot Assistant */}
       <CircuitBot 
-        onOpenBuilder={() => scrollToSection('builder')} 
+        onOpenBuilder={() => scrollToSection('projects')} 
         onOpenProjects={() => scrollToSection('projects')} 
       />
 
@@ -221,6 +233,13 @@ export default function App() {
       <RoadmapModal 
         isOpen={isRoadmapOpen}
         onClose={() => setIsRoadmapOpen(false)}
+      />
+
+      {/* Domain Selector Modal Portal */}
+      <DomainSelectorModal 
+        isOpen={isDomainSelectorOpen}
+        onClose={() => setIsDomainSelectorOpen(false)}
+        onConfirm={handleConfirmDomain}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Lightbulb, Edit, Code, Rocket, ArrowRight, Wrench, BookOpen } from 'lucide-react';
 
-export default function HeroSection({ onStartConfigurator, onExploreCatalog, onOpenStudyHub }) {
+export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenStudyHub }) {
   const canvasRef = useRef(null);
   const [typedText, setTypedText] = useState('');
   const slogan = "Transforming Engineering Ideas into Reality...";
@@ -313,24 +313,7 @@ export default function HeroSection({ onStartConfigurator, onExploreCatalog, onO
           }}
         >
           <button 
-            onClick={onStartConfigurator}
-            style={{
-              padding: '0.85rem 1.75rem',
-              borderRadius: '30px',
-              fontSize: '1rem',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.65rem'
-            }}
-            className="glow-btn"
-          >
-            DIY Project Builder
-            <ArrowRight size={18} />
-          </button>
-          
-          <button 
-            onClick={onOpenStudyHub}
+            onClick={onRoadmapClick}
             style={{
               padding: '0.85rem 1.75rem',
               borderRadius: '30px',
@@ -354,6 +337,24 @@ export default function HeroSection({ onStartConfigurator, onExploreCatalog, onO
               e.currentTarget.style.transform = 'none';
               e.currentTarget.style.boxShadow = '0 0 15px rgba(139, 92, 246, 0.4)';
             }}
+          >
+            <Sparkles size={18} />
+            Career Roadmap (₹99)
+            <ArrowRight size={18} />
+          </button>
+          
+          <button 
+            onClick={onOpenStudyHub}
+            style={{
+              padding: '0.85rem 1.75rem',
+              borderRadius: '30px',
+              fontSize: '1rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem'
+            }}
+            className="glow-btn"
           >
             <BookOpen size={18} />
             VTU Notes / Study Hub
