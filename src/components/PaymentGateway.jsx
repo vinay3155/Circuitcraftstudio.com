@@ -128,7 +128,7 @@ export default function PaymentGateway({
   const [orderId, setOrderId] = useState('');
 
   const totalCost = cart.reduce((sum, item) => sum + item.price, 0);
-  const upiVpa = 'vinaynbodravla315@okaxis';
+  const upiVpa = '8123265315-3@ybl';
   const upiUrl = `upi://pay?pa=${upiVpa}&pn=CircuitCraft%20Studio&am=${totalCost}&cu=INR&tn=Order%20${orderId}`;
 
   // Generate random order ID on checkout
