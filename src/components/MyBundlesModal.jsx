@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Folder, FileText, Download, ShoppingBag, ShieldCheck, Cpu, Terminal, HardDrive, Info, Layout, Award, BookOpen, Video, Sparkles, AlertCircle } from 'lucide-react';
+import { Folder, FileText, Download, ShoppingBag, ShieldCheck, Cpu, Terminal, HardDrive, Info, Layout, Award, BookOpen, Video, Sparkles, AlertCircle, Lock } from 'lucide-react';
 
-export default function MyBundlesModal({ isOpen, onClose }) {
+export default function MyBundlesModal({ isOpen, onClose, currentUser, onOpenAuth }) {
   const [purchasedList, setPurchasedList] = useState([]);
   const [activeBundle, setActiveBundle] = useState(null);
 
@@ -59,33 +59,41 @@ export default function MyBundlesModal({ isOpen, onClose }) {
     'ultimate': { name: 'Ultimate Bundle', price: 500 }
   };
 
-  // Scan localStorage for purchased bundles
-  const loadPurchases = () => {
-    const list = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('cc_purchased_bundle_')) {
-        if (localStorage.getItem(key) === 'true') {
-          // Key format: cc_purchased_bundle_[bundleId]_[tierId]
-          const raw = key.replace('cc_purchased_bundle_', '');
-          const lastUnderscore = raw.lastIndexOf('_');
-          const bundleId = raw.substring(0, lastUnderscore);
-          const tierId = raw.substring(lastUnderscore + 1);
+  // Retrieve purchased bundles list from MongoDB backend
+  const loadPurchases = async () => {
+    const token = localStorage.getItem('cc_auth_token');
+    if (!token) {
+      setPurchasedList([]);
+      return;
+    }
 
-          list.push({
-            id: raw,
-            bundleId,
-            tierId,
-            title: bundleMeta[bundleId]?.title || `${bundleId} Bundle`,
-            tierName: tierMeta[tierId]?.name || `${tierId} Tier`,
-            icon: bundleMeta[bundleId]?.icon || <Folder size={20} />
-          });
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    try {
+      const res = await fetch(`${API_URL}/api/purchases`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.map(p => ({
+          id: `${p.bundleId}_${p.tierId}`,
+          bundleId: p.bundleId,
+          tierId: p.tierId,
+          title: bundleMeta[p.bundleId]?.title || `${p.bundleId} Bundle`,
+          tierName: tierMeta[p.tierId]?.name || `${p.tierId} Tier`,
+          icon: bundleMeta[p.bundleId]?.icon || <Folder size={20} />
+        }));
+        setPurchasedList(list);
+        if (list.length > 0) {
+          // Keep current selection if valid, else pick first
+          const currentId = activeBundle ? `${activeBundle.bundleId}_${activeBundle.tierId}` : '';
+          const match = list.find(item => item.id === currentId);
+          setActiveBundle(match || list[0]);
+        } else {
+          setActiveBundle(null);
         }
       }
-    }
-    setPurchasedList(list);
-    if (list.length > 0 && !activeBundle) {
-      setActiveBundle(list[0]);
+    } catch (err) {
+      console.error('Error loading purchases from backend:', err);
     }
   };
 
@@ -93,7 +101,7 @@ export default function MyBundlesModal({ isOpen, onClose }) {
     if (isOpen) {
       loadPurchases();
     }
-  }, [isOpen]);
+  }, [isOpen, currentUser]);
 
   if (!isOpen) return null;
 
@@ -196,7 +204,40 @@ export default function MyBundlesModal({ isOpen, onClose }) {
 
         {/* Dashboard Grid */}
         <div style={{ flex: 1, display: 'flex', minHeight: 0 }} className="bundles-modal-body">
-          {purchasedList.length === 0 ? (
+          {!currentUser ? (
+            /* Logged Out Lock Screen */
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem', textAlign: 'center' }}>
+              <div
+                style={{
+                  width: '72px',
+                  height: '72px',
+                  borderRadius: '50%',
+                  background: 'rgba(37, 99, 235, 0.05)',
+                  border: '1px dashed var(--accent-blue)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '1.5rem'
+                }}
+              >
+                <Lock size={36} style={{ color: 'var(--accent-blue)', opacity: 0.8 }} />
+              </div>
+              <h4 style={{ fontSize: '1.15rem', marginBottom: '0.5rem', color: '#fff' }}>Access Locked</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', maxWidth: '380px', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+                Please Sign In or Create an Account to securely fetch, sync, and access your purchased project bundle downloads.
+              </p>
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenAuth();
+                }}
+                className="glow-btn"
+                style={{ padding: '0.65rem 1.5rem', borderRadius: '30px', fontSize: '0.85rem' }}
+              >
+                Sign In to Account
+              </button>
+            </div>
+          ) : purchasedList.length === 0 ? (
             /* Empty State */
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem', textAlign: 'center' }}>
               <div

@@ -18,6 +18,7 @@ import RoadmapModal from './components/RoadmapModal';
 import DomainSelectorModal from './components/DomainSelectorModal';
 import DigitalStore from './components/DigitalStore';
 import MyBundlesModal from './components/MyBundlesModal';
+import AuthModal from './components/AuthModal';
 
 export default function App() {
   const [theme, setTheme] = useState('light');
@@ -26,7 +27,44 @@ export default function App() {
   const [isStudyHubOpen, setIsStudyHubOpen] = useState(false);
   const [isOwnerDashboardOpen, setIsOwnerDashboardOpen] = useState(false);
   const [isMyBundlesOpen, setIsMyBundlesOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const fetchProfile = async () => {
+    const token = localStorage.getItem('cc_auth_token');
+    if (!token) return;
+
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    try {
+      const res = await fetch(`${API_URL}/api/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const user = await res.json();
+        setCurrentUser(user);
+      } else {
+        localStorage.removeItem('cc_auth_token');
+      }
+    } catch (err) {
+      console.error('Error verifying active profile session:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('cc_auth_token');
+    setCurrentUser(null);
+    setIsMyBundlesOpen(false);
+  };
+
+  const handleAuthSuccess = (user) => {
+    setCurrentUser(user);
+  };
 
   // Roadmap State (loaded from localStorage)
   const [unlockedRoadmaps, setUnlockedRoadmaps] = useState(() => {
@@ -183,6 +221,9 @@ export default function App() {
         setActiveTab={scrollToSection}
         onOpenStudyHub={() => setIsStudyHubOpen(true)}
         onOpenMyBundles={() => setIsMyBundlesOpen(true)}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onLogout={handleLogout}
       />
 
       {/* Main Content Sections */}
@@ -260,12 +301,23 @@ export default function App() {
           });
         }}
         onPurchaseSuccess={() => setIsMyBundlesOpen(true)}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
       />
 
       {/* My Purchased Bundles Modal Portal */}
       <MyBundlesModal 
         isOpen={isMyBundlesOpen}
         onClose={() => setIsMyBundlesOpen(false)}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
+      />
+
+      {/* Authenticator Portal */}
+      <AuthModal 
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onAuthSuccess={handleAuthSuccess}
       />
 
       {/* Study Hub Modal Portal */}

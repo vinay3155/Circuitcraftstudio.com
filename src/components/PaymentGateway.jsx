@@ -96,7 +96,9 @@ export default function PaymentGateway({
   onRemoveFromCart, 
   onClearCart,
   onUnlockRoadmap,
-  onPurchaseSuccess
+  onPurchaseSuccess,
+  currentUser,
+  onOpenAuth
 }) {
   const [checkoutStep, setCheckoutStep] = useState('cart'); // cart, billing, success
   const [paymentMethod, setPaymentMethod] = useState('card'); // card, upi
@@ -205,7 +207,10 @@ export default function PaymentGateway({
 
       // Unlock store bundles
       let unlockedAnyStoreBundle = false;
-      cart.forEach(item => {
+      const token = localStorage.getItem('cc_auth_token');
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+      cart.forEach(async (item) => {
         if (item.id.startsWith('store-bundle-')) {
           const parts = item.id.split('-');
           const timestamp = parts[parts.length - 1];
@@ -217,6 +222,22 @@ export default function PaymentGateway({
           
           localStorage.setItem(`cc_purchased_bundle_${bundleId}_${tierId}`, 'true');
           unlockedAnyStoreBundle = true;
+
+          // Save to backend MongoDB
+          if (token) {
+            try {
+              await fetch(`${API_URL}/api/purchases/unlock`, {
+                method: 'POST',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ bundleId, tierId })
+              });
+            } catch (err) {
+              console.error('Error unlocking purchase in backend:', err);
+            }
+          }
         }
       });
 
@@ -225,6 +246,15 @@ export default function PaymentGateway({
       }
     }
   }, [checkoutStep]);
+
+  const handleProceedToCheckout = () => {
+    if (!currentUser) {
+      alert('Please Sign In or Create an Account to save your purchased bundles!');
+      onOpenAuth();
+      return;
+    }
+    setCheckoutStep('billing');
+  };
 
   const getWhatsAppLink = () => {
     const totalCost = cart.reduce((sum, item) => sum + item.price, 0);
@@ -463,7 +493,7 @@ export default function PaymentGateway({
                 </div>
 
                 <button 
-                  onClick={() => setCheckoutStep('billing')}
+                  onClick={handleProceedToCheckout}
                   style={{
                     width: '100%',
                     padding: '0.9rem',

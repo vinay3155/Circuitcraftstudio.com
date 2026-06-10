@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Menu, X, Sun, Moon } from 'lucide-react';
+import { ShoppingCart, Menu, X, Sun, Moon, User, LogOut } from 'lucide-react';
 
 export default function Navbar({ 
   theme, 
@@ -9,9 +9,13 @@ export default function Navbar({
   activeTab, 
   setActiveTab,
   onOpenStudyHub,
-  onOpenMyBundles
+  onOpenMyBundles,
+  currentUser,
+  onOpenAuth,
+  onLogout
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const navItems = [
     { id: 'home', label: 'Home' },
@@ -146,7 +150,7 @@ export default function Navbar({
             ))}
           </div>
 
-          {/* Theme & Cart Controls */}
+          {/* Theme & Cart & Profile Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button
               onClick={toggleTheme}
@@ -202,6 +206,122 @@ export default function Navbar({
                 </span>
               )}
             </button>
+
+            {currentUser ? (
+              /* User Profile dropdown menu */
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  style={{
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-color)',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '20px',
+                    cursor: 'pointer',
+                    color: 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontWeight: 600,
+                    fontSize: '0.85rem'
+                  }}
+                >
+                  <User size={14} style={{ color: 'var(--accent-blue)' }} />
+                  <span style={{ maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {currentUser.name.split(' ')[0]}
+                  </span>
+                </button>
+                {isProfileMenuOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: '125%',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '8px',
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                      padding: '0.5rem 0',
+                      width: '180px',
+                      zIndex: 60,
+                      textAlign: 'left'
+                    }}
+                  >
+                    <div style={{ padding: '0.5rem 1rem', borderBottom: '1px solid var(--border-color)', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                      Account:<br/>
+                      <strong style={{ color: '#fff', wordBreak: 'break-all' }}>{currentUser.email}</strong>
+                    </div>
+                    <button
+                      onClick={() => {
+                        onOpenMyBundles();
+                        setIsProfileMenuOpen(false);
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-primary)',
+                        padding: '0.5rem 1rem',
+                        textAlign: 'left',
+                        width: '100%',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <Folder size={12} style={{ color: 'var(--accent-blue)' }} />
+                      My Purchased Bundles
+                    </button>
+                    <button
+                      onClick={() => {
+                        onLogout();
+                        setIsProfileMenuOpen(false);
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#ef4444',
+                        padding: '0.5rem 1rem',
+                        textAlign: 'left',
+                        width: '100%',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <LogOut size={12} /> Log Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Register/Login Trigger */
+              <button
+                onClick={onOpenAuth}
+                style={{
+                  background: 'none',
+                  border: '1px solid var(--accent-blue)',
+                  color: 'var(--accent-blue)',
+                  padding: '0.45rem 1rem',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(37, 99, 235, 0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </div>
 
@@ -296,6 +416,61 @@ export default function Navbar({
               {item.label}
             </button>
           ))}
+
+          {currentUser ? (
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                Account: <strong style={{ color: '#fff' }}>{currentUser.email}</strong>
+              </span>
+              <button
+                onClick={() => {
+                  onLogout();
+                  setIsOpen(false);
+                }}
+                style={{
+                  background: 'none',
+                  border: '1px solid #ef4444',
+                  color: '#ef4444',
+                  padding: '0.5rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                <LogOut size={14} /> Log Out
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                onOpenAuth();
+                setIsOpen(false);
+              }}
+              style={{
+                background: 'var(--accent-blue)',
+                border: 'none',
+                color: '#fff',
+                padding: '0.55rem',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                width: '100%',
+                fontWeight: 600,
+                marginTop: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              <User size={14} /> Sign In to Account
+            </button>
+          )}
         </div>
       )}
 
