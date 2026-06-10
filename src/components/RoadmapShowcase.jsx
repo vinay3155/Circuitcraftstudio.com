@@ -165,56 +165,22 @@ export default function RoadmapShowcase({ isUnlocked, onUnlockClick, onOpenClick
                 Open Fullscreen Roadmap <ArrowRight size={16} />
               </button>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
-                <button
-                  onClick={onUnlockClick}
-                  className="glow-btn"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    borderRadius: '30px',
-                    fontSize: '0.9rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  Buy Roadmap Bundle <ArrowRight size={16} />
-                </button>
-                <button
-                  onClick={() => {
-                    const element = document.getElementById('store');
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '0.65rem',
-                    borderRadius: '30px',
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--text-secondary)',
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                    transition: 'all var(--transition-fast)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--accent-blue)';
-                    e.currentTarget.style.color = 'var(--accent-blue)';
-                    e.currentTarget.style.background = 'var(--bg-tertiary)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border-color)';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                    e.currentTarget.style.background = 'var(--bg-secondary)';
-                  }}
-                >
-                  Buy Project Bundles (Go to Store)
-                </button>
-              </div>
+              <button
+                onClick={onUnlockClick}
+                className="glow-btn"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '30px',
+                  fontSize: '0.9rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                Buy Roadmap Bundle <ArrowRight size={16} />
+              </button>
             )}
 
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>

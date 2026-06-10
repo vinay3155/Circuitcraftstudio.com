@@ -113,23 +113,14 @@ export default function App() {
   };
 
   const handleUnlockRoadmap = () => {
-    setIsDomainSelectorOpen(true);
-  };
-
-  const handleConfirmDomain = (domainId, alreadyUnlocked, domainTitle) => {
-    setIsDomainSelectorOpen(false);
-    if (alreadyUnlocked) {
-      setIsRoadmapOpen(true);
-      return;
-    }
-    const exists = cart.some(item => item.id.startsWith(`roadmap-bundle-${domainId}`));
+    const exists = cart.some(item => item.id.startsWith('roadmap-bundle-all'));
     if (!exists) {
       const roadmapItem = {
-        id: `roadmap-bundle-${domainId}`,
-        title: `VTU Career Roadmap: ${domainTitle}`,
+        id: 'roadmap-bundle-all',
+        title: 'Placement & Career Roadmap Bundle',
         price: 99,
         category: 'Placement & Career',
-        microcontroller: 'Career Guide & Mentorship'
+        microcontroller: '10 Technical Career Paths'
       };
       handleAddToCart(roadmapItem);
     } else {
@@ -142,7 +133,7 @@ export default function App() {
     if (hasAnyUnlocked) {
       setIsRoadmapOpen(true);
     } else {
-      setIsDomainSelectorOpen(true);
+      handleUnlockRoadmap();
     }
   };
 
@@ -229,9 +220,19 @@ export default function App() {
         onClearCart={handleClearCart}
         onUnlockRoadmap={(domainId) => {
           setUnlockedRoadmaps(prev => {
-            const updated = { ...prev, [domainId]: true };
-            localStorage.setItem(`cc_roadmap_unlocked_${domainId}`, 'true');
-            return updated;
+            if (domainId === 'all') {
+              const updated = { ...prev };
+              Object.keys(updated).forEach(k => {
+                updated[k] = true;
+                localStorage.setItem(`cc_roadmap_unlocked_${k}`, 'true');
+              });
+              localStorage.setItem('cc_roadmap_unlocked', 'true');
+              return updated;
+            } else {
+              const updated = { ...prev, [domainId]: true };
+              localStorage.setItem(`cc_roadmap_unlocked_${domainId}`, 'true');
+              return updated;
+            }
           });
         }}
       />
