@@ -100,9 +100,13 @@ export default function PaymentGateway({
       sendNotifications(orderId, cart, billingInfo);
       
       // If the cart contains the roadmap bundle, trigger the unlock callback
-      if (cart.some(item => item.id.startsWith('roadmap-bundle'))) {
+      const roadmapItem = cart.find(item => item.id.startsWith('roadmap-bundle'));
+      if (roadmapItem) {
+        // ID format: roadmap-bundle-embedded-178...
+        const parts = roadmapItem.id.split('-');
+        const domainId = parts[2] || 'sde'; // extracts 'embedded' (fallback to 'sde')
         if (typeof onUnlockRoadmap === 'function') {
-          onUnlockRoadmap();
+          onUnlockRoadmap(domainId);
         }
       }
     }

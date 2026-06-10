@@ -16,6 +16,7 @@ import OwnerDashboardModal from './components/OwnerDashboardModal';
 import RoadmapShowcase from './components/RoadmapShowcase';
 import RoadmapModal from './components/RoadmapModal';
 import DomainSelectorModal from './components/DomainSelectorModal';
+import DigitalStore from './components/DigitalStore';
 
 export default function App() {
   const [theme, setTheme] = useState('light');
@@ -26,8 +27,19 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
 
   // Roadmap State (loaded from localStorage)
-  const [isRoadmapUnlocked, setIsRoadmapUnlocked] = useState(() => {
-    return localStorage.getItem('cc_roadmap_unlocked') === 'true';
+  const [unlockedRoadmaps, setUnlockedRoadmaps] = useState(() => {
+    const list = ['sde', 'fullstack', 'backend', 'frontend', 'mobile', 'datascience', 'aiml', 'vlsi', 'embedded', 'pcb'];
+    const status = {};
+    list.forEach(id => {
+      status[id] = localStorage.getItem(`cc_roadmap_unlocked_${id}`) === 'true';
+    });
+    // backward compatibility check
+    if (localStorage.getItem('cc_roadmap_unlocked') === 'true') {
+      list.forEach(id => {
+        status[id] = true;
+      });
+    }
+    return status;
   });
   const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
   const [isDomainSelectorOpen, setIsDomainSelectorOpen] = useState(false);
@@ -39,7 +51,7 @@ export default function App() {
 
   // Scroll observer to update Navbar highlight automatically based on viewport scroll position
   useEffect(() => {
-    const sections = ['home', 'services', 'projects', 'gallery', 'blog', 'contact'];
+    const sections = ['home', 'services', 'projects', 'store', 'gallery', 'blog', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -104,12 +116,16 @@ export default function App() {
     setIsDomainSelectorOpen(true);
   };
 
-  const handleConfirmDomain = (domainTitle) => {
+  const handleConfirmDomain = (domainId, alreadyUnlocked, domainTitle) => {
     setIsDomainSelectorOpen(false);
-    const exists = cart.some(item => item.id.startsWith('roadmap-bundle'));
+    if (alreadyUnlocked) {
+      setIsRoadmapOpen(true);
+      return;
+    }
+    const exists = cart.some(item => item.id.startsWith(`roadmap-bundle-${domainId}`));
     if (!exists) {
       const roadmapItem = {
-        id: 'roadmap-bundle',
+        id: `roadmap-bundle-${domainId}`,
         title: `VTU Career Roadmap: ${domainTitle}`,
         price: 99,
         category: 'Placement & Career',
@@ -122,27 +138,26 @@ export default function App() {
   };
 
   const handleHeroRoadmapClick = () => {
-    if (isRoadmapUnlocked) {
+    const hasAnyUnlocked = Object.values(unlockedRoadmaps).some(val => val === true);
+    if (hasAnyUnlocked) {
       setIsRoadmapOpen(true);
     } else {
       setIsDomainSelectorOpen(true);
     }
   };
 
-  const handleToggleRoadmapUnlock = () => {
-    setIsRoadmapUnlocked(prev => {
-      const newState = !prev;
-      localStorage.setItem('cc_roadmap_unlocked', newState ? 'true' : 'false');
-      return newState;
+  const handleToggleRoadmapUnlock = (domainId) => {
+    setUnlockedRoadmaps(prev => {
+      const newState = !prev[domainId];
+      localStorage.setItem(`cc_roadmap_unlocked_${domainId}`, newState ? 'true' : 'false');
+      return { ...prev, [domainId]: newState };
     });
   };
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Background Graphic Orbs */}
+      {/* Background Graphic Grid */}
       <div className="circuit-overlay" />
-      <div className="circuit-glow-orb" />
-      <div className="circuit-glow-orb-2" />
 
       {/* Navigation Header */}
       <Navbar 
@@ -175,10 +190,13 @@ export default function App() {
 
         {/* Placement & Career Roadmap Bundle Showcase */}
         <RoadmapShowcase 
-          isUnlocked={isRoadmapUnlocked}
+          isUnlocked={Object.values(unlockedRoadmaps).some(val => val === true)}
           onUnlockClick={handleUnlockRoadmap}
           onOpenClick={() => setIsRoadmapOpen(true)}
         />
+
+        {/* Digital Store Section */}
+        <DigitalStore onAddToCart={handleAddToCart} />
 
         {/* Google AdSense Display Unit */}
         <AdSenseUnit adSlot="5955164719" />
@@ -209,9 +227,12 @@ export default function App() {
         cart={cart}
         onRemoveFromCart={handleRemoveFromCart}
         onClearCart={handleClearCart}
-        onUnlockRoadmap={() => {
-          setIsRoadmapUnlocked(true);
-          localStorage.setItem('cc_roadmap_unlocked', 'true');
+        onUnlockRoadmap={(domainId) => {
+          setUnlockedRoadmaps(prev => {
+            const updated = { ...prev, [domainId]: true };
+            localStorage.setItem(`cc_roadmap_unlocked_${domainId}`, 'true');
+            return updated;
+          });
         }}
       />
 
@@ -225,7 +246,7 @@ export default function App() {
       <OwnerDashboardModal 
         isOpen={isOwnerDashboardOpen} 
         onClose={() => setIsOwnerDashboardOpen(false)} 
-        isRoadmapUnlocked={isRoadmapUnlocked}
+        unlockedRoadmaps={unlockedRoadmaps}
         onToggleRoadmapUnlock={handleToggleRoadmapUnlock}
       />
 
@@ -233,6 +254,11 @@ export default function App() {
       <RoadmapModal 
         isOpen={isRoadmapOpen}
         onClose={() => setIsRoadmapOpen(false)}
+        unlockedRoadmaps={unlockedRoadmaps}
+        onUnlockTrack={(domainId) => {
+          setIsRoadmapOpen(false);
+          setIsDomainSelectorOpen(true);
+        }}
       />
 
       {/* Domain Selector Modal Portal */}
@@ -240,6 +266,7 @@ export default function App() {
         isOpen={isDomainSelectorOpen}
         onClose={() => setIsDomainSelectorOpen(false)}
         onConfirm={handleConfirmDomain}
+        unlockedRoadmaps={unlockedRoadmaps}
       />
     </div>
   );

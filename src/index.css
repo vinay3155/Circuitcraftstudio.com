@@ -1,4 +1,4 @@
-/* CircuitCraft Studio - Modern Professional Design System */
+/* CircuitCraft Studio - Premium Educational Design System */
 
 /* Core Variables - Light Theme (Default) */
 :root {
@@ -6,57 +6,57 @@
   --bg-secondary: #ffffff;
   --bg-tertiary: #f1f5f9;
   --border-color: #e2e8f0;
-  --border-focus: #4f46e5;
+  --border-focus: #3b82f6;
   
   --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  
-  /* Brand accents */
-  --accent-cyan: #0284c7;
-  --accent-blue: #3b82f6;
-  --accent-green: #10b981;
-  --accent-yellow: #f59e0b;
-  --accent-purple: #6366f1;
-  
-  /* Soft Premium Shadows */
-  --glow-cyan: 0 4px 20px rgba(0, 0, 0, 0.05);
-  --glow-cyan-strong: 0 10px 30px rgba(99, 102, 241, 0.08);
-  --glow-blue: 0 4px 20px rgba(0, 0, 0, 0.05);
-  --glow-green: 0 4px 20px rgba(0, 0, 0, 0.05);
-  
-  /* Fonts */
-  --font-display: 'Inter', sans-serif;
-  --font-sans: 'Inter', sans-serif;
-  
-  /* Transition speed */
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Dark Mode Overrides (Refined Slate Midnight) */
-[data-theme="dark"] {
-  --bg-primary: #090d16;
-  --bg-secondary: #0f1524;
-  --bg-tertiary: #192134;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-focus: #6366f1;
-  
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --text-secondary: #334155;
   --text-muted: #64748b;
   
+  /* Trust-oriented Academic Accents */
+  --accent-cyan: #0284c7;     /* Sky/Ocean Blue */
+  --accent-blue: #2563eb;     /* Royal Blue */
+  --accent-green: #16a34a;    /* Emerald Green */
+  --accent-yellow: #ca8a04;   /* Amber Yellow */
+  --accent-purple: #4f46e5;   /* Royal Indigo */
+  
+  /* Clean Premium Shadows (Flat style, no neon glow) */
+  --glow-cyan: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --glow-cyan-strong: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --glow-blue: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --glow-green: 0 1px 3px rgba(0, 0, 0, 0.05);
+  
+  /* Fonts */
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Transition speed - Standard and smooth */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s ease;
+}
+
+/* Dark Mode Overrides (Refined Midnight Slate) */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;       /* Dark slate blue */
+  --bg-secondary: #1e293b;     /* Slate-800 */
+  --bg-tertiary: #334155;      /* Slate-700 */
+  --border-color: #334155;
+  --border-focus: #60a5fa;
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;   /* Slate-300 */
+  --text-muted: #94a3b8;       /* Slate-400 */
+  
   --accent-cyan: #38bdf8;
-  --accent-blue: #6366f1;
-  --accent-green: #34d399;
-  --accent-yellow: #fbbf24;
+  --accent-blue: #60a5fa;
+  --accent-green: #4ade80;
+  --accent-yellow: #facc15;
   --accent-purple: #818cf8;
   
-  --glow-cyan: 0 4px 25px rgba(0, 0, 0, 0.4);
-  --glow-cyan-strong: 0 10px 40px rgba(99, 102, 241, 0.2);
-  --glow-blue: 0 4px 25px rgba(0, 0, 0, 0.4);
-  --glow-green: 0 4px 25px rgba(0, 0, 0, 0.4);
+  --glow-cyan: none;
+  --glow-cyan-strong: none;
+  --glow-blue: none;
+  --glow-green: none;
 }
 
 /* Global Reset & Base Styling */
@@ -98,7 +98,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-/* Subtle background textures (No cyberpunk neon grid) */
+/* Background grid (clean educational pattern, no animations or floating orbs) */
 .circuit-overlay {
   position: fixed;
   top: 0;
@@ -110,127 +110,52 @@ h1, h2, h3, h4, h5, h6 {
   background-size: 24px 24px;
   z-index: -2;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.3;
 }
 
-.circuit-glow-orb {
-  position: fixed;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.02) 0%, transparent 70%);
-  top: -100px;
-  right: -100px;
-  z-index: -1;
-  pointer-events: none;
-  border-radius: 50%;
-  animation: orb-float 20s infinite alternate ease-in-out;
+/* Disable distracting background glowing circles */
+.circuit-glow-orb, .circuit-glow-orb-2 {
+  display: none !important;
 }
 
-.circuit-glow-orb-2 {
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.015) 0%, transparent 70%);
-  bottom: -100px;
-  left: -100px;
-  z-index: -1;
-  pointer-events: none;
-  border-radius: 50%;
-  animation: orb-float-reverse 25s infinite alternate ease-in-out;
-}
-
-/* CSS Animations */
-@keyframes orb-float {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-40px, 40px) scale(1.05); }
-}
-
-@keyframes orb-float-reverse {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(40px, -40px) scale(1.08); }
-}
-
-@keyframes slide-in {
-  from { transform: translateY(15px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(0.97); opacity: 0.7; }
-  50% { transform: scale(1.03); opacity: 0.9; }
-  100% { transform: scale(0.97); opacity: 0.7; }
-}
-
-/* Dynamic Classes */
-.animate-slide-in {
-  animation: slide-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
-}
-
-/* Glassmorphism card template - Redefined to clean SaaS layout */
+/* Glassmorphism template redefined to: Flat Premium Cards */
 .glass-panel {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 [data-theme="dark"] .glass-panel {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .glass-panel:hover {
-  border-color: var(--accent-purple);
-  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.06);
-  transform: translateY(-2px);
+  border-color: var(--accent-blue);
+  /* No vertical jumps or neon shadows */
 }
 
-[data-theme="dark"] .glass-panel:hover {
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 15px rgba(99, 102, 241, 0.08);
-}
-
-/* Sleek Brand Buttons */
+/* Premium Solid Buttons (no neon glow/shadow pulse) */
 .glow-btn {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+  background: var(--accent-purple);
   color: #ffffff !important;
   font-weight: 600;
   border: none;
   cursor: pointer;
-  z-index: 1;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .glow-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+  background: #4338ca; /* Indigo-700 */
 }
 
 .glow-btn:active {
-  transform: translateY(0);
-}
-
-/* Professional Terminal / Code Styles */
-.cyber-terminal {
-  font-family: 'Courier New', Courier, monospace;
-  background-color: var(--bg-tertiary);
-  color: var(--accent-purple);
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  transform: translateY(1px);
 }
 
 /* Custom Checkbox / Toggle styling */
@@ -264,7 +189,6 @@ h1, h2, h3, h4, h5, h6 {
 .custom-checkbox input:checked ~ .checkmark {
   background: var(--accent-purple);
   border-color: var(--accent-purple);
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
 }
 
 .checkmark::after {
@@ -296,7 +220,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform var(--transition-slow);
+  transition: transform var(--transition-normal);
 }
 
 .credit-card.flipped {
@@ -308,16 +232,16 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .card-front {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
   z-index: 2;
@@ -357,8 +281,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Badge Styles */
 .badge-glow {
-  background: rgba(99, 102, 241, 0.06);
-  border: 1px solid rgba(99, 102, 241, 0.15);
+  background: rgba(79, 70, 229, 0.06);
+  border: 1px solid rgba(79, 70, 229, 0.15);
   color: var(--accent-purple);
 }
 
@@ -366,42 +290,47 @@ h1, h2, h3, h4, h5, h6 {
 /* FORCE THEME OVERRIDES FOR DYNAMIC HIGH-CONTRAST DATA */
 /* ---------------------------------------------------- */
 
-/* Ensure all headers adapt to theme text primary color, overriding inline hardcoded white color */
+/* Ensure all headers adapt to theme text primary color */
 h1, h2, h3, h4, h5, h6,
 h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
   color: var(--text-primary) !important;
   text-shadow: none !important;
 }
 
-/* Force specific inline white colors on paragraphs and spans to adapt to the light background */
+/* Force specific inline white colors on paragraphs and spans to adapt to the theme */
 [style*="color: rgb(255, 255, 255)"],
 [style*="color: #fff"],
 [style*="color: #ffffff"] {
   color: var(--text-primary) !important;
 }
 
-/* Exceptions: Let buttons keep their contrast colors */
+/* Exceptions: Let buttons and special accent pills keep their contrast colors */
 .glow-btn,
 .glow-btn *,
 button.glow-btn,
-button.glow-btn * {
+button.glow-btn *,
+.pill-accent,
+.pill-accent * {
   color: #ffffff !important;
 }
 
-/* Navbar light/dark override for inline background */
+/* Navbar: SOLID Premium Header */
 .nav-theme-override {
-  background: rgba(255, 255, 255, 0.8) !important;
+  background: #ffffff !important;
   border-bottom: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
 [data-theme="dark"] .nav-theme-override {
-  background: rgba(15, 21, 36, 0.85) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #0f172a !important;
+  border-bottom: 1px solid #334155 !important;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2) !important;
 }
 
-/* Navbar active underline shadow override */
+/* active tab style overlay - premium solid underline */
 .nav-theme-override span[style*="box-shadow"] {
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3) !important;
+  box-shadow: none !important;
+  background: var(--accent-blue) !important;
 }
 
 /* Redesign project builder inline panels */
@@ -414,7 +343,7 @@ section#builder [style*="background: rgba(255, 255, 255, 0.02)"] {
 }
 
 section#builder [style*="background: rgba(0, 229, 255, 0.04)"] {
-  background: rgba(99, 102, 241, 0.06) !important;
+  background: rgba(79, 70, 229, 0.06) !important;
   border-color: var(--accent-purple) !important;
 }
 
@@ -458,13 +387,13 @@ section#builder [style*="background: rgba(251, 191, 36, 0.05)"] {
 [style*="background: rgba(10, 14, 23, 0.88)"],
 [style*="background: rgba(10, 14, 23, 0.95)"],
 [style*="background: rgba(10, 14, 23, 0.9)"] {
-  background: rgba(15, 23, 42, 0.6) !important;
+  background: rgba(15, 23, 42, 0.75) !important;
 }
 
 [data-theme="dark"] [style*="background: rgba(10, 14, 23, 0.88)"],
 [data-theme="dark"] [style*="background: rgba(10, 14, 23, 0.95)"],
 [data-theme="dark"] [style*="background: rgba(10, 14, 23, 0.9)"] {
-  background: rgba(5, 7, 12, 0.85) !important;
+  background: rgba(15, 23, 42, 0.9) !important;
 }
 
 /* Responsive Utilities */

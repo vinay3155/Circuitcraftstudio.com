@@ -1,10 +1,101 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Cpu, Code, BookOpen, Layers, Award, Terminal, Compass, Briefcase, FileText, Check, Copy, ExternalLink, HelpCircle } from 'lucide-react';
+import { X, Cpu, Code, BookOpen, Layers, Award, Terminal, Compass, Briefcase, FileText, Check, Copy, ExternalLink, HelpCircle, Lock } from 'lucide-react';
 
-export default function RoadmapModal({ isOpen, onClose }) {
+export default function RoadmapModal({ isOpen, onClose, unlockedRoadmaps = {}, onUnlockTrack }) {
   const [activeTab, setActiveTab] = useState('system-design'); // defaults to IT first tab
   const [copiedText, setCopiedText] = useState('');
   const modalRef = useRef(null);
+
+  const getTabDomainId = (tabId) => {
+    switch (tabId) {
+      case 'system-design':
+      case 'dsa':
+        return 'sde';
+      case 'fullstack':
+        return 'fullstack';
+      case 'aiml':
+        return 'aiml';
+      case 'embedded':
+        return 'embedded';
+      case 'vlsi':
+        return 'vlsi';
+      case 'iot':
+        return 'embedded';
+      default:
+        return null;
+    }
+  };
+
+  const isTabLocked = (tabId) => {
+    const domainId = getTabDomainId(tabId);
+    if (!domainId) {
+      // essentials: free if at least one domain is unlocked
+      const hasAnyUnlocked = Object.values(unlockedRoadmaps).some(val => val === true);
+      return !hasAnyUnlocked;
+    }
+    return !unlockedRoadmaps[domainId];
+  };
+
+  const getDomainName = (domainId) => {
+    switch (domainId) {
+      case 'sde': return 'Software Engineer (SDE)';
+      case 'fullstack': return 'Full Stack Developer';
+      case 'backend': return 'Backend Developer';
+      case 'frontend': return 'Frontend Developer';
+      case 'mobile': return 'Mobile App Developer';
+      case 'datascience': return 'Data Science & Analytics';
+      case 'aiml': return 'AI & Machine Learning';
+      case 'vlsi': return 'VLSI Design';
+      case 'embedded': return 'Embedded Systems';
+      case 'pcb': return 'PCB Design & Hardware';
+      default: return 'Placement Roadmap';
+    }
+  };
+
+  const renderLockScreen = (tabId) => {
+    const domainId = getTabDomainId(tabId);
+    const domainName = getDomainName(domainId || 'sde');
+    return (
+      <div 
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '4rem 2rem',
+          textAlign: 'center',
+          background: 'rgba(255,255,255,0.01)',
+          border: '1px dashed var(--border-color)',
+          borderRadius: '16px',
+          height: '100%',
+          minHeight: '400px'
+        }}
+      >
+        <Lock size={48} style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }} />
+        <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '0.75rem' }}>
+          {domainName} Roadmap is Locked
+        </h3>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '450px', lineHeight: '1.6', marginBottom: '2rem' }}>
+          This technical preparation track is part of the premium placement bundle. Unlock this track for ₹99 to access full roadmaps, code guides, templates, and mock interviews.
+        </p>
+        <button
+          onClick={() => onUnlockTrack(domainId || 'sde')}
+          className="glow-btn"
+          style={{
+            padding: '0.75rem 2.5rem',
+            borderRadius: '30px',
+            fontSize: '0.9rem',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          Unlock {domainName} Track - ₹99
+        </button>
+      </div>
+    );
+  };
 
   // Close on Escape
   useEffect(() => {
@@ -290,8 +381,10 @@ Bachelor of Engineering in Computer Science / Electronics \\hfill CGPA: 8.8 / 10
           {/* Main Content Pane */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '2.5rem 3rem', textAlign: 'left' }}>
             
-            {/* 1. SYSTEM DESIGN & ARCHITECTURE */}
-            {activeTab === 'system-design' && (
+            {isTabLocked(activeTab) ? renderLockScreen(activeTab) : (
+              <>
+                {/* 1. SYSTEM DESIGN & ARCHITECTURE */}
+                {activeTab === 'system-design' && (
               <div>
                 <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>System Design & Architecture</h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.6' }}>
@@ -671,6 +764,8 @@ Bachelor of Engineering in Computer Science / Electronics \\hfill CGPA: 8.8 / 10
                   </div>
                 </div>
               </div>
+            )}
+              </>
             )}
 
           </div>

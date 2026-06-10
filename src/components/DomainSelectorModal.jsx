@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, CheckCircle, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { X, CheckCircle, ArrowRight, ShieldCheck, Sparkles, Unlock } from 'lucide-react';
 
-export default function DomainSelectorModal({ isOpen, onClose, onConfirm }) {
+export default function DomainSelectorModal({ isOpen, onClose, onConfirm, unlockedRoadmaps = {} }) {
   const [selectedId, setSelectedId] = useState(null);
   const modalRef = useRef(null);
 
@@ -216,7 +216,7 @@ export default function DomainSelectorModal({ isOpen, onClose, onConfirm }) {
         <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-            Select your preferred industry focus. Unlocking this domain unlocks the **complete Placement & Career Roadmap Bundle** (including all other domains, resume templates, and mock booking) for a one-time fee of ₹99.
+            Select your preferred industry focus. Unlocking this domain gives you active lifetime access to its specific roadmap, templates, and WhatsApp mock interviews.
           </p>
 
           {!selectedId ? (
@@ -228,41 +228,66 @@ export default function DomainSelectorModal({ isOpen, onClose, onConfirm }) {
                 gap: '1rem'
               }}
             >
-              {domains.map((domain) => (
-                <div
-                  key={domain.id}
-                  onClick={() => setSelectedId(domain.id)}
-                  style={{
-                    padding: '1.25rem',
-                    background: 'var(--bg-tertiary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '12px',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    transition: 'all 0.2s',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--accent-purple)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border-color)';
-                    e.currentTarget.style.transform = 'none';
-                  }}
-                >
-                  <h4 style={{ color: '#fff', fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-                    {domain.title}
-                  </h4>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', lineHeight: '1.4' }}>
-                    {domain.desc}
-                  </p>
-                  <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: 'var(--accent-purple)', fontWeight: 600 }}>
-                    Select Domain <ArrowRight size={12} />
+              {domains.map((domain) => {
+                const isUnlocked = !!unlockedRoadmaps[domain.id];
+                return (
+                  <div
+                    key={domain.id}
+                    onClick={() => setSelectedId(domain.id)}
+                    style={{
+                      padding: '1.25rem',
+                      background: 'var(--bg-tertiary)',
+                      border: isUnlocked ? '1px solid var(--accent-green)' : '1px solid var(--border-color)',
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.2s',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = isUnlocked ? 'var(--accent-green)' : 'var(--accent-purple)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = isUnlocked ? 'var(--accent-green)' : 'var(--border-color)';
+                      e.currentTarget.style.transform = 'none';
+                    }}
+                  >
+                    {isUnlocked && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '12px',
+                          right: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '2px',
+                          fontSize: '0.65rem',
+                          fontWeight: 700,
+                          color: 'var(--accent-green)',
+                          background: 'rgba(16, 185, 129, 0.08)',
+                          padding: '2px 6px',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(16, 185, 129, 0.2)'
+                        }}
+                      >
+                        <Unlock size={10} /> Active
+                      </div>
+                    )}
+
+                    <h4 style={{ color: '#fff', fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.5rem', paddingRight: isUnlocked ? '55px' : '0' }}>
+                      {domain.title}
+                    </h4>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', lineHeight: '1.4' }}>
+                      {domain.desc}
+                    </p>
+                    <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: isUnlocked ? 'var(--accent-green)' : 'var(--accent-purple)', fontWeight: 600 }}>
+                      {isUnlocked ? 'View Roadmap' : 'Select Domain'} <ArrowRight size={12} />
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             /* DETAILED DOMAIN VIEW & CHECKOUT PROMPT */
@@ -290,13 +315,20 @@ export default function DomainSelectorModal({ isOpen, onClose, onConfirm }) {
                 className="glass-panel"
                 style={{
                   padding: '2rem',
-                  border: '1px solid var(--accent-purple)',
+                  border: '1.5px solid ' + (unlockedRoadmaps[currentSelection.id] ? 'var(--accent-green)' : 'var(--accent-purple)'),
                   background: 'var(--bg-tertiary)'
                 }}
               >
-                <span style={{ fontSize: '0.75rem', color: 'var(--accent-purple)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Target Domain Selection
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '0.75rem', color: unlockedRoadmaps[currentSelection.id] ? 'var(--accent-green)' : 'var(--accent-purple)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Target Domain Selection
+                  </span>
+                  {unlockedRoadmaps[currentSelection.id] && (
+                    <span style={{ fontSize: '0.8rem', color: 'var(--accent-green)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Unlock size={14} /> YOU HAVE LIFETIME ACCESS
+                    </span>
+                  )}
+                </div>
                 
                 <h4 style={{ fontSize: '1.6rem', color: '#fff', margin: '0.5rem 0 1rem 0' }}>
                   {currentSelection.title}
@@ -322,30 +354,58 @@ export default function DomainSelectorModal({ isOpen, onClose, onConfirm }) {
                 {/* Pricing and Proceed button */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                      <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>₹99</span>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>₹499</span>
-                    </div>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--accent-green)', fontWeight: 600, display: 'block' }}>
-                      Lifetime Full Bundle Access • 80% discount active
-                    </span>
+                    {unlockedRoadmaps[currentSelection.id] ? (
+                      <span style={{ fontSize: '0.85rem', color: 'var(--accent-green)', fontWeight: 600 }}>
+                        Active on this device
+                      </span>
+                    ) : (
+                      <>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                          <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>₹99</span>
+                          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>₹499</span>
+                        </div>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--accent-green)', fontWeight: 600, display: 'block' }}>
+                          Lifetime Track Access • 80% discount active
+                        </span>
+                      </>
+                    )}
                   </div>
 
-                  <button
-                    onClick={() => onConfirm(currentSelection.title)}
-                    className="glow-btn"
-                    style={{
-                      padding: '0.75rem 2rem',
-                      borderRadius: '30px',
-                      fontSize: '0.9rem',
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}
-                  >
-                    <ShieldCheck size={18} /> Unlock Roadmap Bundle <ArrowRight size={16} />
-                  </button>
+                  {unlockedRoadmaps[currentSelection.id] ? (
+                    <button
+                      onClick={() => onConfirm(currentSelection.id, true)}
+                      className="glow-btn"
+                      style={{
+                        padding: '0.75rem 2rem',
+                        borderRadius: '30px',
+                        fontSize: '0.9rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        background: 'linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%)',
+                        boxShadow: '0 0 15px rgba(16, 185, 129, 0.4)'
+                      }}
+                    >
+                      Open Roadmap Dashboard <ArrowRight size={16} />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onConfirm(currentSelection.id, false, currentSelection.title)}
+                      className="glow-btn"
+                      style={{
+                        padding: '0.75rem 2rem',
+                        borderRadius: '30px',
+                        fontSize: '0.9rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <ShieldCheck size={18} /> Unlock This Track <ArrowRight size={16} />
+                    </button>
+                  )}
                 </div>
 
               </div>

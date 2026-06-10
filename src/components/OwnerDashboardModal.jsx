@@ -19,7 +19,20 @@ const GitHubIcon = ({ size = 20, ...props }) => (
   </svg>
 );
 
-export default function OwnerDashboardModal({ isOpen, onClose, isRoadmapUnlocked, onToggleRoadmapUnlock }) {
+const domainLabels = {
+  sde: 'Software Eng (SDE)',
+  fullstack: 'Full Stack Dev',
+  backend: 'Backend Dev',
+  frontend: 'Frontend Dev',
+  mobile: 'Mobile App Dev',
+  datascience: 'Data Science & Anal',
+  aiml: 'AI / Machine Learning',
+  vlsi: 'VLSI Design',
+  embedded: 'Embedded Systems',
+  pcb: 'PCB Design & Hardware'
+};
+
+export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps = {}, onToggleRoadmapUnlock }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [passcodeError, setPasscodeError] = useState('');
@@ -35,6 +48,8 @@ export default function OwnerDashboardModal({ isOpen, onClose, isRoadmapUnlocked
   // Track upload status of each module: { [subjectCode-moduleIndex]: { status: 'idle'|'uploading'|'success'|'error', message: '' } }
   const [uploadStatus, setUploadStatus] = useState({});
   const [filesToUpload, setFilesToUpload] = useState({}); // { [subjectCode-moduleIndex]: File }
+
+  const [showRoadmapLocks, setShowRoadmapLocks] = useState(false);
 
   const modalRef = useRef(null);
 
@@ -707,29 +722,29 @@ export default function OwnerDashboardModal({ isOpen, onClose, isRoadmapUnlocked
 
               {/* Roadmap Bundle Bypass Toggle */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '180px' }}>
-                <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Roadmap Bypass State</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.35rem 0.5rem', height: '38px', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: isRoadmapUnlocked ? 'var(--accent-green)' : 'var(--text-muted)' }}>
-                    {isRoadmapUnlocked ? 'UNLOCKED' : 'LOCKED'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={onToggleRoadmapUnlock}
-                    style={{
-                      background: isRoadmapUnlocked ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 229, 255, 0.1)',
-                      border: '1px solid',
-                      borderColor: isRoadmapUnlocked ? '#ef4444' : 'var(--accent-cyan)',
-                      color: isRoadmapUnlocked ? '#ef4444' : 'var(--accent-cyan)',
-                      padding: '0.15rem 0.5rem',
-                      borderRadius: '4px',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {isRoadmapUnlocked ? 'Lock' : 'Unlock'}
-                  </button>
-                </div>
+                <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Roadmap Locks (10 tracks)</label>
+                <button
+                  type="button"
+                  onClick={() => setShowRoadmapLocks(!showRoadmapLocks)}
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '6px',
+                    padding: '0.35rem 0.5rem',
+                    height: '38px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    color: '#fff',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.5rem'
+                  }}
+                >
+                  <span>Configure Locks</span>
+                  {showRoadmapLocks ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
               </div>
 
               {/* Token warning if not setup */}
@@ -743,6 +758,49 @@ export default function OwnerDashboardModal({ isOpen, onClose, isRoadmapUnlocked
                 </div>
               )}
             </div>
+
+            {/* Roadmap Locks Dropdown Grid */}
+            {showRoadmapLocks && (
+              <div
+                style={{
+                  background: 'var(--bg-secondary)',
+                  borderBottom: '1px solid var(--border-color)',
+                  padding: '1rem 1.5rem',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                  gap: '0.75rem'
+                }}
+              >
+                {Object.entries(domainLabels).map(([domainId, label]) => {
+                  const isUnlocked = unlockedRoadmaps[domainId] || false;
+                  return (
+                    <label
+                      key={domainId}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontSize: '0.8rem',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '4px',
+                        background: isUnlocked ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255,255,255,0.02)',
+                        border: `1px solid ${isUnlocked ? 'var(--accent-green)' : 'var(--border-color)'}`
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isUnlocked}
+                        onChange={() => onToggleRoadmapUnlock(domainId)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
 
             {/* List and Actions */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>

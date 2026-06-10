@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cpu, ShoppingCart, Menu, X, Sun, Moon } from 'lucide-react';
+import { ShoppingCart, Menu, X, Sun, Moon } from 'lucide-react';
 
 export default function Navbar({ 
   theme, 
@@ -16,6 +16,7 @@ export default function Navbar({
     { id: 'home', label: 'Home' },
     { id: 'services', label: 'Services' },
     { id: 'projects', label: 'Projects' },
+    { id: 'store', label: 'Digital Store' },
     { id: 'builder', label: 'DIY Configurator' },
     { id: 'gallery', label: 'Gallery' },
     { id: 'blog', label: 'Hackathon Guide' },
@@ -47,10 +48,9 @@ export default function Navbar({
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        background: 'rgba(17, 24, 39, 0.85)',
-        backdropFilter: 'blur(12px)',
+        background: 'var(--bg-secondary)',
         borderBottom: '1px solid var(--border-color)',
-        transition: 'all var(--transition-normal)',
+        transition: 'background-color var(--transition-fast), border-color var(--transition-fast)',
       }}
       className="nav-theme-override"
     >
@@ -58,7 +58,7 @@ export default function Navbar({
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '1rem 1.5rem',
+          padding: '0.85rem 1.5rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
@@ -74,8 +74,8 @@ export default function Navbar({
             cursor: 'pointer',
             fontFamily: 'var(--font-display)',
             fontWeight: 700,
-            fontSize: '1.25rem',
-            color: 'var(--accent-cyan)'
+            fontSize: '1.2rem',
+            color: 'var(--accent-blue)'
           }}
         >
           <img 
@@ -86,12 +86,11 @@ export default function Navbar({
               height: '32px',
               borderRadius: '6px',
               objectFit: 'cover',
-              border: '1px solid var(--border-color)',
-              animation: 'pulse-ring 2s infinite'
+              border: '1px solid var(--border-color)'
             }}
           />
           <span style={{ color: 'var(--text-primary)' }}>
-            CIRCUITCRAFT <span style={{ color: 'var(--accent-cyan)' }}>STUDIO</span>
+            CIRCUITCRAFT <span style={{ color: 'var(--accent-blue)' }}>STUDIO</span>
           </span>
         </div>
 
@@ -100,11 +99,11 @@ export default function Navbar({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '2rem',
+            gap: '1.5rem',
           }}
           className="desktop-nav"
         >
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', gap: '1rem' }}>
             {navItems.map((item) => (
               <button
                 key={item.id}
@@ -112,14 +111,15 @@ export default function Navbar({
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: activeTab === item.id ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                  fontWeight: activeTab === item.id ? 600 : 400,
-                  fontSize: '0.95rem',
+                  color: activeTab === item.id ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                  fontWeight: activeTab === item.id ? 600 : 500,
+                  fontSize: '0.9rem',
                   cursor: 'pointer',
-                  padding: '0.25rem 0.5rem',
+                  padding: '0.4rem 0.6rem',
                   position: 'relative',
                   transition: 'color var(--transition-fast)',
-                  fontFamily: 'var(--font-sans)'
+                  fontFamily: 'var(--font-sans)',
+                  borderRadius: '4px'
                 }}
               >
                 {item.label}
@@ -131,8 +131,7 @@ export default function Navbar({
                       left: '8px',
                       right: '8px',
                       height: '2px',
-                      background: 'var(--accent-cyan)',
-                      boxShadow: 'var(--glow-cyan)'
+                      background: 'var(--accent-blue)'
                     }}
                   />
                 )}
@@ -141,11 +140,11 @@ export default function Navbar({
           </div>
 
           {/* Theme & Cart Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button
               onClick={toggleTheme}
               style={{
-                background: 'rgba(255,255,255,0.05)',
+                background: 'var(--bg-tertiary)',
                 border: '1px solid var(--border-color)',
                 padding: '0.5rem',
                 borderRadius: '50%',
@@ -158,13 +157,13 @@ export default function Navbar({
               }}
               aria-label="Toggle Theme"
             >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
 
             <button
               onClick={toggleCart}
               style={{
-                background: 'rgba(0, 229, 255, 0.1)',
+                background: 'rgba(37, 99, 235, 0.08)',
                 border: '1px solid var(--border-color)',
                 padding: '0.5rem 1rem',
                 borderRadius: '20px',
@@ -177,16 +176,16 @@ export default function Navbar({
                 fontWeight: 600
               }}
             >
-              <ShoppingCart size={18} style={{ color: 'var(--accent-cyan)' }} />
-              <span style={{ fontSize: '0.9rem' }}>Cart</span>
+              <ShoppingCart size={16} style={{ color: 'var(--accent-blue)' }} />
+              <span style={{ fontSize: '0.85rem' }}>Cart</span>
               {cartCount > 0 && (
                 <span 
                   style={{
-                    background: 'var(--accent-cyan)',
-                    color: '#000',
-                    fontSize: '0.75rem',
-                    borderRadius: '50%',
-                    padding: '2px 6px',
+                    background: 'var(--accent-blue)',
+                    color: '#fff',
+                    fontSize: '0.7rem',
+                    borderRadius: '10px',
+                    padding: '1px 6px',
                     minWidth: '18px',
                     textAlign: 'center',
                     fontWeight: 700
@@ -201,11 +200,11 @@ export default function Navbar({
 
         {/* Mobile Hamburger toggle */}
         <div style={{ display: 'none' }} className="mobile-toggle-btn">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <button
               onClick={toggleTheme}
               style={{
-                background: 'rgba(255,255,255,0.05)',
+                background: 'var(--bg-tertiary)',
                 border: '1px solid var(--border-color)',
                 padding: '0.4rem',
                 borderRadius: '50%',
@@ -216,13 +215,13 @@ export default function Navbar({
                 justifyContent: 'center'
               }}
             >
-              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+              {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
             </button>
 
             <button
               onClick={toggleCart}
               style={{
-                background: 'rgba(0, 229, 255, 0.1)',
+                background: 'rgba(37, 99, 235, 0.08)',
                 border: '1px solid var(--border-color)',
                 padding: '0.4rem 0.75rem',
                 borderRadius: '20px',
@@ -234,9 +233,9 @@ export default function Navbar({
                 fontWeight: 600
               }}
             >
-              <ShoppingCart size={16} style={{ color: 'var(--accent-cyan)' }} />
+              <ShoppingCart size={14} style={{ color: 'var(--accent-blue)' }} />
               {cartCount > 0 && (
-                <span style={{ background: 'var(--accent-cyan)', color: '#000', fontSize: '0.7rem', borderRadius: '50%', padding: '1px 5px', minWidth: '15px' }}>
+                <span style={{ background: 'var(--accent-blue)', color: '#fff', fontSize: '0.65rem', borderRadius: '10px', padding: '1px 5px', minWidth: '15px' }}>
                   {cartCount}
                 </span>
               )}
@@ -252,7 +251,7 @@ export default function Navbar({
                 padding: '0.25rem'
               }}
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {isOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
@@ -267,8 +266,7 @@ export default function Navbar({
             borderBottom: '1px solid var(--border-color)',
             padding: '1rem 1.5rem',
             flexDirection: 'column',
-            gap: '1rem',
-            animation: 'slide-in 0.3s ease'
+            gap: '0.75rem'
           }}
           className="mobile-menu"
         >
@@ -279,11 +277,11 @@ export default function Navbar({
               style={{
                 background: 'none',
                 border: 'none',
-                color: activeTab === item.id ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                fontWeight: activeTab === item.id ? 600 : 400,
-                fontSize: '1.1rem',
+                color: activeTab === item.id ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                fontWeight: activeTab === item.id ? 600 : 500,
+                fontSize: '1rem',
                 cursor: 'pointer',
-                padding: '0.5rem 0',
+                padding: '0.4rem 0',
                 textAlign: 'left',
                 width: '100%'
               }}
