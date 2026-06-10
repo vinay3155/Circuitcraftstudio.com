@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const { User, Purchase } = require('./models');
 
 // Authentication middleware
@@ -175,6 +177,132 @@ router.get('/purchases', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error retrieving purchases.' });
+  }
+});
+
+// Helper function to send password reset email (falls back to console log if SMTP not set)
+const sendResetEmail = async (email, resetToken, origin) => {
+  const resetUrl = `${origin}?resetToken=${resetToken}`;
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpPort = process.env.SMTP_PORT || 587;
+  const smtpMail = process.env.SMTP_MAIL;
+  const smtpPassword = process.env.SMTP_PASSWORD;
+
+  if (smtpHost && smtpMail && smtpPassword) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: parseInt(smtpPort),
+        secure: parseInt(smtpPort) === 465,
+        auth: {
+          user: smtpMail,
+          pass: smtpPassword
+        }
+      });
+
+      const mailOptions = {
+        from: `"CircuitCraft Studio" <${smtpMail}>`,
+        to: email,
+        subject: 'Password Reset Request - CircuitCraft Studio',
+        text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n` +
+              `Please click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n` +
+              `${resetUrl}\n\n` +
+              `If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+        html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                 <h2 style="color: #2563eb; text-align: center;">CircuitCraft Studio</h2>
+                 <p>Hello,</p>
+                 <p>You requested a password reset for your account at CircuitCraft Studio. Please click the button below to set a new password:</p>
+                 <div style="text-align: center; margin: 30px 0;">
+                   <a href="${resetUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Reset Password</a>
+                 </div>
+                 <p>Or copy and paste this link into your browser:</p>
+                 <p style="word-break: break-all; color: #555;">${resetUrl}</p>
+                 <p style="font-size: 0.8rem; color: #888;">This link is valid for 1 hour. If you didn't request a reset, you can safely ignore this email.</p>
+               </div>`
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`[SMTP] Password reset email sent to ${email}`);
+      return true;
+    } catch (error) {
+      console.error('[SMTP Error] Failed to send email via SMTP:', error);
+    }
+  }
+
+  // Developer Fallback: print to console
+  console.log(`\n==================================================`);
+  console.log(`[DEVELOPER FALLBACK] PASSWORD RESET LINK FOR ${email}:`);
+  console.log(`${resetUrl}`);
+  console.log(`==================================================\n`);
+  return false;
+};
+
+// 6. Forgot Password - Request Reset Link
+router.post('/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Please enter your email address.' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: 'No account with that email address exists.' });
+    }
+
+    // Generate token and expiry
+    const token = crypto.randomBytes(20).toString('hex');
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+    await user.save();
+
+    // Send email (or log to console)
+    const origin = req.headers.origin || 'http://localhost:5173';
+    await sendResetEmail(user.email, token, origin);
+
+    res.json({ message: 'A password reset link has been generated and sent to your email.' });
+  } catch (err) {
+    console.error('Error in forgot-password route:', err);
+    res.status(500).json({ error: 'Server error requesting password reset.' });
+  }
+});
+
+// 7. Reset Password - Verify Token and Update Password
+router.post('/auth/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ error: 'Reset token and password are required.' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Password reset token is invalid or has expired.' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = '';
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.json({ message: 'Your password has been reset successfully. You can now log in.' });
+  } catch (err) {
+    console.error('Error in reset-password route:', err);
+    res.status(500).json({ error: 'Server error resetting password.' });
   }
 });
 

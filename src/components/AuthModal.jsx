@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, Mail, Lock, User, BookOpen, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
 
-export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
-  const [tab, setTab] = useState('login'); // 'login' or 'register'
+export default function AuthModal({ isOpen, onClose, onAuthSuccess, resetToken, onClearResetToken }) {
+  const [tab, setTab] = useState('login'); // 'login', 'register', 'forgot', 'reset'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -49,8 +49,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
       setSuccess('Account created successfully!');
       setTimeout(() => {
         onAuthSuccess(data.user);
-        onClose();
-        resetForm();
+        handleClose();
       }, 1200);
 
     } catch (err) {
@@ -82,8 +81,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
       setSuccess('Logged in successfully!');
       setTimeout(() => {
         onAuthSuccess(data.user);
-        onClose();
-        resetForm();
+        handleClose();
       }, 1200);
 
     } catch (err) {
@@ -103,6 +101,103 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
     setSuccess('');
   };
 
+  useEffect(() => {
+    if (resetToken && isOpen) {
+      setTab('reset');
+      setError('');
+      setSuccess('');
+    }
+  }, [resetToken, isOpen]);
+
+  const handleClose = () => {
+    resetForm();
+    if (onClearResetToken) {
+      onClearResetToken();
+    }
+    onClose();
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Request failed');
+      }
+
+      setSuccess('Reset link sent to your email!');
+      setTimeout(() => {
+        setTab('login');
+        setError('');
+        setSuccess('');
+      }, 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: resetToken, password })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Password reset failed');
+      }
+
+      setSuccess('Password updated successfully!');
+      setTimeout(() => {
+        setTab('login');
+        setError('');
+        setSuccess('');
+        if (onClearResetToken) {
+          onClearResetToken();
+        }
+      }, 2000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getFormSubmitHandler = () => {
+    if (tab === 'login') return handleLogin;
+    if (tab === 'register') return handleRegister;
+    if (tab === 'forgot') return handleForgotPassword;
+    if (tab === 'reset') return handleResetPassword;
+  };
+
   return (
     <div
       style={{
@@ -120,7 +215,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         padding: '1.5rem',
         animation: 'fade-in 0.3s ease'
       }}
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         style={{
@@ -137,43 +232,65 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header Tab Toggle */}
-        <div style={{ display: 'flex', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)' }}>
-          <button
-            onClick={() => { setTab('login'); setError(''); }}
-            style={{
-              flex: 1,
-              padding: '1rem',
-              border: 'none',
-              background: tab === 'login' ? 'var(--bg-secondary)' : 'transparent',
-              color: tab === 'login' ? 'var(--accent-blue)' : 'var(--text-secondary)',
-              fontWeight: tab === 'login' ? 700 : 500,
-              cursor: 'pointer',
-              fontSize: '0.95rem',
-              transition: 'all 0.2s',
-              borderBottom: tab === 'login' ? '2px solid var(--accent-blue)' : 'none'
-            }}
-          >
-            Sign In
-          </button>
-          <button
-            onClick={() => { setTab('register'); setError(''); }}
-            style={{
-              flex: 1,
-              padding: '1rem',
-              border: 'none',
-              background: tab === 'register' ? 'var(--bg-secondary)' : 'transparent',
-              color: tab === 'register' ? 'var(--accent-blue)' : 'var(--text-secondary)',
-              fontWeight: tab === 'register' ? 700 : 500,
-              cursor: 'pointer',
-              fontSize: '0.95rem',
-              transition: 'all 0.2s',
-              borderBottom: tab === 'register' ? '2px solid var(--accent-blue)' : 'none'
-            }}
-          >
-            Create Account
-          </button>
-        </div>
+        {/* Modal Header Tab Toggle / Back Button */}
+        {tab === 'forgot' || tab === 'reset' ? (
+          <div style={{ display: 'flex', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)', padding: '1rem' }}>
+            <button
+              onClick={() => { setTab('login'); setError(''); setSuccess(''); }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--accent-blue)',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                padding: 0
+              }}
+            >
+              ← Back to Sign In
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)' }}>
+            <button
+              onClick={() => { setTab('login'); setError(''); setSuccess(''); }}
+              style={{
+                flex: 1,
+                padding: '1rem',
+                border: 'none',
+                background: tab === 'login' ? 'var(--bg-secondary)' : 'transparent',
+                color: tab === 'login' ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                fontWeight: tab === 'login' ? 700 : 500,
+                cursor: 'pointer',
+                fontSize: '0.95rem',
+                transition: 'all 0.2s',
+                borderBottom: tab === 'login' ? '2px solid var(--accent-blue)' : 'none'
+              }}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => { setTab('register'); setError(''); setSuccess(''); }}
+              style={{
+                flex: 1,
+                padding: '1rem',
+                border: 'none',
+                background: tab === 'register' ? 'var(--bg-secondary)' : 'transparent',
+                color: tab === 'register' ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                fontWeight: tab === 'register' ? 700 : 500,
+                cursor: 'pointer',
+                fontSize: '0.95rem',
+                transition: 'all 0.2s',
+                borderBottom: tab === 'register' ? '2px solid var(--accent-blue)' : 'none'
+              }}
+            >
+              Create Account
+            </button>
+          </div>
+        )}
 
         <div style={{ padding: '1.75rem' }}>
           {/* Logo Brand Title */}
@@ -199,7 +316,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
             </div>
           )}
 
-          <form onSubmit={tab === 'login' ? handleLogin : handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={getFormSubmitHandler()} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {/* Name - Sign Up Only */}
             {tab === 'register' && (
               <div>
@@ -218,21 +335,23 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
               </div>
             )}
 
-            {/* Email - Both */}
-            <div>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>Email Address *</label>
-              <div style={{ position: 'relative' }}>
-                <Mail size={14} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                <input
-                  type="email"
-                  required
-                  placeholder="name@college.edu"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={{ width: '100%', padding: '0.55rem 0.75rem 0.55rem 2.25rem', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '0.85rem', outline: 'none' }}
-                />
+            {/* Email - Both / Forgot */}
+            {tab !== 'reset' && (
+              <div>
+                <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>Email Address *</label>
+                <div style={{ position: 'relative' }}>
+                  <Mail size={14} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input
+                    type="email"
+                    required
+                    placeholder="name@college.edu"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{ width: '100%', padding: '0.55rem 0.75rem 0.55rem 2.25rem', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '0.85rem', outline: 'none' }}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* College - Sign Up Only */}
             {tab === 'register' && (
@@ -251,24 +370,39 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
               </div>
             )}
 
-            {/* Password - Both */}
-            <div>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>Password *</label>
-              <div style={{ position: 'relative' }}>
-                <Lock size={14} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                <input
-                  type="password"
-                  required
-                  placeholder="Min 6 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{ width: '100%', padding: '0.55rem 0.75rem 0.55rem 2.25rem', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '0.85rem', outline: 'none' }}
-                />
+            {/* Password - Both / Reset */}
+            {tab !== 'forgot' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                    {tab === 'reset' ? 'New Password *' : 'Password *'}
+                  </label>
+                  {tab === 'login' && (
+                    <button
+                      type="button"
+                      onClick={() => { setTab('forgot'); setError(''); setSuccess(''); }}
+                      style={{ background: 'transparent', border: 'none', color: 'var(--accent-blue)', fontSize: '0.75rem', cursor: 'pointer', padding: 0, fontWeight: 500 }}
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={14} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input
+                    type="password"
+                    required
+                    placeholder={tab === 'reset' ? 'Min 6 characters' : 'Enter password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{ width: '100%', padding: '0.55rem 0.75rem 0.55rem 2.25rem', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '0.85rem', outline: 'none' }}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Confirm Password - Sign Up Only */}
-            {tab === 'register' && (
+            {/* Confirm Password - Sign Up / Reset */}
+            {(tab === 'register' || tab === 'reset') && (
               <div>
                 <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.3rem', fontWeight: 600 }}>Confirm Password *</label>
                 <div style={{ position: 'relative' }}>
@@ -308,8 +442,30 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                 <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.1)', borderTopColor: '#fff', animation: 'orb-float 0.8s linear infinite' }} />
               ) : (
                 <>
-                  <Sparkles size={16} />
-                  <span>{tab === 'login' ? 'Secure Login' : 'Register Profile'}</span>
+                  {tab === 'login' && (
+                    <>
+                      <Sparkles size={16} />
+                      <span>Secure Login</span>
+                    </>
+                  )}
+                  {tab === 'register' && (
+                    <>
+                      <Sparkles size={16} />
+                      <span>Register Profile</span>
+                    </>
+                  )}
+                  {tab === 'forgot' && (
+                    <>
+                      <Mail size={16} />
+                      <span>Send Recovery Link</span>
+                    </>
+                  )}
+                  {tab === 'reset' && (
+                    <>
+                      <Shield size={16} />
+                      <span>Update Password</span>
+                    </>
+                  )}
                 </>
               )}
             </button>

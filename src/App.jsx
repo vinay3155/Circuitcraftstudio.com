@@ -28,6 +28,7 @@ export default function App() {
   const [isOwnerDashboardOpen, setIsOwnerDashboardOpen] = useState(false);
   const [isMyBundlesOpen, setIsMyBundlesOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [resetToken, setResetToken] = useState('');
   const [activeTab, setActiveTab] = useState('home');
 
   const [currentUser, setCurrentUser] = useState(null);
@@ -54,6 +55,17 @@ export default function App() {
 
   useEffect(() => {
     fetchProfile();
+    
+    // Check if password reset token is in URL
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('resetToken');
+    if (token) {
+      setResetToken(token);
+      setIsAuthOpen(true);
+      // Clean url search params without reload
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
   }, []);
 
   const handleLogout = () => {
@@ -318,6 +330,8 @@ export default function App() {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onAuthSuccess={handleAuthSuccess}
+        resetToken={resetToken}
+        onClearResetToken={() => setResetToken('')}
       />
 
       {/* Study Hub Modal Portal */}
