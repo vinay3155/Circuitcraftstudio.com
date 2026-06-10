@@ -194,22 +194,54 @@ export default function DomainSelectorModal({ isOpen, onClose, onConfirm, unlock
               Choose Your Career Path Domain
             </h3>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-secondary)',
-              borderRadius: '50%',
-              padding: '0.4rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <X size={18} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button
+              onClick={() => {
+                onClose();
+                const element = document.getElementById('store');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              style={{
+                background: 'rgba(37, 99, 235, 0.08)',
+                border: '1px solid var(--accent-blue)',
+                color: 'var(--accent-blue)',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '20px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--accent-blue)';
+                e.currentTarget.style.color = '#fff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(37, 99, 235, 0.08)';
+                e.currentTarget.style.color = 'var(--accent-blue)';
+              }}
+            >
+              Buy Bundles (Go to Store)
+            </button>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)',
+                borderRadius: '50%',
+                padding: '0.4rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Modal Main Area */}

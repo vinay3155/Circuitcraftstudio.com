@@ -60,6 +60,59 @@ export default function DigitalStore({ onAddToCart }) {
       icon: <Info size={24} style={{ color: 'var(--accent-yellow)' }} />
     },
     {
+      id: 'system-design',
+      title: 'System Design & Arch Bundle',
+      description: 'Learn system design paradigms, load balancing, microservices, and high-availability database setups.',
+      details: [
+        'System Design & Architecture fundamentals',
+        'Microservices & API Gateway setups',
+        'Load Balancing & CDN caching guides',
+        'Database Sharding & Replication cases',
+        'Real-world System Design case studies'
+      ],
+      icon: <Layout size={24} style={{ color: 'var(--accent-cyan)' }} />
+    },
+    {
+      id: 'dsa',
+      title: 'DSA & Coding Patterns Bundle',
+      description: 'Crack coding rounds with patterns, structured data structures templates, algorithms, and cheat sheets.',
+      details: [
+        'Common DSA coding patterns (Sliding Window, Two Pointer)',
+        'Structured Data Structures guides & cheat sheets',
+        'Popular Algorithms templates (Sorting, Search, Graph)',
+        'Core Recursion & Dynamic Programming walkthroughs',
+        'Practice Questions & Interview Solutions'
+      ],
+      icon: <Terminal size={24} style={{ color: 'var(--accent-purple)' }} />
+    },
+    {
+      id: 'fullstack',
+      title: 'Full-Stack Development Bundle',
+      description: 'Pre-configured Web Development boilerplates, API integrations, and Database schemas.',
+      details: [
+        'React/Next.js frontend boilerplates',
+        'Node.js/Express backend API templates',
+        'MongoDB/PostgreSQL schemas & indexing',
+        'Authentication & Security middleware',
+        'Deployment checklists & CI/CD guides'
+      ],
+      icon: <HardDrive size={24} style={{ color: 'var(--accent-blue)' }} />,
+      popular: true
+    },
+    {
+      id: 'aiml',
+      title: 'AI & Machine Learning Bundle',
+      description: 'Build predictive models, neural networks, computer vision apps, and Jupyter Notebook pipelines.',
+      details: [
+        'Python AI/ML mini-projects & pipelines',
+        'Jupyter Notebooks with clean data workflows',
+        'Model training, evaluation & tuning guides',
+        'Computer Vision (OpenCV) & NLP scripts',
+        'TensorFlow/PyTorch model deployment guides'
+      ],
+      icon: <Cpu size={24} style={{ color: 'var(--accent-green)' }} />
+    },
+    {
       id: 'hackathon',
       title: 'Hackathon Winning Bundle',
       description: 'Get pitch-ready templates, roadmaps, and winning ideas used by top teams.',
