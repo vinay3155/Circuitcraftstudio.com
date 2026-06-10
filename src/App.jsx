@@ -137,6 +137,27 @@ export default function App() {
     }
   };
 
+  const handleConfirmDomain = (domainId, alreadyUnlocked, domainTitle) => {
+    setIsDomainSelectorOpen(false);
+    if (alreadyUnlocked) {
+      setIsRoadmapOpen(true);
+      return;
+    }
+    const exists = cart.some(item => item.id.startsWith(`roadmap-bundle-${domainId}`));
+    if (!exists) {
+      const roadmapItem = {
+        id: `roadmap-bundle-${domainId}`,
+        title: `VTU Career Roadmap: ${domainTitle}`,
+        price: 99,
+        category: 'Placement & Career',
+        microcontroller: 'Career Guide & Mentorship'
+      };
+      handleAddToCart(roadmapItem);
+    } else {
+      setIsCartOpen(true);
+    }
+  };
+
   const handleToggleRoadmapUnlock = (domainId) => {
     setUnlockedRoadmaps(prev => {
       const newState = !prev[domainId];
