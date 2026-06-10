@@ -8,7 +8,8 @@ export default function Navbar({
   toggleCart, 
   activeTab, 
   setActiveTab,
-  onOpenStudyHub
+  onOpenStudyHub,
+  onOpenMyBundles
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -21,6 +22,7 @@ export default function Navbar({
     { id: 'gallery', label: 'Gallery' },
     { id: 'blog', label: 'Hackathon Guide' },
     { id: 'study-hub', label: 'VTU Study Hub' },
+    { id: 'my-bundles', label: 'My Bundles' },
     { id: 'contact', label: 'Contact Us' }
   ];
 
@@ -30,11 +32,16 @@ export default function Navbar({
       setIsOpen(false);
       return;
     }
+    if (id === 'my-bundles') {
+      onOpenMyBundles();
+      setIsOpen(false);
+      return;
+    }
     setActiveTab(id);
     setIsOpen(false);
     
     // Smooth scroll to section if on home tab
-    if (id !== 'builder') {
+    if (id !== 'builder' && id !== 'my-bundles') {
       const element = document.getElementById(id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });

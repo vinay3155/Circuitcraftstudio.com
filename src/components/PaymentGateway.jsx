@@ -1,13 +1,102 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Trash2, CreditCard, QrCode, ShieldCheck, CheckCircle2, Download, Printer } from 'lucide-react';
 
+function ConfettiCanvas() {
+  const canvasRef = React.useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const colors = ['#00e5ff', '#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+    const particles = [];
+    
+    for (let i = 0; i < 150; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        tilt: Math.random() * 10 - 5,
+        tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+        tiltAngle: 0,
+        speed: Math.random() * 3 + 2
+      });
+    }
+    
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach((p, idx) => {
+        p.tiltAngle += p.tiltAngleIncremental;
+        p.y += p.speed;
+        p.x += Math.sin(p.tiltAngle) * 0.5;
+        p.tilt = Math.sin(p.tiltAngle - idx/3) * 15;
+        
+        ctx.beginPath();
+        ctx.lineWidth = p.r;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+        ctx.stroke();
+        
+        if (p.y > canvas.height) {
+          particles[idx] = {
+            ...p,
+            x: Math.random() * canvas.width,
+            y: -20,
+            tilt: Math.random() * 10 - 5,
+            speed: Math.random() * 3 + 2
+          };
+        }
+      });
+      
+      animationFrameId = requestAnimationFrame(draw);
+    }
+    
+    draw();
+    
+    const handleResize = () => {
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  return (
+    <canvas 
+      ref={canvasRef} 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'none',
+        zIndex: 9999
+      }}
+    />
+  );
+}
+
 export default function PaymentGateway({ 
   isOpen, 
   onClose, 
   cart, 
   onRemoveFromCart, 
   onClearCart,
-  onUnlockRoadmap
+  onUnlockRoadmap,
+  onPurchaseSuccess
 }) {
   const [checkoutStep, setCheckoutStep] = useState('cart'); // cart, billing, success
   const [paymentMethod, setPaymentMethod] = useState('card'); // card, upi
@@ -37,6 +126,10 @@ export default function PaymentGateway({
   });
 
   const [orderId, setOrderId] = useState('');
+
+  const totalCost = cart.reduce((sum, item) => sum + item.price, 0);
+  const upiVpa = 'vinaynbodravla315@okaxis';
+  const upiUrl = `upi://pay?pa=${upiVpa}&pn=CircuitCraft%20Studio&am=${totalCost}&cu=INR&tn=Order%20${orderId}`;
 
   // Generate random order ID on checkout
   useEffect(() => {
@@ -108,6 +201,27 @@ export default function PaymentGateway({
         if (typeof onUnlockRoadmap === 'function') {
           onUnlockRoadmap(domainId);
         }
+      }
+
+      // Unlock store bundles
+      let unlockedAnyStoreBundle = false;
+      cart.forEach(item => {
+        if (item.id.startsWith('store-bundle-')) {
+          const parts = item.id.split('-');
+          const timestamp = parts[parts.length - 1];
+          let middle = item.id.substring(13); // strip "store-bundle-"
+          middle = middle.substring(0, middle.length - (timestamp.length + 1)); // strip "-[timestamp]"
+          const tierSeparatorIdx = middle.lastIndexOf('-');
+          const bundleId = middle.substring(0, tierSeparatorIdx);
+          const tierId = middle.substring(tierSeparatorIdx + 1);
+          
+          localStorage.setItem(`cc_purchased_bundle_${bundleId}_${tierId}`, 'true');
+          unlockedAnyStoreBundle = true;
+        }
+      });
+
+      if (unlockedAnyStoreBundle && typeof onPurchaseSuccess === 'function') {
+        onPurchaseSuccess();
       }
     }
   }, [checkoutStep]);
@@ -572,6 +686,45 @@ export default function PaymentGateway({
                 {/* UPI QR GATEWAY */}
                 {paymentMethod === 'upi' && (
                   <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                    {/* Native UPI App Redirect Button for Mobile */}
+                    <div style={{ marginBottom: '1.25rem' }}>
+                      <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+                        On Mobile? Pay directly via any UPI App:
+                      </span>
+                      <a 
+                        href={upiUrl}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          background: 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)',
+                          color: '#fff',
+                          border: 'none',
+                          padding: '0.75rem 1.5rem',
+                          borderRadius: '30px',
+                          fontWeight: 700,
+                          fontSize: '0.95rem',
+                          textDecoration: 'none',
+                          boxShadow: '0 4px 15px rgba(37, 211, 102, 0.3)',
+                          cursor: 'pointer',
+                          width: '100%',
+                          maxWidth: '300px',
+                          transition: 'transform 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.03)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                      >
+                        📱 Open UPI App (GPay/PhonePe)
+                      </a>
+                    </div>
+
+                    <div style={{ margin: '1.25rem 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                      <span style={{ height: '1px', background: 'var(--border-color)', flex: 1 }} />
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Or Scan QR Code</span>
+                      <span style={{ height: '1px', background: 'var(--border-color)', flex: 1 }} />
+                    </div>
+
                     <div 
                       style={{ 
                         background: '#fff', 
@@ -582,10 +735,10 @@ export default function PaymentGateway({
                         boxShadow: '0 4px 15px rgba(0,0,0,0.25)' 
                       }}
                     >
-                      {/* PhonePe QR Code Image */}
+                      {/* Dynamic QR Code */}
                       <img 
-                        src="/phonepe-qr.jpg"
-                        alt="Scan to Pay via PhonePe"
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`}
+                        alt={`Scan to Pay ₹${totalCost}`}
                         style={{ 
                           width: '180px', 
                           height: '180px', 
@@ -601,7 +754,7 @@ export default function PaymentGateway({
                       <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.8rem' }}>Scan using GPay, PhonePe, or BHIM app</span>
                       <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.9rem' }}>Merchant: CircuitCraft Studio</span>
                       <code style={{ display: 'block', width: 'fit-content', margin: '4px auto', background: '#05070c', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>
-                        vinaynbodravla315@okaxis
+                        {upiVpa}
                       </code>
                     </div>
 
@@ -765,9 +918,12 @@ export default function PaymentGateway({
               justifyContent: 'space-between', 
               height: '100%', 
               padding: '2rem 1.5rem',
-              textAlign: 'center' 
+              textAlign: 'center',
+              position: 'relative',
+              overflow: 'hidden'
             }}
           >
+            <ConfettiCanvas />
             <div style={{ margin: 'auto 0' }}>
               <div 
                 style={{ 

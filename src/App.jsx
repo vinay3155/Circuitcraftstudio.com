@@ -17,6 +17,7 @@ import RoadmapShowcase from './components/RoadmapShowcase';
 import RoadmapModal from './components/RoadmapModal';
 import DomainSelectorModal from './components/DomainSelectorModal';
 import DigitalStore from './components/DigitalStore';
+import MyBundlesModal from './components/MyBundlesModal';
 
 export default function App() {
   const [theme, setTheme] = useState('light');
@@ -24,6 +25,7 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isStudyHubOpen, setIsStudyHubOpen] = useState(false);
   const [isOwnerDashboardOpen, setIsOwnerDashboardOpen] = useState(false);
+  const [isMyBundlesOpen, setIsMyBundlesOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
 
   // Roadmap State (loaded from localStorage)
@@ -180,6 +182,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={scrollToSection}
         onOpenStudyHub={() => setIsStudyHubOpen(true)}
+        onOpenMyBundles={() => setIsMyBundlesOpen(true)}
       />
 
       {/* Main Content Sections */}
@@ -256,6 +259,13 @@ export default function App() {
             }
           });
         }}
+        onPurchaseSuccess={() => setIsMyBundlesOpen(true)}
+      />
+
+      {/* My Purchased Bundles Modal Portal */}
+      <MyBundlesModal 
+        isOpen={isMyBundlesOpen}
+        onClose={() => setIsMyBundlesOpen(false)}
       />
 
       {/* Study Hub Modal Portal */}
