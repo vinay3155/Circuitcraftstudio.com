@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Lightbulb, Edit, Code, Rocket, ArrowRight, Wrench, BookOpen } from 'lucide-react';
+import { Lightbulb, Edit, Code, Rocket, ArrowRight, Wrench, BookOpen, Sparkles } from 'lucide-react';
 
 export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenStudyHub }) {
   const canvasRef = useRef(null);
