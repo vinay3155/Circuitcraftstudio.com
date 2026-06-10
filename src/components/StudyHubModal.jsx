@@ -637,27 +637,6 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                       />
                     )}
                   </div>
-
-                  {/* PDF Setup Instruction Block */}
-                  <div 
-                    style={{ 
-                      marginTop: '1.25rem', 
-                      padding: '1rem', 
-                      background: 'rgba(0, 229, 255, 0.03)', 
-                      border: '1px solid rgba(0, 229, 255, 0.15)', 
-                      borderRadius: '8px',
-                      fontSize: '0.8rem',
-                      color: 'var(--text-secondary)',
-                      lineHeight: '1.5'
-                    }}
-                  >
-                    💡 <strong>How to permanently add PDF notes to the website:</strong><br />
-                    To make notes load automatically for this module, simply place your PDF file inside the website's project folder at: <br />
-                    <code style={{ color: 'var(--accent-cyan)', fontFamily: 'monospace', display: 'block', margin: '0.35rem 0', background: 'rgba(0,0,0,0.3)', padding: '0.25rem 0.5rem', borderRadius: '4px', width: 'fit-content' }}>
-                      public/pdfs/{activeModuleNotes.subjectCode}_M{activeModuleNotes.moduleIndex + 1}.pdf
-                    </code>
-                    (For example: <code style={{ color: 'var(--accent-cyan)' }}>public/pdfs/{activeModuleNotes.subjectCode}_M1.pdf</code> for Module 1, then commit and push to GitHub).
-                  </div>
                 </div>
               ) : (
                 /* Subjects List view */
