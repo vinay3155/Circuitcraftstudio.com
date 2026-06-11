@@ -1,6 +1,29 @@
 import React, { useState } from 'react';
 import { Star, StarHalf, BookOpen, Clock, Search, Sparkles, ShoppingCart, Check, Flame, Award, Cpu, Layers } from 'lucide-react';
 
+// Component to render star ratings dynamically
+function StarRating({ rating }) {
+  const stars = [];
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+
+  for (let i = 1; i <= 5; i++) {
+    if (i <= fullStars) {
+      stars.push(<Star key={i} size={14} fill="#eab308" stroke="#eab308" style={{ flexShrink: 0 }} />);
+    } else if (i === fullStars + 1 && hasHalfStar) {
+      stars.push(<StarHalf key={i} size={14} fill="#eab308" stroke="#eab308" style={{ flexShrink: 0 }} />);
+    } else {
+      stars.push(<Star key={i} size={14} stroke="#cbd5e1" style={{ flexShrink: 0 }} />);
+    }
+  }
+  return (
+    <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-yellow)', marginRight: '0.25rem' }}>{rating.toFixed(1)}</span>
+      {stars}
+    </div>
+  );
+}
+
 export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenStudyHub, currentUser, onAddToCart }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,29 +98,6 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
       level: 'Beginner to Advanced'
     }
   ];
-
-  // Helper to render star ratings dynamically
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-
-    for (let i = 1; i <= 5; i++) {
-      if (i <= fullStars) {
-        stars.push(<Star key={i} size={14} fill="#eab308" stroke="#eab308" style={{ flexShrink: 0 }} />);
-      } else if (i === fullStars + 1 && hasHalfStar) {
-        stars.push(<StarHalf key={i} size={14} fill="#eab308" stroke="#eab308" style={{ flexShrink: 0 }} />);
-      } else {
-        stars.push(<Star key={i} size={14} stroke="#cbd5e1" style={{ flexShrink: 0 }} />);
-      }
-    }
-    return (
-      <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-yellow)', marginRight: '0.25rem' }}>{rating.toFixed(1)}</span>
-        {stars}
-      </div>
-    );
-  };
 
   // Filter courses based on selected tab and search query
   const filteredCourses = recommendedCourses.filter(course => {
@@ -565,7 +565,7 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                       </p>
 
                       {/* Ratings stars block */}
-                      {renderStars(course.rating)}
+                      <StarRating rating={course.rating} />
 
                       {/* Metadata Details (Hours & Lectures) */}
                       <div 
