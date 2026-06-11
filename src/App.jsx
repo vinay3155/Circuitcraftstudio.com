@@ -3,8 +3,6 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import ServicesSection from './components/ServicesSection';
 import ProjectExplorer from './components/ProjectExplorer';
-import ProjectBuilder from './components/ProjectBuilder';
-import GallerySection from './components/GallerySection';
 import HackathonGuide from './components/HackathonGuide';
 import PaymentGateway from './components/PaymentGateway';
 import CircuitBot from './components/CircuitBot';
@@ -103,7 +101,7 @@ export default function App() {
 
   // Scroll observer to update Navbar highlight automatically based on viewport scroll position
   useEffect(() => {
-    const sections = ['home', 'services', 'projects', 'store', 'gallery', 'blog', 'contact'];
+    const sections = ['home', 'services', 'projects', 'store', 'blog', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -291,9 +289,6 @@ export default function App() {
 
         {/* Google AdSense Display Unit */}
         <AdSenseUnit adSlot="5955164719" />
-
-        {/* Gallery Section */}
-        <GallerySection />
 
         {/* Hackathon Guide Blog Section */}
         <HackathonGuide />

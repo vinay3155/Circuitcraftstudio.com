@@ -22,8 +22,6 @@ export default function Navbar({
     { id: 'services', label: 'Services' },
     { id: 'projects', label: 'Projects' },
     { id: 'store', label: 'Digital Store' },
-    { id: 'builder', label: 'DIY Configurator' },
-    { id: 'gallery', label: 'Gallery' },
     { id: 'blog', label: 'Hackathon Guide' },
     { id: 'study-hub', label: 'VTU Study Hub' },
     { id: 'my-bundles', label: 'My Bundles' },
@@ -45,7 +43,7 @@ export default function Navbar({
     setIsOpen(false);
     
     // Smooth scroll to section if on home tab
-    if (id !== 'builder' && id !== 'my-bundles') {
+    if (id !== 'my-bundles') {
       const element = document.getElementById(id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
