@@ -56,7 +56,6 @@ export default function Navbar({
 
   const navItems = [
     { id: 'home', label: 'Home' },
-    { id: 'services', label: 'Services' },
     { id: 'projects', label: 'Projects' },
     { id: 'webinars', label: 'Webinars' },
     { id: 'store', label: 'Digital Store' },
