@@ -424,6 +424,7 @@ export default function App() {
         isOpen={selectedCourseDetailsId !== null}
         onClose={() => setSelectedCourseDetailsId(null)}
         courseId={selectedCourseDetailsId}
+        onAddToCart={handleAddToCart}
       />
     </div>
   );

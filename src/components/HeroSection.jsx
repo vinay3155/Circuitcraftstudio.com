@@ -24,7 +24,7 @@ function StarRating({ rating }) {
   );
 }
 
-export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenStudyHub, currentUser, onAddToCart }) {
+export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenStudyHub, currentUser, onAddToCart, onOpenCourseDetails }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [addedCourses, setAddedCourses] = useState({});
