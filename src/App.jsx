@@ -3,7 +3,6 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import ServicesSection from './components/ServicesSection';
 import ProjectExplorer from './components/ProjectExplorer';
-import HackathonGuide from './components/HackathonGuide';
 import PaymentGateway from './components/PaymentGateway';
 import CircuitBot from './components/CircuitBot';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -109,7 +108,7 @@ export default function App() {
 
   // Scroll observer to update Navbar highlight automatically based on viewport scroll position
   useEffect(() => {
-    const sections = ['home', 'about', 'services', 'projects', 'webinars', 'store', 'blog', 'contact'];
+    const sections = ['home', 'about', 'services', 'projects', 'webinars', 'store', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -307,7 +306,7 @@ export default function App() {
         <AdSenseUnit adSlot="5955164719" />
 
         {/* Hackathon Guide Blog Section */}
-        <HackathonGuide />
+
 
         {/* Certificate Verification System */}
         <CertificateVerifier />

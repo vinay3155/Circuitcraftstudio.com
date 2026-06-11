@@ -25,7 +25,6 @@ export default function Navbar({
     { id: 'projects', label: 'Projects' },
     { id: 'webinars', label: 'Webinars' },
     { id: 'store', label: 'Digital Store' },
-    { id: 'blog', label: 'Hackathon Guide' },
     { id: 'study-hub', label: 'VTU Study Hub' },
     { id: 'my-bundles', label: 'My Bundles' },
     { id: 'contact', label: 'Contact Us' }
