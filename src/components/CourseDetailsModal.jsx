@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  X, Clock, BookOpen, Award, CheckCircle2, User, Play, 
+  X, Clock, BookOpen, Award, CheckCircle2, User, Play, PlayCircle,
   ChevronDown, ChevronUp, Globe, FileText, Video, Sparkles, ShoppingCart, Info
 } from 'lucide-react';
 
@@ -531,38 +531,49 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
 
                         {/* Section Lectures */}
                         {isExpanded && (
-                          <div style={{ padding: '0.5rem 1rem', background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            {sec.lectures.map((lec, lIdx) => (
-                              <div 
-                                key={lIdx}
-                                style={{
-                                  display: 'flex',
-                                  justifyContent: 'space-between',
-                                  alignItems: 'center',
-                                  padding: '0.45rem 0',
-                                  fontSize: '0.85rem'
-                                }}
-                              >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                                  <FileText size={14} style={{ color: 'var(--text-muted)' }} />
-                                  <span>{lec.name}</span>
+                          <div style={{ padding: '0.5rem 1.25rem', background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                            {sec.lectures.map((lec, lIdx) => {
+                              // Identify if lecture is an article vs video based on keywords
+                              const isArticle = ['slides', 'note', 'faq', 'instructor', 'download'].some(kw => lec.name.toLowerCase().includes(kw));
+                              return (
+                                <div 
+                                  key={lIdx}
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '0.5rem',
+                                    fontSize: '0.85rem',
+                                    borderRadius: '4px',
+                                    transition: 'background-color 0.15s ease'
+                                  }}
+                                  className="lecture-row"
+                                >
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                                    {isArticle ? (
+                                      <FileText size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                                    ) : (
+                                      <PlayCircle size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                                    )}
+                                    <span>{lec.name}</span>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    {lec.preview && (
+                                      <span 
+                                        style={{ color: '#0056d2', fontWeight: 600, fontSize: '0.75rem', textDecoration: 'underline', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '2px' }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          alert(`Playing preview video: "${lec.name}"`);
+                                        }}
+                                      >
+                                        <Play size={10} fill="#0056d2" /> Preview
+                                      </span>
+                                    )}
+                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{lec.duration}</span>
+                                  </div>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                  {lec.preview && (
-                                    <span 
-                                      style={{ color: '#0056d2', fontWeight: 600, fontSize: '0.75rem', textDecoration: 'underline', cursor: 'pointer' }}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        alert(`Playing preview video: "${lec.name}"`);
-                                      }}
-                                    >
-                                      Preview
-                                    </span>
-                                  )}
-                                  <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{lec.duration}</span>
-                                </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         )}
                       </div>
@@ -591,6 +602,79 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
                   {details.description}
                 </p>
+              </div>
+
+              {/* Box F: Students also bought */}
+              <div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginTop: '0.5rem', marginBottom: '1rem' }}>
+                  Students also bought
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                  {[
+                    {
+                      id: 'course-arm-groundup',
+                      title: 'FreeRTOS From Ground Up™ on ARM Processors (REVISED)',
+                      image: '/course-arm.png',
+                      rating: 4.8,
+                      reviewsCount: '8,250',
+                      hours: '23.5 total hours',
+                      updated: 'Updated 3/2025',
+                      price: 579,
+                      originalPrice: 1999
+                    },
+                    {
+                      id: 'course-intro-embedded',
+                      title: 'Introduction to Embedded Systems',
+                      image: '/course-bootcamp.png',
+                      rating: 4.6,
+                      reviewsCount: '5,520',
+                      hours: '15.5 total hours',
+                      updated: 'Updated 6/2025',
+                      price: 609,
+                      originalPrice: 1599
+                    }
+                  ].map((sab) => (
+                    <div 
+                      key={sab.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '1rem',
+                        padding: '0.75rem',
+                        borderBottom: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        transition: 'background var(--transition-fast)'
+                      }}
+                      className="lecture-row"
+                      onClick={() => alert(`Redirecting to related course: ${sab.title}`)}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <img 
+                          src={sab.image} 
+                          alt={sab.title}
+                          style={{ width: '64px', height: '48px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border-color)' }}
+                        />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', textAlign: 'left' }}>
+                          <h4 style={{ fontSize: '0.85rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>{sab.title}</h4>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.72rem', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
+                            <span style={{ color: 'var(--accent-yellow)', fontWeight: 700 }}>{sab.rating} ★</span>
+                            <span>({sab.reviewsCount} reviews)</span>
+                            <span>•</span>
+                            <span>{sab.hours}</span>
+                            <span>•</span>
+                            <span>{sab.updated}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.1rem', flexShrink: 0 }}>
+                        <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)' }}>₹{sab.price}</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>₹{sab.originalPrice}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
             </div>
@@ -808,6 +892,9 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
 
       {/* Responsive layout styling overrides */}
       <style>{`
+        .lecture-row:hover {
+          background-color: rgba(0, 86, 210, 0.04) !important;
+        }
         @media (max-width: 768px) {
           .details-grid-layout {
             grid-template-columns: 1fr !important;
