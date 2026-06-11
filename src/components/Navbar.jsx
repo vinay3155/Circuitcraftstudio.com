@@ -75,34 +75,51 @@ export default function Navbar({
           justifyContent: 'space-between'
         }}
       >
-        {/* Logo */}
+        {/* Logo (Udemy-inspired custom text brand without image logo) */}
         <div 
           onClick={() => handleNavClick('home')}
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.75rem',
             cursor: 'pointer',
             fontFamily: 'var(--font-display)',
-            fontWeight: 700,
-            fontSize: '1.2rem',
-            color: 'var(--accent-blue)'
+            fontWeight: 800,
+            fontSize: '1.45rem',
+            letterSpacing: '-0.04em',
+            color: 'var(--text-primary)',
+            gap: '0.05rem',
+            userSelect: 'none'
           }}
         >
-          <img 
-            src="/logo.png" 
-            alt="CircuitCraft Logo" 
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '6px',
-              objectFit: 'cover',
-              border: '1px solid var(--border-color)'
-            }}
-          />
-          <span style={{ color: 'var(--text-primary)' }}>
-            CIRCUITCRAFT <span style={{ color: 'var(--accent-blue)' }}>STUDIO</span>
+          {/* C with caret */}
+          <span style={{ 
+            position: 'relative', 
+            display: 'inline-flex', 
+            flexDirection: 'column', 
+            alignItems: 'center',
+            lineHeight: 0.95
+          }}>
+            {/* Purple Caret */}
+            <svg 
+              viewBox="0 0 24 24" 
+              width="14" 
+              height="10" 
+              fill="none" 
+              stroke="#a855f7" 
+              strokeWidth="5.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              style={{
+                marginBottom: '-1px',
+                transform: 'translateY(-1px)'
+              }}
+            >
+              <polyline points="18 15 12 9 6 15" />
+            </svg>
+            <span>c</span>
           </span>
+          {/* rest of text */}
+          <span>ircuitcraftstudio</span>
         </div>
 
         {/* Desktop Nav Items */}

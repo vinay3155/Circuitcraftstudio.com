@@ -293,12 +293,38 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, resetToken, 
         )}
 
         <div style={{ padding: '1.75rem' }}>
-          {/* Logo Brand Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', justifyContent: 'center' }}>
-            <Shield size={22} style={{ color: 'var(--accent-blue)' }} />
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, letterSpacing: '0.05em' }}>
-              CIRCUITCRAFT <span style={{ color: 'var(--accent-blue)' }}>PORTAL</span>
-            </h4>
+          {/* Logo Brand Title (Udemy-inspired) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.05rem', marginBottom: '1.5rem', justifyContent: 'center', fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.35rem', letterSpacing: '-0.04em', color: 'var(--text-primary)', userSelect: 'none' }}>
+            {/* C with caret */}
+            <span style={{ 
+              position: 'relative', 
+              display: 'inline-flex', 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              lineHeight: 0.95
+            }}>
+              {/* Purple Caret */}
+              <svg 
+                viewBox="0 0 24 24" 
+                width="13" 
+                height="9" 
+                fill="none" 
+                stroke="#a855f7" 
+                strokeWidth="5.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                style={{
+                  marginBottom: '-1px',
+                  transform: 'translateY(-1px)'
+                }}
+              >
+                <polyline points="18 15 12 9 6 15" />
+              </svg>
+              <span>c</span>
+            </span>
+            {/* rest of text */}
+            <span>ircuitcraftstudio</span>
+            <span style={{ color: '#a855f7', fontWeight: 500, fontSize: '0.8rem', marginLeft: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>portal</span>
           </div>
 
           {/* Feedback states */}
