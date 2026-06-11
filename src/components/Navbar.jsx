@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Menu, X, Sun, Moon, User, LogOut } from 'lucide-react';
+import { ShoppingCart, Menu, X, Sun, Moon, User, LogOut, Search, Folder } from 'lucide-react';
 
 export default function Navbar({ 
   theme, 
@@ -72,54 +72,47 @@ export default function Navbar({
           padding: '0.85rem 1.5rem',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          position: 'relative'
         }}
+        className="nav-wrapper"
       >
-        {/* Logo (Udemy-inspired custom text brand without image logo) */}
+        {/* Mobile Hamburger menu toggle (left on mobile, hidden on desktop) */}
+        <button 
+          onClick={() => setIsOpen(!isOpen)}
+          className="mobile-only-btn hamburger-btn"
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-primary)',
+            cursor: 'pointer',
+            padding: '0.25rem',
+            display: 'none',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          aria-label="Toggle Menu"
+        >
+          {isOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+
+        {/* Logo (Coursera-inspired custom text brand) */}
         <div 
           onClick={() => handleNavClick('home')}
+          className="nav-logo"
           style={{
             display: 'flex',
             alignItems: 'center',
             cursor: 'pointer',
-            fontFamily: 'var(--font-display)',
-            fontWeight: 800,
-            fontSize: '1.45rem',
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 700,
+            fontSize: '1.5rem',
             letterSpacing: '-0.04em',
-            color: 'var(--text-primary)',
-            gap: '0.05rem',
+            color: '#0056d2', // Coursera Royal Blue
             userSelect: 'none'
           }}
         >
-          {/* C with caret */}
-          <span style={{ 
-            position: 'relative', 
-            display: 'inline-flex', 
-            flexDirection: 'column', 
-            alignItems: 'center',
-            lineHeight: 0.95
-          }}>
-            {/* Purple Caret */}
-            <svg 
-              viewBox="0 0 24 24" 
-              width="14" 
-              height="10" 
-              fill="none" 
-              stroke="#a855f7" 
-              strokeWidth="5.5" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-              style={{
-                marginBottom: '-1px',
-                transform: 'translateY(-1px)'
-              }}
-            >
-              <polyline points="18 15 12 9 6 15" />
-            </svg>
-            <span>c</span>
-          </span>
-          {/* rest of text */}
-          <span>ircuitcraftstudio</span>
+          circuitcraftstudio
         </div>
 
         {/* Desktop Nav Items */}
@@ -342,62 +335,77 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Mobile Hamburger toggle */}
-        <div style={{ display: 'none' }} className="mobile-toggle-btn">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <button
-              onClick={toggleTheme}
-              style={{
-                background: 'var(--bg-tertiary)',
-                border: '1px solid var(--border-color)',
-                padding: '0.4rem',
-                borderRadius: '50%',
-                cursor: 'pointer',
-                color: 'var(--text-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
-            </button>
+        {/* Mobile Controls (Right-aligned, hidden on desktop) */}
+        <div 
+          className="mobile-only-controls"
+          style={{
+            display: 'none',
+            alignItems: 'center',
+            gap: '1rem'
+          }}
+        >
+          {/* Search Icon (scrolls to catalog search) */}
+          <button
+            onClick={() => {
+              const element = document.getElementById('projects');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              padding: '0.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            aria-label="Search Projects"
+          >
+            <Search size={22} />
+          </button>
 
-            <button
-              onClick={toggleCart}
-              style={{
-                background: 'rgba(37, 99, 235, 0.08)',
-                border: '1px solid var(--border-color)',
-                padding: '0.4rem 0.75rem',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                color: 'var(--text-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                fontWeight: 600
-              }}
-            >
-              <ShoppingCart size={14} style={{ color: 'var(--accent-blue)' }} />
-              {cartCount > 0 && (
-                <span style={{ background: 'var(--accent-blue)', color: '#fff', fontSize: '0.65rem', borderRadius: '10px', padding: '1px 5px', minWidth: '15px' }}>
-                  {cartCount}
-                </span>
-              )}
-            </button>
-
-            <button 
-              onClick={() => setIsOpen(!isOpen)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-                padding: '0.25rem'
-              }}
-            >
-              {isOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
+          {/* Cart Icon */}
+          <button
+            onClick={toggleCart}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              padding: '0.25rem',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            aria-label="Open Cart"
+          >
+            <ShoppingCart size={22} />
+            {cartCount > 0 && (
+              <span 
+                style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  right: '-6px',
+                  background: 'var(--accent-blue)',
+                  color: '#fff',
+                  fontSize: '0.65rem',
+                  borderRadius: '50%',
+                  width: '16px',
+                  height: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 700
+                }}
+              >
+                {cartCount}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
@@ -497,11 +505,25 @@ export default function Navbar({
           .desktop-nav {
             display: none !important;
           }
-          .mobile-toggle-btn {
-            display: block !important;
+          .mobile-only-btn.hamburger-btn {
+            display: flex !important;
+          }
+          .mobile-only-controls {
+            display: flex !important;
           }
           .mobile-menu {
             display: flex !important;
+          }
+          .nav-wrapper {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+          }
+          /* Center the logo on mobile exactly */
+          .nav-logo {
+            position: absolute !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
           }
         }
       `}</style>
