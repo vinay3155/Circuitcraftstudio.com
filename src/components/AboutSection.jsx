@@ -4,16 +4,22 @@ import { Target, Eye, ShieldCheck, Heart, ArrowUpRight } from 'lucide-react';
 export default function AboutSection() {
   const team = [
     {
-      name: 'Vinay N',
+      name: 'Vinay Bodravla',
       role: 'Founder & Lead Embedded Architect',
       bio: 'Former systems designer specializing in firmware optimization, hardware prototyping, and low-level C programming. Passionate about reforming ECE curriculum with hands-on lab execution.',
       img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop'
     },
     {
-      name: 'Nandish',
+      name: 'Subramanya Sondur',
       role: 'Co-Founder & Lead VLSI/FPGA Engineer',
       bio: 'Specialist in digital design logic, Verilog HDL synthesis, and FPGA prototyping architectures. Committed to simplifying complex chip design roadmaps for engineering graduates.',
       img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop'
+    },
+    {
+      name: 'Mallikarjun Bujaruk',
+      role: 'Co-Founder & Lead Systems Engineer',
+      bio: 'Expert in mixed-signal PCB layout design, high-speed routing design constraints, and hardware prototyping. Dedicated to training ECE engineers in industry hardware standards.',
+      img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop'
     }
   ];
 

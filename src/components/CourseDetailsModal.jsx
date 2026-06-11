@@ -8,7 +8,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId }) {
     'course-rtos-stm32': {
       title: 'Mastering RTOS: Hands on FreeRTOS and STM32Fx with MCU',
       duration: '12 weeks (24.5 Hours Content)',
-      instructor: 'Vinay N (Founder & Embedded Architect)',
+      instructor: 'Vinay Bodravla (Founder & Lead Embedded Architect)',
       overview: 'Develop professional-grade firmware using FreeRTOS on STM32 microcontrollers. This course takes you bare-metal register configs to task scheduling, semaphores, queues, and concurrency mechanisms.',
       outcomes: [
         'Understand RTOS concepts: Tasks, Kernel Schedulers, Context Switching',
@@ -22,7 +22,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId }) {
     'course-embedded-bootcamp': {
       title: 'Embedded Systems Bootcamp: RTOS, IoT, AI, Vision and FPGA',
       duration: '18 weeks (42 Hours Content)',
-      instructor: 'Vinay N & Nandish (Hardware Design Leads)',
+      instructor: 'Vinay Bodravla, Subramanya Sondur & Mallikarjun Bujaruk (Founding Hardware Architects)',
       overview: 'The ultimate zero-to-hero firmware bootcamp. Build cloud-connected smart nodes, run light convolutional neural filters (Edge-AI) on microcontrollers, and synthesize digital hardware circuits on Xilinx FPGAs using Verilog.',
       outcomes: [
         'Program microcontrollers in Embedded C and compile with GCC toolchains',
@@ -36,7 +36,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId }) {
     'course-microcontroller-timers': {
       title: 'Mastering Microcontroller: Timers, PWM, CAN, Low Power & DMA',
       duration: '10 weeks (18 Hours Content)',
-      instructor: 'Vinay N (Founder & Lead Architect)',
+      instructor: 'Vinay Bodravla (Founder & Lead Architect)',
       overview: 'Dive deep into microcontroller peripheral configurations. Master the core silicon mechanisms that make modern hardware power-efficient and high-performing, including Direct Memory Access (DMA) and Controller Area Network (CAN).',
       outcomes: [
         'Program hardware timers, input captures, output compares, and interrupts',
@@ -50,7 +50,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId }) {
     'course-arm-cortex': {
       title: 'Embedded Systems Programming on ARM Cortex-M3/M4 MCU',
       duration: '14 weeks (30.5 Hours Content)',
-      instructor: 'Vinay N & Industry Mentors',
+      instructor: 'Vinay Bodravla & Industry Mentors',
       overview: 'Unlock the potential of ARM silicon. Learn how to read ARM technical manuals, write registers directly from scratch without HAL abstraction libraries, and write custom interrupt controllers and bootloaders.',
       outcomes: [
         'Understand ARM Cortex processor architecture, pipeline states, and stacks',

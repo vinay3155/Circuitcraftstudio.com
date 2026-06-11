@@ -51,21 +51,21 @@ export default function WebinarSection() {
     {
       title: 'Bare-Metal Register Programming on ARM Cortex-M4',
       duration: '1.5 Hours',
-      speaker: 'Vinay N',
+      speaker: 'Vinay Bodravla',
       views: '1.2k views',
       date: 'May 14, 2026'
     },
     {
       title: 'FPGA Prototyping & Verilog Synthesis Patterns',
       duration: '2.5 Hours',
-      speaker: 'Nandish',
+      speaker: 'Subramanya Sondur',
       views: '940 views',
       date: 'May 28, 2026'
     },
     {
       title: 'CAN Bus Protocol in Automotive & Industrial Networking',
       duration: '2 Hours',
-      speaker: 'Vinay N',
+      speaker: 'Vinay Bodravla',
       views: '1.8k views',
       date: 'June 05, 2026'
     }
@@ -166,7 +166,7 @@ export default function WebinarSection() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                 <User size={16} style={{ color: 'var(--accent-purple)' }} />
-                <span><strong>Presenter:</strong> Vinay N (Founder & Embedded Architect)</span>
+                <span><strong>Presenter:</strong> Vinay Bodravla (Founder & Embedded Architect)</span>
               </div>
             </div>
 
