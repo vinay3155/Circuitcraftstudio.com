@@ -223,6 +223,27 @@ export default function App() {
       {/* Background Graphic Grid */}
       <div className="circuit-overlay" />
 
+      {/* Top Announcement Promo Banner */}
+      <div 
+        style={{
+          background: 'linear-gradient(90deg, #2563eb 0%, #0ea5e9 100%)',
+          color: '#fff',
+          textAlign: 'center',
+          padding: '0.45rem 1rem',
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.5rem',
+          zIndex: 100,
+          position: 'relative'
+        }}
+        className="pill-accent"
+      >
+        <span>⚡ Limited Time Offer: Get premium engineering placement career roadmaps for just ₹99! Offer ends soon.</span>
+      </div>
+
       {/* Navigation Header */}
       <Navbar 
         theme={theme} 
@@ -245,6 +266,8 @@ export default function App() {
           onRoadmapClick={handleHeroRoadmapClick} 
           onExploreCatalog={() => scrollToSection('projects')} 
           onOpenStudyHub={() => setIsStudyHubOpen(true)}
+          currentUser={currentUser}
+          onAddToCart={handleAddToCart}
         />
 
         {/* Services Grid Section */}

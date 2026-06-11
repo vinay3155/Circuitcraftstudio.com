@@ -294,8 +294,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, resetToken, 
 
         <div style={{ padding: '1.75rem' }}>
           {/* Logo Brand Title (Coursera-inspired) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.05rem', marginBottom: '1.5rem', justifyContent: 'center', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '1.45rem', letterSpacing: '-0.04em', color: '#0056d2', userSelect: 'none' }}>
-            <span>circuitcraftstudio</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.05rem', marginBottom: '1.5rem', justifyContent: 'center', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: '1.5rem', letterSpacing: '-0.04em', color: '#0056d2', userSelect: 'none' }}>
+            <span>circuitcraft</span>
             <span style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.8rem', marginLeft: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>portal</span>
           </div>
 

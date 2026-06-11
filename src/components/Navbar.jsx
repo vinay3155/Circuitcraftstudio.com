@@ -105,14 +105,14 @@ export default function Navbar({
             alignItems: 'center',
             cursor: 'pointer',
             fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 700,
-            fontSize: '1.5rem',
+            fontWeight: 800,
+            fontSize: '1.65rem',
             letterSpacing: '-0.04em',
             color: '#0056d2', // Coursera Royal Blue
             userSelect: 'none'
           }}
         >
-          circuitcraftstudio
+          circuitcraft
         </div>
 
         {/* Desktop Nav Items */}
