@@ -37,6 +37,7 @@ export default function App() {
   const [selectedCourseDetailsId, setSelectedCourseDetailsId] = useState(null);
 
   const [currentUser, setCurrentUser] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchProfile = async () => {
     const token = localStorage.getItem('cc_auth_token');
@@ -263,6 +264,8 @@ export default function App() {
         onOpenAuth={() => setIsAuthOpen(true)}
         onLogout={handleLogout}
         onOpenStudentDashboard={() => setIsStudentDashboardOpen(true)}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
       />
 
       {/* Main Content Sections */}
@@ -275,6 +278,8 @@ export default function App() {
           currentUser={currentUser}
           onAddToCart={handleAddToCart}
           onOpenCourseDetails={(courseId) => setSelectedCourseDetailsId(courseId)}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
         />
 
         {/* Services Grid Section */}

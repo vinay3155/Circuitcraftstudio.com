@@ -146,6 +146,15 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
     return 'Guest';
   };
 
+  const getUserInitials = () => {
+    if (!currentUser || !currentUser.name) return 'NP';
+    const parts = currentUser.name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].slice(0, 2).toUpperCase();
+  };
+
   return (
     <section 
       id="home"
@@ -429,6 +438,54 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
           </div>
         </div>
 
+        {/* Welcome Banner */}
+        {currentUser && (
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1.25rem',
+              padding: '1.25rem',
+              border: '1px solid var(--border-color)',
+              background: 'var(--bg-secondary)',
+              borderRadius: '8px',
+              textAlign: 'left',
+              width: '100%',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)'
+            }}
+            className="welcome-banner"
+          >
+            <div 
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                background: 'var(--text-primary)',
+                color: 'var(--bg-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.5rem',
+                fontWeight: 700,
+                flexShrink: 0
+              }}
+            >
+              {getUserInitials()}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+                Welcome back, {currentUser.name.toUpperCase()}
+              </h2>
+              <span 
+                onClick={onOpenStudyHub}
+                style={{ fontSize: '0.8rem', color: 'var(--accent-purple)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                Add occupation and interests
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Dashboard Catalog Content */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
@@ -525,16 +582,19 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                 return (
                   <div
                     key={course.id}
+                    onClick={() => onOpenCourseDetails(course.id)}
                     style={{
                       background: 'var(--bg-secondary)',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       border: '1px solid var(--border-color)',
                       overflow: 'hidden',
                       display: 'flex',
                       flexDirection: 'column',
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
-                      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                      position: 'relative'
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                      transition: 'all 0.2s ease',
+                      position: 'relative',
+                      cursor: 'pointer',
+                      textAlign: 'left'
                     }}
                     className="course-card"
                   >
@@ -568,17 +628,17 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                         <div
                           style={{
                             position: 'absolute',
-                            top: '10px',
-                            left: '10px',
-                            background: course.badge === 'Bestseller' ? '#f59e0b' : 
-                                       course.badge === 'Highest Rated' ? 'var(--accent-purple)' : '#3b82f6',
+                            top: '8px',
+                            left: '8px',
+                            background: course.badge === 'Bestseller' ? '#eab308' : 
+                                       course.badge === 'Highest Rated' ? 'var(--accent-purple)' : '#2563eb',
                             color: '#fff',
-                            fontSize: '0.7rem',
+                            fontSize: '0.65rem',
                             fontWeight: 700,
-                            padding: '0.25rem 0.5rem',
-                            borderRadius: '4px',
+                            padding: '0.2rem 0.45rem',
+                            borderRadius: '2px',
                             textTransform: 'uppercase',
-                            letterSpacing: '0.03em',
+                            letterSpacing: '0.02em',
                             zIndex: 2,
                             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                           }}
@@ -596,7 +656,7 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                           left: 0,
                           right: 0,
                           bottom: 0,
-                          background: 'rgba(5, 7, 12, 0.4)',
+                          background: 'rgba(15, 23, 42, 0.35)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -606,13 +666,16 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                         }}
                       >
                         <button
-                          onClick={() => handleAddToCartClick(course)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCartClick(course);
+                          }}
                           disabled={isAdded}
                           style={{
-                            background: '#fff',
+                            background: '#ffffff',
                             border: 'none',
-                            color: '#0056d2',
-                            padding: '0.6rem 1.2rem',
+                            color: 'var(--accent-blue)',
+                            padding: '0.55rem 1.25rem',
                             borderRadius: '24px',
                             fontWeight: 700,
                             fontSize: '0.8rem',
@@ -620,23 +683,14 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.4rem',
-                            boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
-                            transform: 'translateY(10px)',
+                            boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+                            transform: 'translateY(8px)',
                             transition: 'all 0.2s ease'
                           }}
                           className="overlay-cart-btn"
                         >
-                          {isAdded ? (
-                            <>
-                              <Check size={14} style={{ color: 'var(--accent-green)' }} />
-                              <span>Added to Cart</span>
-                            </>
-                          ) : (
-                            <>
-                              <ShoppingCart size={14} />
-                              <span>Add to Cart</span>
-                            </>
-                          )}
+                          <ShoppingCart size={14} style={{ color: 'var(--accent-blue)' }} />
+                          <span>{isAdded ? 'Added' : 'Add to Cart'}</span>
                         </button>
                       </div>
                     </div>
@@ -644,17 +698,17 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                     {/* Course Text Details */}
                     <div 
                       style={{ 
-                        padding: '1rem', 
+                        padding: '0.85rem', 
                         display: 'flex', 
                         flexDirection: 'column', 
                         flex: 1,
-                        gap: '0.4rem'
+                        gap: '0.3rem'
                       }}
                     >
                       <h3 
                         style={{
-                          fontSize: '0.95rem',
-                          lineHeight: 1.35,
+                          fontSize: '0.92rem',
+                          lineHeight: 1.3,
                           fontWeight: 700,
                           color: 'var(--text-primary)',
                           margin: 0,
@@ -662,14 +716,14 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical',
                           overflow: 'hidden',
-                          height: '2.7rem' // Fix height to match 2 lines of text
+                          height: '2.5rem'
                         }}
                         title={course.title}
                       >
                         {course.title}
                       </h3>
 
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
+                      <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: 0 }}>
                         By {course.author}
                       </p>
 
@@ -680,17 +734,14 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                       <div 
                         style={{ 
                           display: 'flex', 
-                          gap: '0.5rem', 
+                          gap: '0.4rem', 
                           alignItems: 'center', 
-                          fontSize: '0.75rem', 
+                          fontSize: '0.72rem', 
                           color: 'var(--text-secondary)',
-                          marginTop: '0.2rem'
+                          marginTop: '0.1rem'
                         }}
                       >
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                          <Clock size={12} style={{ color: 'var(--text-muted)' }} />
-                          {course.hours}
-                        </span>
+                        <span>{course.hours}</span>
                         <span>•</span>
                         <span>{course.level}</span>
                       </div>
@@ -700,35 +751,38 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                         style={{ 
                           display: 'flex', 
                           alignItems: 'baseline', 
-                          gap: '0.5rem', 
+                          gap: '0.4rem', 
                           marginTop: 'auto',
-                          paddingTop: '0.5rem'
+                          paddingTop: '0.4rem'
                         }}
                       >
-                        <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                        <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                           ₹{course.price}
                         </span>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
                           ₹{course.originalPrice}
                         </span>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-green)' }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-green)' }}>
                           ({Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}% off)
                         </span>
                       </div>
 
-                      {/* Action buttons at bottom for touch devices or default view */}
+                      {/* Mobile Action Row */}
                       <div 
                         style={{ 
                           display: 'flex', 
-                          gap: '0.5rem', 
+                          gap: '0.4rem', 
                           marginTop: '0.5rem',
                           borderTop: '1px solid var(--border-color)',
-                          paddingTop: '0.75rem'
+                          paddingTop: '0.6rem'
                         }}
                         className="card-bottom-actions"
                       >
                         <button
-                          onClick={() => handleAddToCartClick(course)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCartClick(course);
+                          }}
                           disabled={isAdded}
                           style={{
                             flex: 1,
@@ -736,60 +790,18 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                             border: '1px solid',
                             borderColor: isAdded ? 'rgba(16, 185, 129, 0.2)' : 'rgba(0, 86, 210, 0.15)',
                             color: isAdded ? 'var(--accent-green)' : '#0056d2',
-                            padding: '0.45rem 0',
-                            borderRadius: '6px',
+                            padding: '0.35rem 0',
+                            borderRadius: '4px',
                             fontWeight: 700,
-                            fontSize: '0.75rem',
+                            fontSize: '0.72rem',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '0.25rem',
-                            transition: 'all 0.15s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!isAdded) {
-                              e.currentTarget.style.background = 'rgba(0, 86, 210, 0.1)';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isAdded) {
-                              e.currentTarget.style.background = 'rgba(0, 86, 210, 0.06)';
-                            }
+                            gap: '0.2rem'
                           }}
                         >
-                          {isAdded ? (
-                            <>
-                              <Check size={12} />
-                              <span>Added</span>
-                            </>
-                          ) : (
-                            <>
-                              <ShoppingCart size={12} />
-                              <span>Add to Cart</span>
-                            </>
-                          )}
-                        </button>
-
-                        <button
-                          onClick={onExploreCatalog}
-                          style={{
-                            flex: 1,
-                            background: 'var(--bg-tertiary)',
-                            border: '1px solid var(--border-color)',
-                            color: 'var(--text-secondary)',
-                            padding: '0.45rem 0',
-                            borderRadius: '6px',
-                            fontWeight: 600,
-                            fontSize: '0.75rem',
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            transition: 'background 0.15s ease'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--border-color)'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'}
-                        >
-                          Details
+                          {isAdded ? 'Added' : 'Add to Cart'}
                         </button>
                       </div>
                     </div>
@@ -821,12 +833,11 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
       <style>{`
         /* Desktop Image zoom on card hover */
         .course-card:hover {
-          transform: translateY(-4px);
           border-color: #0056d2 !important;
-          box-shadow: 0 10px 20px -5px rgba(0, 86, 210, 0.1) !important;
+          box-shadow: 0 4px 12px rgba(0, 86, 210, 0.08) !important;
         }
         .course-card:hover .course-card-img {
-          transform: scale(1.05);
+          transform: scale(1.03);
         }
         
         /* Show card overlay on hover only for non-touch devices */
@@ -847,7 +858,7 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
         @media (max-width: 768px) {
           .welcome-banner {
             padding: 1.5rem 1.25rem !important;
-            border-radius: 16px !important;
+            border-radius: 8px !important;
             flex-direction: column !important;
             align-items: flex-start !important;
           }
