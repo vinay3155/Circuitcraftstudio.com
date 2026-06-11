@@ -17,6 +17,12 @@ import DomainSelectorModal from './components/DomainSelectorModal';
 import DigitalStore from './components/DigitalStore';
 import MyBundlesModal from './components/MyBundlesModal';
 import AuthModal from './components/AuthModal';
+import AboutSection from './components/AboutSection';
+import WebinarSection from './components/WebinarSection';
+import StudentDashboardModal from './components/StudentDashboardModal';
+import CertificateVerifier from './components/CertificateVerifier';
+import TestimonialsSection from './components/TestimonialsSection';
+import CourseDetailsModal from './components/CourseDetailsModal';
 
 export default function App() {
   const [theme, setTheme] = useState('light');
@@ -28,6 +34,8 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [resetToken, setResetToken] = useState('');
   const [activeTab, setActiveTab] = useState('home');
+  const [isStudentDashboardOpen, setIsStudentDashboardOpen] = useState(false);
+  const [selectedCourseDetailsId, setSelectedCourseDetailsId] = useState(null);
 
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -101,7 +109,7 @@ export default function App() {
 
   // Scroll observer to update Navbar highlight automatically based on viewport scroll position
   useEffect(() => {
-    const sections = ['home', 'services', 'projects', 'store', 'blog', 'contact'];
+    const sections = ['home', 'about', 'services', 'projects', 'webinars', 'store', 'blog', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -255,6 +263,7 @@ export default function App() {
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthOpen(true)}
         onLogout={handleLogout}
+        onOpenStudentDashboard={() => setIsStudentDashboardOpen(true)}
       />
 
       {/* Main Content Sections */}
@@ -266,7 +275,11 @@ export default function App() {
           onOpenStudyHub={() => setIsStudyHubOpen(true)}
           currentUser={currentUser}
           onAddToCart={handleAddToCart}
+          onOpenCourseDetails={(courseId) => setSelectedCourseDetailsId(courseId)}
         />
+
+        {/* About Us Page Segment */}
+        <AboutSection />
 
         {/* Services Grid Section */}
         <ServicesSection onServiceClick={(service) => {
@@ -276,6 +289,9 @@ export default function App() {
 
         {/* Categories Catalog Section */}
         <ProjectExplorer onAddToCart={handleAddToCart} />
+
+        {/* Live Webinars System */}
+        <WebinarSection />
 
         {/* Placement & Career Roadmap Bundle Showcase */}
         <RoadmapShowcase 
@@ -292,6 +308,12 @@ export default function App() {
 
         {/* Hackathon Guide Blog Section */}
         <HackathonGuide />
+
+        {/* Certificate Verification System */}
+        <CertificateVerifier />
+
+        {/* Testimonials Segment */}
+        <TestimonialsSection />
       </main>
 
       {/* Floating WhatsApp Chat Button */}
@@ -383,6 +405,21 @@ export default function App() {
         onClose={() => setIsDomainSelectorOpen(false)}
         onConfirm={handleConfirmDomain}
         unlockedRoadmaps={unlockedRoadmaps}
+      />
+
+      {/* Student Dashboard Modal Portal */}
+      <StudentDashboardModal 
+        isOpen={isStudentDashboardOpen}
+        onClose={() => setIsStudentDashboardOpen(false)}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
+      />
+
+      {/* Course Details Modal Portal */}
+      <CourseDetailsModal 
+        isOpen={selectedCourseDetailsId !== null}
+        onClose={() => setSelectedCourseDetailsId(null)}
+        courseId={selectedCourseDetailsId}
       />
     </div>
   );

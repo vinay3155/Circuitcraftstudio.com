@@ -12,15 +12,18 @@ export default function Navbar({
   onOpenMyBundles,
   currentUser,
   onOpenAuth,
-  onLogout
+  onLogout,
+  onOpenStudentDashboard
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const navItems = [
     { id: 'home', label: 'Home' },
+    { id: 'about', label: 'About Us' },
     { id: 'services', label: 'Services' },
     { id: 'projects', label: 'Projects' },
+    { id: 'webinars', label: 'Webinars' },
     { id: 'store', label: 'Digital Store' },
     { id: 'blog', label: 'Hackathon Guide' },
     { id: 'study-hub', label: 'VTU Study Hub' },
@@ -285,6 +288,30 @@ export default function Navbar({
                     </button>
                     <button
                       onClick={() => {
+                        onOpenStudentDashboard();
+                        setIsProfileMenuOpen(false);
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-primary)',
+                        padding: '0.5rem 1rem',
+                        textAlign: 'left',
+                        width: '100%',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <Cpu size={12} style={{ color: 'var(--accent-blue)' }} />
+                      Student Dashboard
+                    </button>
+                    <button
+                      onClick={() => {
                         onLogout();
                         setIsProfileMenuOpen(false);
                       }}
@@ -440,11 +467,34 @@ export default function Navbar({
             </button>
           ))}
 
-          {currentUser ? (
-            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+           {currentUser ? (
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
                 Account: <strong style={{ color: '#fff' }}>{currentUser.email}</strong>
               </span>
+              <button
+                onClick={() => {
+                  onOpenStudentDashboard();
+                  setIsOpen(false);
+                }}
+                style={{
+                  background: 'rgba(0, 86, 210, 0.06)',
+                  border: '1px solid rgba(0, 86, 210, 0.15)',
+                  color: '#0056d2',
+                  padding: '0.5rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.4rem',
+                  fontWeight: 600
+                }}
+              >
+                <Cpu size={14} /> Student Dashboard
+              </button>
               <button
                 onClick={() => {
                   onLogout();

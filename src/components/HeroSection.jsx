@@ -188,85 +188,67 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
           gap: '2.5rem'
         }}
       >
-        {/* Dynamic Welcome back, [Name]/Guest Card */}
+        {/* Split Landing Hero Section */}
         <div 
           style={{
-            background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(79, 70, 229, 0.08) 100%)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '20px',
-            padding: '2.5rem 2rem',
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 4px 20px -5px rgba(0, 0, 0, 0.05)',
-            display: 'flex',
-            flexWrap: 'wrap',
+            display: 'grid',
+            gridTemplateColumns: '1.1fr 0.9fr',
+            gap: '3rem',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '2rem'
+            minHeight: '50vh',
+            marginBottom: '1rem',
+            textAlign: 'left'
           }}
-          className="welcome-banner"
+          className="hero-split-row"
         >
-          {/* Ambient Glow Graphic behind greeting */}
-          <div 
-            style={{
-              position: 'absolute',
-              top: '-50px',
-              right: '-50px',
-              width: '200px',
-              height: '200px',
-              background: 'radial-gradient(circle, rgba(0, 86, 210, 0.12) 0%, rgba(255, 255, 255, 0) 70%)',
-              pointerEvents: 'none'
-            }}
-          />
-
-          <div style={{ flex: '1 1 500px' }}>
+          {/* Left Column: Text & Actions */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', alignItems: 'flex-start' }}>
+            {currentUser && (
+              <div 
+                style={{ 
+                  background: 'rgba(0, 86, 210, 0.06)',
+                  border: '1px solid rgba(0, 86, 210, 0.15)',
+                  borderRadius: '12px',
+                  padding: '0.4rem 0.8rem',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  color: '#0056d2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                <span>👋 Welcome back, <strong>{getGreetingName()}</strong>!</span>
+              </div>
+            )}
+            
             <h1 
               style={{
-                fontSize: '2.4rem',
-                lineHeight: 1.2,
+                fontSize: '2.85rem',
+                lineHeight: 1.15,
                 color: 'var(--text-primary)',
                 fontFamily: 'var(--font-display)',
                 fontWeight: 800,
                 letterSpacing: '-0.03em',
-                margin: '0 0 0.5rem 0'
+                margin: 0
               }}
             >
-              Welcome back, <span style={{ color: '#0056d2' }}>{getGreetingName()}</span>
+              Empowering Future Engineers Through Practical Learning
             </h1>
+            
             <p 
               style={{
                 fontSize: '1.05rem',
                 color: 'var(--text-secondary)',
-                lineHeight: 1.5,
+                lineHeight: 1.55,
                 margin: 0,
-                maxWidth: '600px'
+                maxWidth: '580px'
               }}
             >
-              Ready to construct your next engineering project? Pick up where you left off or explore customized course recommendations below.
+              Bridge the gap between textbook engineering theory and industry requirements. Build real hardware prototypes, program bare-metal microcontrollers, and register verifiable credentials.
             </p>
-            
-            {/* Quick action metrics bar */}
-            <div 
-              style={{ 
-                display: 'flex', 
-                gap: '1.5rem', 
-                marginTop: '1.5rem', 
-                flexWrap: 'wrap' 
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                <Cpu size={16} style={{ color: '#0056d2' }} />
-                <span>ECE, Embedded, IoT & VLSI Resources</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                <Layers size={16} style={{ color: 'var(--accent-purple)' }} />
-                <span>100+ Projects & Lab Schematics</span>
-              </div>
-            </div>
-          </div>
 
-          {/* Interactive Search inside greeting box */}
-          <div style={{ flex: '1 1 320px', maxWidth: '420px', width: '100%' }}>
+            {/* Quick Search */}
             <form 
               onSubmit={handleSearchSubmit}
               style={{
@@ -274,24 +256,26 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                 background: 'var(--bg-secondary)',
                 border: '1px solid var(--border-color)',
                 borderRadius: '30px',
-                padding: '0.4rem 0.4rem 0.4rem 1.2rem',
+                padding: '0.3rem 0.3rem 0.3rem 1.1rem',
                 alignItems: 'center',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)',
+                width: '100%',
+                maxWidth: '460px',
                 transition: 'border-color var(--transition-fast)'
               }}
-              className="greeting-search-form"
+              className="hero-search-form"
             >
               <Search size={18} style={{ color: 'var(--text-muted)', marginRight: '0.5rem', flexShrink: 0 }} />
               <input 
                 type="text" 
-                placeholder="What project do you want to build?"
+                placeholder="What project or course do you want to build?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
                   border: 'none',
                   background: 'transparent',
                   color: 'var(--text-primary)',
-                  fontSize: '0.9rem',
+                  fontSize: '0.875rem',
                   outline: 'none',
                   width: '100%',
                   fontWeight: 500
@@ -303,7 +287,7 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                   background: '#0056d2',
                   border: 'none',
                   color: '#fff',
-                  padding: '0.6rem 1.2rem',
+                  padding: '0.5rem 1.25rem',
                   borderRadius: '20px',
                   fontWeight: 600,
                   fontSize: '0.85rem',
@@ -317,6 +301,131 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                 Search
               </button>
             </form>
+
+            {/* Buttons Row */}
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+              <button
+                onClick={onOpenStudyHub}
+                style={{
+                  padding: '0.75rem 1.75rem',
+                  borderRadius: '30px',
+                  background: '#0056d2',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 10px 20px -5px rgba(0, 86, 210, 0.25)',
+                  transition: 'background var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#0043a4'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#0056d2'}
+              >
+                Start Learning
+              </button>
+              
+              <button
+                onClick={() => {
+                  const element = document.getElementById('store');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  } else if (onExploreCatalog) {
+                    onExploreCatalog();
+                  }
+                }}
+                style={{
+                  padding: '0.75rem 1.75rem',
+                  borderRadius: '30px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#0056d2';
+                  e.currentTarget.style.background = 'rgba(0, 86, 210, 0.02)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                }}
+              >
+                Explore Courses
+              </button>
+              
+              <button
+                onClick={() => {
+                  const element = document.getElementById('webinars');
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
+                }}
+                style={{
+                  padding: '0.75rem 1.75rem',
+                  borderRadius: '30px',
+                  background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.06) 0%, rgba(0, 86, 210, 0.06) 100%)',
+                  border: '1px solid rgba(79, 70, 229, 0.2)',
+                  color: 'var(--accent-purple)',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, rgba(0, 86, 210, 0.12) 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(79, 70, 229, 0.06) 0%, rgba(0, 86, 210, 0.06) 100%)';
+                }}
+              >
+                Join Webinar
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column: High Tech Loop Video Card */}
+          <div 
+            style={{
+              position: 'relative',
+              borderRadius: '20px',
+              overflow: 'hidden',
+              border: '1px solid var(--border-color)',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.05)',
+              background: 'var(--bg-secondary)',
+              aspectRatio: '16/9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%'
+            }}
+            className="hero-video-container"
+          >
+            <video
+              src="https://assets.mixkit.co/videos/preview/mixkit-circuit-board-microchip-of-a-computer-close-up-41584-large.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
+            {/* Dark gradient overlay bottom */}
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                pointerEvents: 'none',
+                background: 'linear-gradient(to bottom, transparent 75%, rgba(15, 23, 42, 0.15))',
+                zIndex: 2
+              }}
+            />
           </div>
         </div>
 

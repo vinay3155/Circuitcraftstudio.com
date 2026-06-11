@@ -32,7 +32,7 @@ const domainLabels = {
   pcb: 'PCB Design & Hardware'
 };
 
-export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps = {}, onToggleRoadmapUnlock }) {
+export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps = {}, onToggleRoadmapUnlock, currentUser, onOpenAuth }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [passcodeError, setPasscodeError] = useState('');
@@ -50,6 +50,14 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
   const [filesToUpload, setFilesToUpload] = useState({}); // { [subjectCode-moduleIndex]: File }
 
   const [showRoadmapLocks, setShowRoadmapLocks] = useState(false);
+  const [activeConsoleTab, setActiveConsoleTab] = useState('syllabus'); // 'syllabus', 'certificates'
+  const [studentName, setStudentName] = useState('');
+  const [courseName, setCourseName] = useState('Arduino Masterclass');
+  const [certificateId, setCertificateId] = useState('');
+  const [certsList, setCertsList] = useState([]);
+  const [certActionLoading, setCertActionLoading] = useState(false);
+  const [certError, setCertError] = useState('');
+  const [certSuccess, setCertSuccess] = useState('');
 
   const modalRef = useRef(null);
 
@@ -84,6 +92,100 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
   const handleOutsideClick = (e) => {
     if (modalRef.current && !modalRef.current.contains(e.target)) {
       onClose();
+    }
+  };
+
+  const fetchCertificates = async () => {
+    const token = localStorage.getItem('cc_auth_token');
+    if (!token || !currentUser || currentUser.email !== 'vinaynbodravla315@gmail.com') return;
+
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    try {
+      const res = await fetch(`${API_URL}/api/certificates`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCertsList(data);
+      }
+    } catch (err) {
+      console.error('Error fetching certificates list:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && activeConsoleTab === 'certificates') {
+      fetchCertificates();
+    }
+  }, [isOpen, activeConsoleTab, currentUser]);
+
+  const handleGenerateCertificate = async (e) => {
+    e.preventDefault();
+    if (!studentName.trim() || !courseName) {
+      setCertError('Student name and course name are required.');
+      return;
+    }
+
+    setCertActionLoading(true);
+    setCertError('');
+    setCertSuccess('');
+
+    const token = localStorage.getItem('cc_auth_token');
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+    try {
+      const res = await fetch(`${API_URL}/api/certificates/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          studentName: studentName.trim(),
+          courseName,
+          certificateId: certificateId.trim() || undefined
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setCertSuccess(`Success! Certificate ID: ${data.certificate.certificateId}`);
+        setStudentName('');
+        setCertificateId('');
+        fetchCertificates();
+      } else {
+        setCertError(data.error || 'Failed to generate certificate.');
+      }
+    } catch (err) {
+      console.error('Error generating certificate:', err);
+      setCertError('Network error generating certificate.');
+    } finally {
+      setCertActionLoading(false);
+    }
+  };
+
+  const handleDeleteCertificate = async (certId) => {
+    if (!window.confirm(`Are you sure you want to delete certificate ${certId}?`)) return;
+
+    const token = localStorage.getItem('cc_auth_token');
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+    try {
+      const res = await fetch(`${API_URL}/api/certificates/${certId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        fetchCertificates();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete certificate.');
+      }
+    } catch (err) {
+      console.error('Error deleting certificate:', err);
+      alert('Network error deleting certificate.');
     }
   };
 
@@ -658,329 +760,589 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
           /* MAIN CONSOLE VIEW */
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             
-            {/* Filter Bar */}
-            <div 
-              style={{
-                padding: '1rem 1.5rem',
-                background: 'var(--bg-tertiary)',
-                borderBottom: '1px solid var(--border-color)',
-                display: 'flex',
-                gap: '1rem',
-                flexWrap: 'wrap'
-              }}
-            >
-              {/* Branch Selector */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1, minWidth: '150px' }}>
-                <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Branch</label>
-                <select 
-                  value={selectedBranch}
-                  onChange={(e) => {
-                    setSelectedBranch(e.target.value);
-                    setExpandedSubject(null);
-                  }}
-                  style={{
-                    padding: '0.5rem',
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <option value="CSE">CSE (Computer Science)</option>
-                  <option value="AI">AI (Artificial Intelligence)</option>
-                  <option value="ECE">ECE (Electronics & Comm)</option>
-                  <option value="EEE">EEE (Electrical & Electronics)</option>
-                </select>
-              </div>
-
-              {/* Semester Selector */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1, minWidth: '150px' }}>
-                <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Semester</label>
-                <select 
-                  value={selectedSem}
-                  onChange={(e) => {
-                    setSelectedSem(e.target.value);
-                    setExpandedSubject(null);
-                  }}
-                  style={{
-                    padding: '0.5rem',
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {[1, 2, 3, 4, 5, 6].map(sem => (
-                    <option key={sem} value={sem}>{sem}st Sem</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Roadmap Bundle Bypass Toggle */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '180px' }}>
-                <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Roadmap Locks (10 tracks)</label>
-                <button
-                  type="button"
-                  onClick={() => setShowRoadmapLocks(!showRoadmapLocks)}
-                  style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '6px',
-                    padding: '0.35rem 0.5rem',
-                    height: '38px',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    color: '#fff',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '0.5rem'
-                  }}
-                >
-                  <span>Configure Locks</span>
-                  {showRoadmapLocks ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
-              </div>
-
-              {/* Token warning if not setup */}
-              {!isPatSaved && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.5rem 1rem', borderRadius: '6px', color: '#ef4444', fontSize: '0.75rem', flex: 2, minWidth: '250px' }}>
-                  <AlertTriangle size={16} />
-                  <div>
-                    <strong>GitHub Connection Pending:</strong> Please set up your access token in settings to commit uploads.
-                    <button onClick={() => setShowSettings(true)} style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', textDecoration: 'underline', cursor: 'pointer', padding: '0 4px', fontWeight: 600 }}>Click here</button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Roadmap Locks Dropdown Grid */}
-            {showRoadmapLocks && (
-              <div
+            {/* Tab Selection Header */}
+            <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-tertiary)' }}>
+              <button
+                onClick={() => { setActiveConsoleTab('syllabus'); }}
                 style={{
-                  background: 'var(--bg-secondary)',
-                  borderBottom: '1px solid var(--border-color)',
-                  padding: '1rem 1.5rem',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                  gap: '0.75rem'
+                  flex: 1,
+                  background: activeConsoleTab === 'syllabus' ? 'rgba(0, 86, 210, 0.06)' : 'transparent',
+                  border: 'none',
+                  borderBottom: activeConsoleTab === 'syllabus' ? '3px solid #0056d2' : '3px solid transparent',
+                  color: activeConsoleTab === 'syllabus' ? '#0056d2' : 'var(--text-secondary)',
+                  padding: '1rem',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  transition: 'all 0.15s ease'
                 }}
               >
-                {Object.entries(domainLabels).map(([domainId, label]) => {
-                  const isUnlocked = unlockedRoadmaps[domainId] || false;
-                  return (
-                    <label
-                      key={domainId}
+                Syllabus PDF Uploads
+              </button>
+              <button
+                onClick={() => { setActiveConsoleTab('certificates'); }}
+                style={{
+                  flex: 1,
+                  background: activeConsoleTab === 'certificates' ? 'rgba(0, 86, 210, 0.06)' : 'transparent',
+                  border: 'none',
+                  borderBottom: activeConsoleTab === 'certificates' ? '3px solid #0056d2' : '3px solid transparent',
+                  color: activeConsoleTab === 'certificates' ? '#0056d2' : 'var(--text-secondary)',
+                  padding: '1rem',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                Certificate Generator & Registry
+              </button>
+            </div>
+
+            {activeConsoleTab === 'syllabus' ? (
+              <>
+                {/* Filter Bar */}
+                <div 
+                  style={{
+                    padding: '1rem 1.5rem',
+                    background: 'var(--bg-tertiary)',
+                    borderBottom: '1px solid var(--border-color)',
+                    display: 'flex',
+                    gap: '1rem',
+                    flexWrap: 'wrap'
+                  }}
+                >
+                  {/* Branch Selector */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1, minWidth: '150px' }}>
+                    <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Branch</label>
+                    <select 
+                      value={selectedBranch}
+                      onChange={(e) => {
+                        setSelectedBranch(e.target.value);
+                        setExpandedSubject(null);
+                      }}
                       style={{
+                        padding: '0.5rem',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        color: '#fff',
+                        outline: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="CSE">CSE (Computer Science)</option>
+                      <option value="AI">AI (Artificial Intelligence)</option>
+                      <option value="ECE">ECE (Electronics & Comm)</option>
+                      <option value="EEE">EEE (Electrical & Electronics)</option>
+                    </select>
+                  </div>
+
+                  {/* Semester Selector */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1, minWidth: '150px' }}>
+                    <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Semester</label>
+                    <select 
+                      value={selectedSem}
+                      onChange={(e) => {
+                        setSelectedSem(e.target.value);
+                        setExpandedSubject(null);
+                      }}
+                      style={{
+                        padding: '0.5rem',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        color: '#fff',
+                        outline: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {[1, 2, 3, 4, 5, 6].map(sem => (
+                        <option key={sem} value={sem}>{sem}st Sem</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Roadmap Bundle Bypass Toggle */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', minWidth: '180px' }}>
+                    <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>Roadmap Locks (10 tracks)</label>
+                    <button
+                      type="button"
+                      onClick={() => setShowRoadmapLocks(!showRoadmapLocks)}
+                      style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        padding: '0.35rem 0.5rem',
+                        height: '38px',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        color: '#fff',
+                        cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.5rem',
-                        fontSize: '0.8rem',
-                        color: 'var(--text-primary)',
-                        cursor: 'pointer',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
-                        background: isUnlocked ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255,255,255,0.02)',
-                        border: `1px solid ${isUnlocked ? 'var(--accent-green)' : 'var(--border-color)'}`
+                        justifyContent: 'space-between',
+                        gap: '0.5rem'
                       }}
                     >
-                      <input
-                        type="checkbox"
-                        checked={isUnlocked}
-                        onChange={() => onToggleRoadmapUnlock(domainId)}
-                        style={{ cursor: 'pointer' }}
-                      />
-                      <span>{label}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            )}
+                      <span>Configure Locks</span>
+                      {showRoadmapLocks ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </button>
+                  </div>
 
-            {/* List and Actions */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {currentSubjects.map((subject) => {
-                  const isSubjectExpanded = expandedSubject === subject.code;
-                  const modulesList = [0, 1, 2, 3, 4];
+                  {/* Token warning if not setup */}
+                  {!isPatSaved && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.5rem 1rem', borderRadius: '6px', color: '#ef4444', fontSize: '0.75rem', flex: 2, minWidth: '250px' }}>
+                      <AlertTriangle size={16} />
+                      <div>
+                        <strong>GitHub Connection Pending:</strong> Please set up your access token in settings to commit uploads.
+                        <button onClick={() => setShowSettings(true)} style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', textDecoration: 'underline', cursor: 'pointer', padding: '0 4px', fontWeight: 600 }}>Click here</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                  return (
-                    <div 
-                      key={subject.code}
-                      className="glass-panel"
-                      style={{
-                        padding: '1rem 1.25rem',
-                        transition: 'all 0.25s',
-                        borderLeft: isSubjectExpanded ? '3px solid var(--accent-cyan)' : '1px solid var(--border-color)',
-                        background: 'rgba(10, 14, 23, 0.5)'
-                      }}
-                    >
-                      <div 
-                        onClick={() => setExpandedSubject(isSubjectExpanded ? null : subject.code)}
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left' }}>
-                          <span 
+                {/* Roadmap Locks Dropdown Grid */}
+                {showRoadmapLocks && (
+                  <div
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      borderBottom: '1px solid var(--border-color)',
+                      padding: '1rem 1.5rem',
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                      gap: '0.75rem'
+                    }}
+                  >
+                    {Object.entries(domainLabels).map(([domainId, label]) => {
+                      const isUnlocked = unlockedRoadmaps[domainId] || false;
+                      return (
+                        <label
+                          key={domainId}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            fontSize: '0.8rem',
+                            color: 'var(--text-primary)',
+                            cursor: 'pointer',
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '4px',
+                            background: isUnlocked ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255,255,255,0.02)',
+                            border: `1px solid ${isUnlocked ? 'var(--accent-green)' : 'var(--border-color)'}`
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isUnlocked}
+                            onChange={() => onToggleRoadmapUnlock(domainId)}
+                            style={{ cursor: 'pointer' }}
+                          />
+                          <span>{label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* List and Actions */}
+                <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {currentSubjects.map((subject) => {
+                      const isSubjectExpanded = expandedSubject === subject.code;
+                      const modulesList = [0, 1, 2, 3, 4];
+
+                      return (
+                        <div 
+                          key={subject.code}
+                          className="glass-panel"
+                          style={{
+                            padding: '1rem 1.25rem',
+                            transition: 'all 0.25s',
+                            borderLeft: isSubjectExpanded ? '3px solid var(--accent-cyan)' : '1px solid var(--border-color)',
+                            background: 'rgba(10, 14, 23, 0.5)'
+                          }}
+                        >
+                          <div 
+                            onClick={() => setExpandedSubject(isSubjectExpanded ? null : subject.code)}
                             style={{
-                              fontSize: '0.7rem',
-                              fontWeight: 700,
-                              padding: '0.2rem 0.5rem',
-                              borderRadius: '4px',
-                              background: 'rgba(0, 229, 255, 0.1)',
-                              border: '1px solid rgba(0, 229, 255, 0.2)',
-                              color: 'var(--accent-cyan)'
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              cursor: 'pointer'
                             }}
                           >
-                            {subject.code}
-                          </span>
-                          <span style={{ fontWeight: 600, color: '#fff', fontSize: '0.95rem' }}>{subject.name}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left' }}>
+                              <span 
+                                style={{
+                                  fontSize: '0.7rem',
+                                  fontWeight: 700,
+                                  padding: '0.2rem 0.5rem',
+                                  borderRadius: '4px',
+                                  background: 'rgba(0, 229, 255, 0.1)',
+                                  border: '1px solid rgba(0, 229, 255, 0.2)',
+                                  color: 'var(--accent-cyan)'
+                                }}
+                              >
+                                {subject.code}
+                              </span>
+                              <span style={{ fontWeight: 600, color: '#fff', fontSize: '0.95rem' }}>{subject.name}</span>
+                            </div>
+                            <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
+                              {isSubjectExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </button>
+                          </div>
+
+                          {/* Modules detail layout inside cards */}
+                          {isSubjectExpanded && (
+                            <div 
+                              style={{
+                                marginTop: '1rem',
+                                paddingTop: '1rem',
+                                borderTop: '1px solid rgba(255,255,255,0.05)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '0.75rem',
+                                textAlign: 'left'
+                              }}
+                            >
+                              {modulesList.map((mIndex) => {
+                                const key = `${subject.code}-${mIndex}`;
+                                const selectedFile = filesToUpload[key];
+                                const status = uploadStatus[key];
+
+                                return (
+                                  <div 
+                                    key={mIndex}
+                                    style={{
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      padding: '0.75rem 1rem',
+                                      background: 'var(--bg-tertiary)',
+                                      borderRadius: '8px',
+                                      border: '1px solid var(--border-color)',
+                                      gap: '0.5rem'
+                                    }}
+                                  >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                      <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600 }}>
+                                        Module {mIndex + 1}
+                                      </span>
+
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                        
+                                        {/* Select file */}
+                                        <label
+                                          style={{
+                                            background: 'rgba(255, 255, 255, 0.02)',
+                                            border: '1px solid var(--border-color)',
+                                            color: selectedFile ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                                            padding: '0.3rem 0.65rem',
+                                            borderRadius: '15px',
+                                            fontSize: '0.7rem',
+                                            fontWeight: 600,
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                          }}
+                                        >
+                                          <Upload size={12} />
+                                          {selectedFile ? "Change PDF" : "Select PDF"}
+                                          <input 
+                                            type="file" 
+                                            accept=".pdf"
+                                            onChange={(e) => handleFileChange(subject.code, mIndex, e.target.files[0])}
+                                            style={{ display: 'none' }}
+                                          />
+                                        </label>
+
+                                        {/* Commit to Github Trigger */}
+                                        {selectedFile && (
+                                          <button
+                                            onClick={() => handleCommitToGithub(subject.code, subject.name, mIndex)}
+                                            disabled={status?.status === 'uploading'}
+                                            style={{
+                                              background: 'linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%)',
+                                              border: 'none',
+                                              color: '#000',
+                                              padding: '0.3rem 0.75rem',
+                                              borderRadius: '15px',
+                                              fontSize: '0.7rem',
+                                              fontWeight: 700,
+                                              cursor: status?.status === 'uploading' ? 'not-allowed' : 'pointer',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: '4px'
+                                            }}
+                                          >
+                                            {status?.status === 'uploading' ? <RefreshCw size={12} className="spin" /> : <ArrowRight size={12} />}
+                                            Commit to GitHub
+                                          </button>
+                                        )}
+
+                                      </div>
+                                    </div>
+
+                                    {/* File Name display */}
+                                    {selectedFile && (
+                                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                        Selected File: <strong style={{ color: 'var(--accent-cyan)' }}>{selectedFile.name}</strong> ({Math.round(selectedFile.size / 1024)} KB)
+                                      </div>
+                                    )}
+
+                                    {/* Upload status responses */}
+                                    {status && status.status !== 'idle' && (
+                                      <div 
+                                        style={{ 
+                                          fontSize: '0.75rem', 
+                                          padding: '0.4rem 0.6rem', 
+                                          borderRadius: '4px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '6px',
+                                          marginTop: '0.25rem',
+                                          background: status.status === 'uploading' ? 'rgba(0, 229, 255, 0.05)' : status.status === 'success' ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)',
+                                          border: '1px solid',
+                                          borderColor: status.status === 'uploading' ? 'rgba(0, 229, 255, 0.15)' : status.status === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                          color: status.status === 'uploading' ? 'var(--accent-cyan)' : status.status === 'success' ? 'var(--accent-green)' : '#ef4444'
+                                        }}
+                                      >
+                                        {status.status === 'uploading' && <RefreshCw size={12} className="spin" />}
+                                        {status.status === 'success' && <CheckCircle size={12} />}
+                                        {status.status === 'error' && <AlertTriangle size={12} />}
+                                        <span>{status.message}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                        <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
-                          {isSubjectExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* CERTIFICATE GENERATOR PANEL */
+              <div style={{ flex: 1, overflowY: 'auto' }}>
+                {(!currentUser || currentUser.email !== 'vinaynbodravla315@gmail.com') ? (
+                  <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+                    <Lock size={44} style={{ color: 'var(--text-muted)', marginBottom: '1.25rem', display: 'block', margin: '0 auto 1.25rem auto' }} />
+                    <h4 style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem' }}>Admin Account Required</h4>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '450px', margin: '0 auto 1.75rem auto', lineHeight: 1.55 }}>
+                      To generate, view, and delete verified certificate registry records in MongoDB, you must sign in with your administrator account <strong>vinaynbodravla315@gmail.com</strong>.
+                    </p>
+                    <button
+                      onClick={onOpenAuth}
+                      style={{
+                        background: '#0056d2',
+                        border: 'none',
+                        color: '#fff',
+                        padding: '0.65rem 2rem',
+                        borderRadius: '30px',
+                        fontWeight: 700,
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 10px rgba(0, 86, 210, 0.2)'
+                      }}
+                    >
+                      Sign In as Admin
+                    </button>
+                  </div>
+                ) : (
+                  /* Verified Admin View: Split layout */
+                  <div 
+                    style={{ 
+                      display: 'flex', 
+                      flexWrap: 'wrap', 
+                      gap: '2rem', 
+                      padding: '2rem', 
+                      textAlign: 'left' 
+                    }}
+                    className="cert-split-layout"
+                  >
+                    {/* Left: Generator Form */}
+                    <div style={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                      <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', margin: 0 }}>Issue Student Certificate</h3>
+                      
+                      <form 
+                        onSubmit={handleGenerateCertificate} 
+                        style={{ 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          gap: '1rem', 
+                          background: 'var(--bg-tertiary)', 
+                          padding: '1.5rem', 
+                          borderRadius: '12px', 
+                          border: '1px solid var(--border-color)' 
+                        }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Student Full Name</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. NANDISH"
+                            value={studentName}
+                            onChange={(e) => setStudentName(e.target.value)}
+                            required
+                            style={{ 
+                              padding: '0.65rem', 
+                              borderRadius: '6px', 
+                              background: 'var(--bg-secondary)', 
+                              border: '1px solid var(--border-color)', 
+                              color: '#fff', 
+                              fontSize: '0.85rem', 
+                              outline: 'none',
+                              fontWeight: 500
+                            }}
+                          />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Course Completed</label>
+                          <select
+                            value={courseName}
+                            onChange={(e) => setCourseName(e.target.value)}
+                            style={{ 
+                              padding: '0.65rem', 
+                              borderRadius: '6px', 
+                              background: 'var(--bg-secondary)', 
+                              border: '1px solid var(--border-color)', 
+                              color: '#fff', 
+                              fontSize: '0.85rem', 
+                              outline: 'none', 
+                              cursor: 'pointer',
+                              fontWeight: 500
+                            }}
+                          >
+                            <option value="Arduino Masterclass">Arduino Masterclass</option>
+                            <option value="ESP32 IoT Bootcamp">ESP32 IoT Bootcamp</option>
+                            <option value="PCB Design Fundamentals">PCB Design Fundamentals</option>
+                            <option value="VLSI Roadmap">VLSI Roadmap</option>
+                          </select>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Custom Certificate ID (Optional)</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. CC-E70A-F56B-883F (Leave blank to auto-generate)"
+                            value={certificateId}
+                            onChange={(e) => setCertificateId(e.target.value)}
+                            style={{ 
+                              padding: '0.65rem', 
+                              borderRadius: '6px', 
+                              background: 'var(--bg-secondary)', 
+                              border: '1px solid var(--border-color)', 
+                              color: '#fff', 
+                              fontSize: '0.85rem', 
+                              outline: 'none',
+                              fontWeight: 500
+                            }}
+                          />
+                        </div>
+
+                        {certError && (
+                          <div style={{ fontSize: '0.75rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <AlertTriangle size={12} /> {certError}
+                          </div>
+                        )}
+                        {certSuccess && (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <CheckCircle size={12} /> {certSuccess}
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={certActionLoading}
+                          style={{ 
+                            background: '#0056d2', 
+                            border: 'none', 
+                            color: '#fff', 
+                            padding: '0.7rem', 
+                            borderRadius: '6px', 
+                            fontWeight: 700, 
+                            fontSize: '0.85rem', 
+                            cursor: certActionLoading ? 'not-allowed' : 'pointer', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            gap: '0.5rem', 
+                            marginTop: '0.5rem',
+                            boxShadow: '0 4px 10px rgba(0, 86, 210, 0.2)'
+                          }}
+                        >
+                          {certActionLoading ? <RefreshCw size={14} className="spin" /> : null}
+                          <span>{certActionLoading ? 'Issuing...' : 'Issue Certificate'}</span>
+                        </button>
+                      </form>
+                    </div>
+
+                    {/* Right: Registry List */}
+                    <div style={{ flex: '1.2 1 380px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', margin: 0 }}>Registry Records ({certsList.length})</h3>
+                        <button
+                          onClick={fetchCertificates}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--accent-cyan)',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <RefreshCw size={12} /> Refresh
                         </button>
                       </div>
 
-                      {/* Modules detail layout inside cards */}
-                      {isSubjectExpanded && (
-                        <div 
-                          style={{
-                            marginTop: '1rem',
-                            paddingTop: '1rem',
-                            borderTop: '1px solid rgba(255,255,255,0.05)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '0.75rem',
-                            textAlign: 'left'
-                          }}
-                        >
-                          {modulesList.map((mIndex) => {
-                            const key = `${subject.code}-${mIndex}`;
-                            const selectedFile = filesToUpload[key];
-                            const status = uploadStatus[key];
-
-                            return (
-                              <div 
-                                key={mIndex}
-                                style={{
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  padding: '0.75rem 1rem',
-                                  background: 'var(--bg-tertiary)',
-                                  borderRadius: '8px',
-                                  border: '1px solid var(--border-color)',
-                                  gap: '0.5rem'
-                                }}
-                              >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-                                  <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600 }}>
-                                    Module {mIndex + 1}
-                                  </span>
-
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                    
-                                    {/* Select file */}
-                                    <label
-                                      style={{
-                                        background: 'rgba(255, 255, 255, 0.02)',
-                                        border: '1px solid var(--border-color)',
-                                        color: selectedFile ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                                        padding: '0.3rem 0.65rem',
-                                        borderRadius: '15px',
-                                        fontSize: '0.7rem',
-                                        fontWeight: 600,
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '4px'
-                                      }}
+                      <div style={{ background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--border-color)', overflow: 'hidden', flex: 1, maxHeight: '380px', overflowY: 'auto' }}>
+                        {certsList.length === 0 ? (
+                          <div style={{ padding: '3rem 2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                            No certificates generated yet in the registry database.
+                          </div>
+                        ) : (
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
+                            <thead>
+                              <tr style={{ borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.02)' }}>
+                                <th style={{ padding: '0.75rem 1rem', color: 'var(--text-primary)', fontWeight: 700 }}>Student</th>
+                                <th style={{ padding: '0.75rem 1rem', color: 'var(--text-primary)', fontWeight: 700 }}>Course</th>
+                                <th style={{ padding: '0.75rem 1rem', color: 'var(--text-primary)', fontWeight: 700 }}>ID</th>
+                                <th style={{ padding: '0.75rem 1rem', color: 'var(--text-primary)', fontWeight: 700, textAlign: 'center' }}>Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {certsList.map((c) => (
+                                <tr key={c._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
+                                  <td style={{ padding: '0.75rem 1rem', color: '#fff', fontWeight: 600 }}>{c.studentName}</td>
+                                  <td style={{ padding: '0.75rem 1rem', color: 'var(--text-secondary)' }}>{c.courseName}</td>
+                                  <td style={{ padding: '0.75rem 1rem', color: 'var(--accent-cyan)' }}><code>{c.certificateId}</code></td>
+                                  <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                                    <button
+                                      onClick={() => handleDeleteCertificate(c.certificateId)}
+                                      style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '0.75rem' }}
                                     >
-                                      <Upload size={12} />
-                                      {selectedFile ? "Change PDF" : "Select PDF"}
-                                      <input 
-                                        type="file" 
-                                        accept=".pdf"
-                                        onChange={(e) => handleFileChange(subject.code, mIndex, e.target.files[0])}
-                                        style={{ display: 'none' }}
-                                      />
-                                    </label>
-
-                                    {/* Commit to Github Trigger */}
-                                    {selectedFile && (
-                                      <button
-                                        onClick={() => handleCommitToGithub(subject.code, subject.name, mIndex)}
-                                        disabled={status?.status === 'uploading'}
-                                        style={{
-                                          background: 'linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%)',
-                                          border: 'none',
-                                          color: '#000',
-                                          padding: '0.3rem 0.75rem',
-                                          borderRadius: '15px',
-                                          fontSize: '0.7rem',
-                                          fontWeight: 700,
-                                          cursor: status?.status === 'uploading' ? 'not-allowed' : 'pointer',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: '4px'
-                                        }}
-                                      >
-                                        {status?.status === 'uploading' ? <RefreshCw size={12} className="spin" /> : <ArrowRight size={12} />}
-                                        Commit to GitHub
-                                      </button>
-                                    )}
-
-                                  </div>
-                                </div>
-
-                                {/* File Name display */}
-                                {selectedFile && (
-                                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                    Selected File: <strong style={{ color: 'var(--accent-cyan)' }}>{selectedFile.name}</strong> ({Math.round(selectedFile.size / 1024)} KB)
-                                  </div>
-                                )}
-
-                                {/* Upload status responses */}
-                                {status && status.status !== 'idle' && (
-                                  <div 
-                                    style={{ 
-                                      fontSize: '0.75rem', 
-                                      padding: '0.4rem 0.6rem', 
-                                      borderRadius: '4px',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '6px',
-                                      marginTop: '0.25rem',
-                                      background: status.status === 'uploading' ? 'rgba(0, 229, 255, 0.05)' : status.status === 'success' ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)',
-                                      border: '1px solid',
-                                      borderColor: status.status === 'uploading' ? 'rgba(0, 229, 255, 0.15)' : status.status === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                                      color: status.status === 'uploading' ? 'var(--accent-cyan)' : status.status === 'success' ? 'var(--accent-green)' : '#ef4444'
-                                    }}
-                                  >
-                                    {status.status === 'uploading' && <RefreshCw size={12} className="spin" />}
-                                    {status.status === 'success' && <CheckCircle size={12} />}
-                                    {status.status === 'error' && <AlertTriangle size={12} />}
-                                    <span>{status.message}</span>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                                      Delete
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
                     </div>
-                  );
-                })}
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </div>
         )}
 

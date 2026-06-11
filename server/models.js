@@ -55,8 +55,32 @@ const PurchaseSchema = new mongoose.Schema({
   }
 });
 
+const CertificateSchema = new mongoose.Schema({
+  certificateId: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  studentName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  courseName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  issueDate: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 // Prevent compile models model name conflicts
 const User = mongoose.models.User || mongoose.model('User', UserSchema);
 const Purchase = mongoose.models.Purchase || mongoose.model('Purchase', PurchaseSchema);
+const Certificate = mongoose.models.Certificate || mongoose.model('Certificate', CertificateSchema);
 
-module.exports = { User, Purchase };
+module.exports = { User, Purchase, Certificate };

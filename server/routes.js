@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const { User, Purchase } = require('./models');
+const { User, Purchase, Certificate } = require('./models');
 
 // Authentication middleware
 const authenticateToken = (req, res, next) => {
@@ -303,6 +303,86 @@ router.post('/auth/reset-password', async (req, res) => {
   } catch (err) {
     console.error('Error in reset-password route:', err);
     res.status(500).json({ error: 'Server error resetting password.' });
+  }
+});
+
+// 8. Public Certificate Verification
+router.get('/certificates/verify/:id', async (req, res) => {
+  try {
+    const cert = await Certificate.findOne({ certificateId: req.params.id.trim() });
+    if (!cert) {
+      return res.status(404).json({ valid: false, error: 'Certificate not found or invalid ID.' });
+    }
+    res.json({ valid: true, certificate: cert });
+  } catch (err) {
+    console.error('Error verifying certificate:', err);
+    res.status(500).json({ error: 'Server error during verification.' });
+  }
+});
+
+// 9. Owner Generate Certificate (Owner/Admin Only)
+router.post('/certificates/generate', authenticateToken, async (req, res) => {
+  try {
+    // Owner check by email
+    if (req.user.email !== 'vinaynbodravla315@gmail.com') {
+      return res.status(403).json({ error: 'Access denied. Admin console only.' });
+    }
+
+    const { studentName, courseName, certificateId } = req.body;
+    if (!studentName || !courseName) {
+      return res.status(400).json({ error: 'Student name and course name are required.' });
+    }
+
+    // Generate a unique ID if not provided
+    const certId = certificateId ? certificateId.trim() : `CC-${crypto.randomBytes(4).toString('hex').toUpperCase().replace(/(.{4})/g, '$1-').slice(0, -1)}`;
+
+    const existingCert = await Certificate.findOne({ certificateId: certId });
+    if (existingCert) {
+      return res.status(400).json({ error: 'A certificate with this ID already exists.' });
+    }
+
+    const newCert = new Certificate({
+      certificateId: certId,
+      studentName,
+      courseName
+    });
+
+    const savedCert = await newCert.save();
+    res.json({ message: 'Certificate generated successfully.', certificate: savedCert });
+  } catch (err) {
+    console.error('Error generating certificate:', err);
+    res.status(500).json({ error: 'Server error generating certificate.' });
+  }
+});
+
+// 10. Owner List All Certificates (Owner/Admin Only)
+router.get('/certificates', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.email !== 'vinaynbodravla315@gmail.com') {
+      return res.status(403).json({ error: 'Access denied. Admin console only.' });
+    }
+    const certs = await Certificate.find().sort({ issueDate: -1 });
+    res.json(certs);
+  } catch (err) {
+    console.error('Error listing certificates:', err);
+    res.status(500).json({ error: 'Server error listing certificates.' });
+  }
+});
+
+// 11. Owner Delete Certificate (Owner/Admin Only)
+router.delete('/certificates/:id', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.email !== 'vinaynbodravla315@gmail.com') {
+      return res.status(403).json({ error: 'Access denied. Admin console only.' });
+    }
+    const cert = await Certificate.findOneAndDelete({ certificateId: req.params.id });
+    if (!cert) {
+      return res.status(404).json({ error: 'Certificate not found.' });
+    }
+    res.json({ message: 'Certificate deleted successfully.' });
+  } catch (err) {
+    console.error('Error deleting certificate:', err);
+    res.status(500).json({ error: 'Server error deleting certificate.' });
   }
 });
 
