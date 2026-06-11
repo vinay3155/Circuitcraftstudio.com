@@ -108,7 +108,7 @@ export default function App() {
 
   // Scroll observer to update Navbar highlight automatically based on viewport scroll position
   useEffect(() => {
-    const sections = ['home', 'projects', 'webinars', 'store', 'about', 'contact'];
+    const sections = ['home', 'store', 'projects', 'webinars', 'about', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -281,12 +281,6 @@ export default function App() {
           setSearchQuery={setSearchQuery}
         />
 
-        {/* Categories Catalog Section */}
-        <ProjectExplorer onAddToCart={handleAddToCart} />
-
-        {/* Live Webinars System */}
-        <WebinarSection />
-
         {/* Placement & Career Roadmap Bundle Showcase */}
         <RoadmapShowcase 
           isUnlocked={Object.values(unlockedRoadmaps).some(val => val === true)}
@@ -296,6 +290,12 @@ export default function App() {
 
         {/* Digital Store Section */}
         <DigitalStore onAddToCart={handleAddToCart} />
+
+        {/* Categories Catalog Section */}
+        <ProjectExplorer onAddToCart={handleAddToCart} />
+
+        {/* Live Webinars System */}
+        <WebinarSection />
 
         {/* Google AdSense Display Unit */}
         <AdSenseUnit adSlot="5955164719" />

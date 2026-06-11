@@ -56,9 +56,9 @@ export default function Navbar({
 
   const navItems = [
     { id: 'home', label: 'Home' },
+    { id: 'store', label: 'Digital Store' },
     { id: 'projects', label: 'Projects' },
     { id: 'webinars', label: 'Webinars' },
-    { id: 'store', label: 'Digital Store' },
     { id: 'study-hub', label: 'VTU Study Hub' },
     { id: 'my-bundles', label: 'My Bundles' },
     { id: 'about', label: 'About Us' },
