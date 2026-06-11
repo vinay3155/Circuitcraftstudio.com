@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Menu, X, Sun, Moon, User, LogOut, Search, Folder } from 'lucide-react';
+import { ShoppingCart, Menu, X, Sun, Moon, User, LogOut, Search, Folder, Cpu } from 'lucide-react';
 
 export default function Navbar({ 
   theme, 
@@ -20,13 +20,13 @@ export default function Navbar({
 
   const navItems = [
     { id: 'home', label: 'Home' },
-    { id: 'about', label: 'About Us' },
     { id: 'services', label: 'Services' },
     { id: 'projects', label: 'Projects' },
     { id: 'webinars', label: 'Webinars' },
     { id: 'store', label: 'Digital Store' },
     { id: 'study-hub', label: 'VTU Study Hub' },
     { id: 'my-bundles', label: 'My Bundles' },
+    { id: 'about', label: 'About Us' },
     { id: 'contact', label: 'Contact Us' }
   ];
 

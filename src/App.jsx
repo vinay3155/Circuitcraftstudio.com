@@ -108,7 +108,7 @@ export default function App() {
 
   // Scroll observer to update Navbar highlight automatically based on viewport scroll position
   useEffect(() => {
-    const sections = ['home', 'about', 'services', 'projects', 'webinars', 'store', 'contact'];
+    const sections = ['home', 'services', 'projects', 'webinars', 'store', 'about', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -277,9 +277,6 @@ export default function App() {
           onOpenCourseDetails={(courseId) => setSelectedCourseDetailsId(courseId)}
         />
 
-        {/* About Us Page Segment */}
-        <AboutSection />
-
         {/* Services Grid Section */}
         <ServicesSection onServiceClick={(service) => {
           const text = `Hello CircuitCraft Studio! 🚀\nI am interested in inquiring about your "${service.title}" service. Please share further details.`;
@@ -313,6 +310,9 @@ export default function App() {
 
         {/* Testimonials Segment */}
         <TestimonialsSection />
+
+        {/* About Us Page Segment (Relocated) */}
+        <AboutSection />
       </main>
 
       {/* Floating WhatsApp Chat Button */}
