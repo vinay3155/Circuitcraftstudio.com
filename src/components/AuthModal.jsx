@@ -16,8 +16,6 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, resetToken, 
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  if (!isOpen) return null;
-
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
@@ -197,6 +195,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, resetToken, 
     if (tab === 'forgot') return handleForgotPassword;
     if (tab === 'reset') return handleResetPassword;
   };
+
+  if (!isOpen) return null;
 
   return (
     <div
