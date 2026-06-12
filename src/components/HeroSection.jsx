@@ -28,6 +28,8 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [addedCourses, setAddedCourses] = useState({});
+  const [heroBranch, setHeroBranch] = useState('CSE');
+  const [heroSem, setHeroSem] = useState('3');
 
   const categories = [
     'All',
@@ -242,7 +244,7 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                 margin: 0
               }}
             >
-              Empowering Future Engineers Through Practical Learning
+              VTU Engineering Notes, Model Question Papers & Solved QP
             </h1>
             
             <p 
@@ -254,67 +256,125 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                 maxWidth: '580px'
               }}
             >
-              Bridge the gap between textbook engineering theory and industry requirements. Build real hardware prototypes, program bare-metal microcontrollers, and register verifiable credentials.
+              Access premium module-wise subject notes, download official model question papers, and get solved previous year board exam papers. Stacks neatly on mobile devices.
             </p>
 
-            {/* Quick Search */}
-            <form 
-              onSubmit={handleSearchSubmit}
+            <style>{`
+              @media (max-width: 768px) {
+                .hero-notes-widget {
+                  flex-direction: column !important;
+                  align-items: stretch !important;
+                  gap: 1rem !important;
+                  padding: 1.25rem !important;
+                }
+                .hero-notes-widget button {
+                  align-self: stretch !important;
+                  margin-top: 0.5rem;
+                }
+              }
+            `}</style>
+
+            {/* VTU Notes selector widget */}
+            <div 
               style={{
                 display: 'flex',
-                background: 'var(--bg-secondary)',
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
                 border: '1px solid var(--border-color)',
-                borderRadius: '30px',
-                padding: '0.3rem 0.3rem 0.3rem 1.1rem',
+                borderRadius: '16px',
+                padding: '0.75rem',
                 alignItems: 'center',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)',
+                gap: '0.75rem',
                 width: '100%',
-                maxWidth: '460px',
-                transition: 'border-color var(--transition-fast)'
+                maxWidth: '600px',
+                boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15)',
               }}
-              className="hero-search-form"
+              className="hero-notes-widget"
             >
-              <Search size={18} style={{ color: 'var(--text-muted)', marginRight: '0.5rem', flexShrink: 0 }} />
-              <input 
-                type="text" 
-                placeholder="What project or course do you want to build?"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', paddingLeft: '4px' }}>
+                  Branch
+                </span>
+                <select
+                  value={heroBranch}
+                  onChange={(e) => setHeroBranch(e.target.value)}
+                  style={{
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    padding: '0.5rem 0.75rem',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    outline: 'none',
+                    cursor: 'pointer',
+                    width: '100%'
+                  }}
+                >
+                  <option value="CSE">CSE (Computer Science)</option>
+                  <option value="AI">AI & ML (Artificial Intelligence)</option>
+                  <option value="ECE">ECE (Electronics & Comm)</option>
+                  <option value="EEE">EEE (Electrical & Electronics)</option>
+                </select>
+              </div>
+
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', paddingLeft: '4px' }}>
+                  Semester
+                </span>
+                <select
+                  value={heroSem}
+                  onChange={(e) => setHeroSem(e.target.value)}
+                  style={{
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    padding: '0.5rem 0.75rem',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    outline: 'none',
+                    cursor: 'pointer',
+                    width: '100%'
+                  }}
+                >
+                  <option value="1">1st Sem (Common)</option>
+                  <option value="2">2nd Sem (Common)</option>
+                  <option value="3">3rd Sem</option>
+                  <option value="4">4th Sem</option>
+                  <option value="5">5th Sem</option>
+                  <option value="6">6th Sem</option>
+                  <option value="7">7th Sem</option>
+                  <option value="8">8th Sem</option>
+                </select>
+              </div>
+
+              <button
+                onClick={() => onOpenStudyHub(heroBranch, heroSem)}
+                className="glow-btn"
                 style={{
-                  border: 'none',
-                  background: 'transparent',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.875rem',
-                  outline: 'none',
-                  width: '100%',
-                  fontWeight: 500
-                }}
-              />
-              <button 
-                type="submit"
-                style={{
-                  background: '#0056d2',
-                  border: 'none',
-                  color: '#fff',
-                  padding: '0.5rem 1.25rem',
-                  borderRadius: '20px',
-                  fontWeight: 600,
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '10px',
+                  fontWeight: 700,
                   fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  transition: 'background var(--transition-fast)',
+                  alignSelf: 'flex-end',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
                   whiteSpace: 'nowrap'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#0043a4'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#0056d2'}
               >
-                Search
+                <BookOpen size={16} /> Get Notes & Papers
               </button>
-            </form>
+            </div>
 
             {/* Buttons Row */}
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
               <button
-                onClick={onOpenStudyHub}
+                onClick={() => onOpenStudyHub(heroBranch, heroSem)}
                 style={{
                   padding: '0.75rem 1.75rem',
                   borderRadius: '30px',
@@ -330,7 +390,7 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                 onMouseEnter={(e) => e.currentTarget.style.background = '#0043a4'}
                 onMouseLeave={(e) => e.currentTarget.style.background = '#0056d2'}
               >
-                Start Learning
+                VTU Study Hub
               </button>
               
               <button

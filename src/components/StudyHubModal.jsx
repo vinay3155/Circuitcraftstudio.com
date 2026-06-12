@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, BookOpen, FileText, Check, Copy, ExternalLink, Download, Upload, MessageCircle, ArrowRight, Award, Cpu, Star, ChevronDown, ChevronUp } from 'lucide-react';
 
-export default function StudyHubModal({ isOpen, onClose }) {
+export default function StudyHubModal({ isOpen, onClose, initialBranch, initialSem }) {
   const [activeTab, setActiveTab] = useState('notes'); // 'notes' or 'placement'
   const [selectedBranch, setSelectedBranch] = useState('CSE');
   const [selectedSem, setSelectedSem] = useState('3');
@@ -12,6 +12,14 @@ export default function StudyHubModal({ isOpen, onClose }) {
   // Track uploaded PDFs in current session (temporary Object URLs)
   // Structure: { [subjectCode]: { [moduleIndex]: { url, name } } }
   const [uploadedPdfs, setUploadedPdfs] = useState({});
+
+  // Sync selected branch & sem from props on open
+  useEffect(() => {
+    if (isOpen) {
+      if (initialBranch) setSelectedBranch(initialBranch);
+      if (initialSem) setSelectedSem(initialSem);
+    }
+  }, [isOpen, initialBranch, initialSem]);
 
   const modalRef = useRef(null);
 

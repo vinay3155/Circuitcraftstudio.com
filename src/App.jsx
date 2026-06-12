@@ -27,6 +27,8 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isStudyHubOpen, setIsStudyHubOpen] = useState(false);
+  const [studyHubInitialBranch, setStudyHubInitialBranch] = useState('CSE');
+  const [studyHubInitialSem, setStudyHubInitialSem] = useState('3');
   const [isOwnerDashboardOpen, setIsOwnerDashboardOpen] = useState(false);
   const [isMyBundlesOpen, setIsMyBundlesOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -259,7 +261,11 @@ export default function App() {
         <HeroSection 
           onRoadmapClick={handleHeroRoadmapClick} 
           onExploreCatalog={() => scrollToSection('projects')} 
-          onOpenStudyHub={() => setIsStudyHubOpen(true)}
+          onOpenStudyHub={(branch, sem) => {
+            if (branch) setStudyHubInitialBranch(branch);
+            if (sem) setStudyHubInitialSem(sem);
+            setIsStudyHubOpen(true);
+          }}
           currentUser={currentUser}
           onAddToCart={handleAddToCart}
           onOpenCourseDetails={(courseId) => setSelectedCourseDetailsId(courseId)}
@@ -361,6 +367,8 @@ export default function App() {
       <StudyHubModal 
         isOpen={isStudyHubOpen} 
         onClose={() => setIsStudyHubOpen(false)} 
+        initialBranch={studyHubInitialBranch}
+        initialSem={studyHubInitialSem}
       />
 
       {/* Owner Dashboard Modal Portal */}
