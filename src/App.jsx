@@ -170,49 +170,35 @@ export default function App() {
   };
 
   const handleUnlockRoadmap = () => {
-    const exists = cart.some(item => item.id.startsWith('roadmap-bundle-all'));
-    if (!exists) {
-      const roadmapItem = {
-        id: 'roadmap-bundle-all',
-        title: 'Placement & Career Roadmap Bundle',
-        price: 99,
-        category: 'Placement & Career',
-        microcontroller: '10 Technical Career Paths'
-      };
-      handleAddToCart(roadmapItem);
-    } else {
-      setIsCartOpen(true);
-    }
+    // Instantly unlock all roadmaps for free!
+    setUnlockedRoadmaps(prev => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach(k => {
+        updated[k] = true;
+        localStorage.setItem(`cc_roadmap_unlocked_${k}`, 'true');
+      });
+      localStorage.setItem('cc_roadmap_unlocked', 'true');
+      return updated;
+    });
+    alert('🎉 Premium Career Roadmaps unlocked successfully for FREE! Enjoy your prep.');
+    setIsRoadmapOpen(true);
   };
 
   const handleHeroRoadmapClick = () => {
-    const hasAnyUnlocked = Object.values(unlockedRoadmaps).some(val => val === true);
-    if (hasAnyUnlocked) {
-      setIsRoadmapOpen(true);
-    } else {
-      handleUnlockRoadmap();
-    }
+    // Immediately open the roadmap workspace since it is free and instant
+    handleUnlockRoadmap();
   };
 
   const handleConfirmDomain = (domainId, alreadyUnlocked, domainTitle) => {
     setIsDomainSelectorOpen(false);
-    if (alreadyUnlocked) {
-      setIsRoadmapOpen(true);
-      return;
-    }
-    const exists = cart.some(item => item.id.startsWith(`roadmap-bundle-${domainId}`));
-    if (!exists) {
-      const roadmapItem = {
-        id: `roadmap-bundle-${domainId}`,
-        title: `VTU Career Roadmap: ${domainTitle}`,
-        price: 99,
-        category: 'Placement & Career',
-        microcontroller: 'Career Guide & Mentorship'
-      };
-      handleAddToCart(roadmapItem);
-    } else {
-      setIsCartOpen(true);
-    }
+    // Instantly unlock this domain for free!
+    setUnlockedRoadmaps(prev => {
+      const updated = { ...prev, [domainId]: true };
+      localStorage.setItem(`cc_roadmap_unlocked_${domainId}`, 'true');
+      return updated;
+    });
+    alert(`🎉 VTU Career Roadmap: ${domainTitle} unlocked successfully for FREE!`);
+    setIsRoadmapOpen(true);
   };
 
   const handleToggleRoadmapUnlock = (domainId) => {
@@ -246,7 +232,7 @@ export default function App() {
         }}
         className="pill-accent"
       >
-        <span>⚡ Limited Time Offer: Get premium engineering placement career roadmaps for just ₹99! Offer ends soon.</span>
+        <span>🎁 Limited Time Offer: All premium VTU engineering career placement roadmaps are now 100% FREE! Start your prep today.</span>
       </div>
 
       {/* Navigation Header */}
@@ -417,7 +403,18 @@ export default function App() {
         isOpen={selectedCourseDetailsId !== null}
         onClose={() => setSelectedCourseDetailsId(null)}
         courseId={selectedCourseDetailsId}
-        onAddToCart={handleAddToCart}
+        onUnlockFree={(id) => {
+          // Unlock the specific domain
+          let domain = 'embedded'; // default
+          if (id.includes('vlsi')) domain = 'vlsi';
+          setUnlockedRoadmaps(prev => {
+            const updated = { ...prev, [domain]: true };
+            localStorage.setItem(`cc_roadmap_unlocked_${domain}`, 'true');
+            return updated;
+          });
+          alert('🎉 Success! This roadmap has been unlocked and added to your Student Dashboard.');
+          setIsStudentDashboardOpen(true);
+        }}
       />
     </div>
   );

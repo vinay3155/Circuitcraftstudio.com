@@ -91,10 +91,10 @@ export default function StudentDashboardModal({ isOpen, onClose, currentUser, on
   }
 
   const courses = [
-    { name: 'Mastering RTOS: Hands on FreeRTOS and STM32Fx with MCU', progress: 75, status: 'Active', lessons: '136/182 lessons completed' },
-    { name: 'Embedded Systems Bootcamp: RTOS, IoT, AI, Vision and FPGA', progress: 30, status: 'Active', lessons: '88/295 lessons completed' },
-    { name: 'Mastering Microcontroller: Timers, PWM, CAN, Low Power & DMA', progress: 0, status: 'Not Started', lessons: '0/124 lessons completed' },
-    { name: 'Embedded Systems Programming on ARM Cortex-M3/M4 MCU', progress: 0, status: 'Not Started', lessons: '0/210 lessons completed' }
+    { name: 'STM32 & FreeRTOS Development Career Roadmap', progress: 75, status: 'Active', lessons: '136/182 milestones completed' },
+    { name: 'Embedded Systems & IoT Firmware Career Roadmap', progress: 30, status: 'Active', lessons: '88/295 milestones completed' },
+    { name: 'Advanced Microcontroller Peripheral & CAN Bus Roadmap', progress: 0, status: 'Not Started', lessons: '0/124 milestones completed' },
+    { name: 'ARM Cortex-M Bare-Metal Programming Roadmap', progress: 0, status: 'Not Started', lessons: '0/210 milestones completed' }
   ];
 
   const certificates = [
@@ -193,7 +193,7 @@ export default function StudentDashboardModal({ isOpen, onClose, currentUser, on
             }}
             className="dashboard-sidebar"
           >
-            {/* Tab 1: Courses */}
+            {/* Tab 1: Roadmaps */}
             <button
               onClick={() => setActiveTab('courses')}
               style={{
@@ -213,7 +213,7 @@ export default function StudentDashboardModal({ isOpen, onClose, currentUser, on
               }}
             >
               <Cpu size={16} />
-              <span>My Courses</span>
+              <span>My Roadmaps</span>
             </button>
 
             {/* Tab 2: Certificates */}
@@ -289,10 +289,10 @@ export default function StudentDashboardModal({ isOpen, onClose, currentUser, on
           {/* Content Pane */}
           <div style={{ flex: 1, padding: '1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             
-            {/* Courses View */}
+            {/* Roadmaps View */}
             {activeTab === 'courses' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>Your Learning Progress</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>Your Roadmap Progress</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {courses.map((course) => (
                     <div 

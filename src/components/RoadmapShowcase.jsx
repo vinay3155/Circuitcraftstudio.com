@@ -81,7 +81,7 @@ export default function RoadmapShowcase({ isUnlocked, onUnlockClick, onOpenClick
               VTU Placement & Career <span style={{ color: 'var(--accent-purple)' }}>Roadmap Bundle</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: '1.6' }}>
-              Gain access to the ultimate prep bundle built for placement readiness. Includes trending 2026/2027 technology roadmaps, coding patterns, resume templates, and mock interviews.
+              Gain access to the ultimate prep bundle built for placement readiness, now offered **100% Free** as a limited-time promotion. Includes trending 2026/2027 technology roadmaps, coding patterns, resume templates, and mock interviews.
             </p>
 
             {/* Feature List */}
@@ -130,20 +130,20 @@ export default function RoadmapShowcase({ isUnlocked, onUnlockClick, onOpenClick
             )}
 
             <div>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>
-                {isUnlocked ? "Status: Unlocked" : "Get Complete Access"}
+              <span style={{ fontSize: '0.8rem', color: 'var(--accent-purple)', textTransform: 'uppercase', fontWeight: 700, animation: 'pulse 2s infinite' }}>
+                {isUnlocked ? "Status: Unlocked" : "SPECIAL FREE OFFER"}
               </span>
               
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '8px', marginTop: '0.5rem' }}>
-                <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  ₹99
+                <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-green)' }}>
+                  FREE
                 </span>
                 <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
                   ₹499
                 </span>
               </div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--accent-green)', fontWeight: 600, display: 'block', marginTop: '0.25rem' }}>
-                Save 80% • One-time purchase
+              <span style={{ fontSize: '0.75rem', color: 'var(--accent-purple)', fontWeight: 600, display: 'block', marginTop: '0.25rem' }}>
+                100% Off • Limited Time Promotion
               </span>
             </div>
 
@@ -179,14 +179,14 @@ export default function RoadmapShowcase({ isUnlocked, onUnlockClick, onOpenClick
                   gap: '6px'
                 }}
               >
-                Buy Roadmap Bundle <ArrowRight size={16} />
+                Unlock Free Roadmaps <ArrowRight size={16} />
               </button>
             )}
 
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
               {isUnlocked 
                 ? "You have active lifetime access on this device."
-                : "Instant automatic unlock upon UPI/UTR payment verification."
+                : "Instant automatic unlock of all premium preparation tracks."
               }
             </span>
           </div>

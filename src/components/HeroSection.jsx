@@ -39,62 +39,62 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
   const recommendedCourses = [
     {
       id: 'course-rtos-stm32',
-      title: 'Mastering RTOS: Hands on FreeRTOS and STM32Fx with MCU',
+      title: 'STM32 & FreeRTOS Development Career Roadmap',
       category: 'IoT & RTOS',
       image: '/course-rtos.png',
       author: 'CircuitCraft Team',
       rating: 4.8,
       reviews: 1240,
-      price: 499,
+      price: 0,
       originalPrice: 1999,
-      badge: 'Bestseller',
+      badge: 'FREE OFFER',
       hours: '24.5 total hours',
-      lectures: '182 lectures',
+      lectures: '182 milestones',
       level: 'Intermediate'
     },
     {
       id: 'course-embedded-bootcamp',
-      title: 'Embedded Systems Bootcamp: RTOS, IoT, AI, Vision and FPGA',
+      title: 'Embedded Systems & IoT Firmware Career Roadmap',
       category: 'Embedded Systems',
       image: '/course-bootcamp.png',
       author: 'CircuitCraft Team',
       rating: 4.9,
       reviews: 850,
-      price: 599,
+      price: 0,
       originalPrice: 2499,
-      badge: 'Highest Rated',
+      badge: 'FREE OFFER',
       hours: '42 total hours',
-      lectures: '295 lectures',
+      lectures: '295 milestones',
       level: 'All Levels'
     },
     {
       id: 'course-microcontroller-timers',
-      title: 'Mastering Microcontroller: Timers, PWM, CAN, Low Power & DMA',
+      title: 'Advanced Microcontroller Peripheral & CAN Bus Roadmap',
       category: 'Embedded Systems',
       image: '/course-microcontroller.png',
       author: 'CircuitCraft Team',
       rating: 4.7,
       reviews: 2110,
-      price: 399,
+      price: 0,
       originalPrice: 1599,
-      badge: 'Popular',
+      badge: 'FREE OFFER',
       hours: '18 total hours',
-      lectures: '124 lectures',
+      lectures: '124 milestones',
       level: 'Intermediate'
     },
     {
       id: 'course-arm-cortex',
-      title: 'Embedded Systems Programming on ARM Cortex-M3/M4 MCU',
+      title: 'ARM Cortex-M Bare-Metal Programming Roadmap',
       category: 'Embedded Systems',
       image: '/course-arm.png',
       author: 'CircuitCraft Team',
       rating: 4.8,
       reviews: 1560,
-      price: 449,
+      price: 0,
       originalPrice: 1889,
-      badge: 'Trending',
+      badge: 'FREE OFFER',
       hours: '30.5 total hours',
-      lectures: '210 lectures',
+      lectures: '210 milestones',
       level: 'Beginner to Advanced'
     }
   ];
@@ -362,7 +362,7 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                   e.currentTarget.style.background = 'var(--bg-secondary)';
                 }}
               >
-                Explore Courses
+                Explore Roadmaps
               </button>
               
               <button
@@ -668,9 +668,8 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleAddToCartClick(course);
+                            onOpenCourseDetails(course.id);
                           }}
-                          disabled={isAdded}
                           style={{
                             background: '#ffffff',
                             border: 'none',
@@ -689,8 +688,8 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                           }}
                           className="overlay-cart-btn"
                         >
-                          <ShoppingCart size={14} style={{ color: 'var(--accent-blue)' }} />
-                          <span>{isAdded ? 'Added' : 'Add to Cart'}</span>
+                          <BookOpen size={14} style={{ color: 'var(--accent-blue)' }} />
+                          <span>Get Free Access</span>
                         </button>
                       </div>
                     </div>
@@ -756,14 +755,14 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                           paddingTop: '0.4rem'
                         }}
                       >
-                        <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                          ₹{course.price}
+                        <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--accent-green)' }}>
+                          FREE
                         </span>
                         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
                           ₹{course.originalPrice}
                         </span>
-                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-green)' }}>
-                          ({Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}% off)
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-purple)', animation: 'pulse 2s infinite' }}>
+                          (100% off - Promo)
                         </span>
                       </div>
 
@@ -781,15 +780,13 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleAddToCartClick(course);
+                            onOpenCourseDetails(course.id);
                           }}
-                          disabled={isAdded}
                           style={{
                             flex: 1,
-                            background: isAdded ? 'rgba(16, 185, 129, 0.08)' : 'rgba(0, 86, 210, 0.06)',
-                            border: '1px solid',
-                            borderColor: isAdded ? 'rgba(16, 185, 129, 0.2)' : 'rgba(0, 86, 210, 0.15)',
-                            color: isAdded ? 'var(--accent-green)' : '#0056d2',
+                            background: 'rgba(99, 102, 241, 0.08)',
+                            border: '1px solid rgba(99, 102, 241, 0.2)',
+                            color: 'var(--accent-purple)',
                             padding: '0.35rem 0',
                             borderRadius: '4px',
                             fontWeight: 700,
@@ -801,7 +798,7 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                             gap: '0.2rem'
                           }}
                         >
-                          {isAdded ? 'Added' : 'Add to Cart'}
+                          Get Free Access
                         </button>
                       </div>
                     </div>

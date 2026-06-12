@@ -4,10 +4,9 @@ import {
   ChevronDown, ChevronUp, Globe, FileText, Video, Sparkles, ShoppingCart, Info
 } from 'lucide-react';
 
-export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToCart }) {
+export default function CourseDetailsModal({ isOpen, onClose, courseId, onUnlockFree }) {
   if (!isOpen || !courseId) return null;
 
-  const [pricingOption, setPricingOption] = useState('buy'); // 'subscribe' or 'buy'
   const [openSections, setOpenSections] = useState({ 0: true }); // default first section open
 
   const toggleSection = (idx) => {
@@ -19,7 +18,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
 
   const courseData = {
     'course-rtos-stm32': {
-      title: 'Mastering RTOS: Hands on FreeRTOS and STM32Fx with MCU',
+      title: 'STM32 & FreeRTOS Development Career Roadmap',
       subtitle: 'Master RTOS concepts, task schedulers, context switching, semaphores, queues, and concurrency mechanisms.',
       rating: 4.8,
       reviewsCount: '1,240 ratings',
@@ -27,7 +26,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
       author: 'FastBit Embedded Brain Academy, Kiran Nayak & CircuitCraft Team',
       lastUpdated: 'Last updated 8/2025',
       language: 'English',
-      price: 499,
+      price: 0,
       originalPrice: 1999,
       image: '/course-rtos.png',
       whatYouWillLearn: [
@@ -106,7 +105,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
       description: 'The Complete FreeRTOS Course with Programming and Debugging. Master RTOS concepts, task schedulers, context switching, semaphores, queues, and concurrency mechanisms.'
     },
     'course-embedded-bootcamp': {
-      title: 'Embedded Systems Bootcamp: RTOS, IoT, AI, Vision and FPGA',
+      title: 'Embedded Systems & IoT Firmware Career Roadmap',
       subtitle: 'The ultimate zero-to-hero firmware bootcamp. Build cloud nodes, Edge-AI vision, and synthesize digital circuits on FPGA.',
       rating: 4.9,
       reviewsCount: '850 ratings',
@@ -114,7 +113,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
       author: 'Vinay Bodravla, Subramanya Sondur & Mallikarjun Bujaruk',
       lastUpdated: 'Last updated 10/2025',
       language: 'English',
-      price: 599,
+      price: 0,
       originalPrice: 2499,
       image: '/course-bootcamp.png',
       whatYouWillLearn: [
@@ -166,7 +165,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
       description: 'A comprehensive zero-to-hero firmware bootcamp. Build cloud-connected smart nodes, run light convolutional neural filters (Edge-AI) on microcontrollers, and synthesize digital hardware circuits on Xilinx FPGAs using Verilog.'
     },
     'course-microcontroller-timers': {
-      title: 'Mastering Microcontroller: Timers, PWM, CAN, Low Power & DMA',
+      title: 'Advanced Microcontroller Peripheral & CAN Bus Roadmap',
       subtitle: 'Dive deep into microcontroller peripheral configurations. Master advanced silicon hardware controllers.',
       rating: 4.7,
       reviewsCount: '2,110 ratings',
@@ -174,7 +173,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
       author: 'Vinay Bodravla (Founder & Lead Architect)',
       lastUpdated: 'Last updated 9/2025',
       language: 'English',
-      price: 399,
+      price: 0,
       originalPrice: 1599,
       image: '/course-microcontroller.png',
       whatYouWillLearn: [
@@ -216,7 +215,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
       description: 'Master the core silicon mechanisms that make modern hardware power-efficient and high-performing, including Direct Memory Access (DMA) and Controller Area Network (CAN).'
     },
     'course-arm-cortex': {
-      title: 'Embedded Systems Programming on ARM Cortex-M3/M4 MCU',
+      title: 'ARM Cortex-M Bare-Metal Programming Roadmap',
       subtitle: 'Unlock the potential of ARM silicon. Write bare-metal register level code directly in C from scratch.',
       rating: 4.8,
       reviewsCount: '1,560 ratings',
@@ -224,7 +223,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
       author: 'Vinay Bodravla & Industry Mentors',
       lastUpdated: 'Last updated 11/2025',
       language: 'English',
-      price: 449,
+      price: 0,
       originalPrice: 1889,
       image: '/course-arm.png',
       whatYouWillLearn: [
@@ -268,22 +267,10 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
 
   const details = courseData[courseId] || courseData['course-rtos-stm32'];
 
-  const handleAddToCartClick = () => {
-    const cartItem = {
-      id: courseId,
-      title: details.title,
-      price: details.price,
-      category: 'Recommended Courses',
-      microcontroller: 'Course Certificate',
-      image: details.image
-    };
-    onAddToCart(cartItem);
-    onClose();
-  };
-
-  const handleSubscribeClick = () => {
-    const text = `Hello CircuitCraft Studio! 🚀\nI want to subscribe to the CircuitCraft Personal Plan (₹350/month) for the course: "${details.title}". Please assist with the registration.`;
-    window.open(`https://api.whatsapp.com/send?phone=918123265315&text=${encodeURIComponent(text)}`, '_blank');
+  const handleStartLearningClick = () => {
+    if (onUnlockFree) {
+      onUnlockFree(courseId);
+    }
     onClose();
   };
 
@@ -338,7 +325,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
           }}
         >
           <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0056d2', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Course Details View
+            Career Roadmap Details
           </span>
           <button 
             onClick={onClose}
@@ -604,33 +591,33 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
                 </p>
               </div>
 
-              {/* Box F: Students also bought */}
+              {/* Box F: Related Career Roadmaps */}
               <div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginTop: '0.5rem', marginBottom: '1rem' }}>
-                  Students also bought
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '0.5rem', marginBottom: '1rem' }}>
+                  Related Career Roadmaps
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                   {[
                     {
                       id: 'course-arm-groundup',
-                      title: 'FreeRTOS From Ground Up™ on ARM Processors (REVISED)',
+                      title: 'FreeRTOS From Ground Up™ on ARM Processors',
                       image: '/course-arm.png',
                       rating: 4.8,
                       reviewsCount: '8,250',
                       hours: '23.5 total hours',
                       updated: 'Updated 3/2025',
-                      price: 579,
+                      price: 0,
                       originalPrice: 1999
                     },
                     {
                       id: 'course-intro-embedded',
-                      title: 'Introduction to Embedded Systems',
+                      title: 'Introduction to Embedded Systems & Robotics',
                       image: '/course-bootcamp.png',
                       rating: 4.6,
                       reviewsCount: '5,520',
                       hours: '15.5 total hours',
                       updated: 'Updated 6/2025',
-                      price: 609,
+                      price: 0,
                       originalPrice: 1599
                     }
                   ].map((sab) => (
@@ -648,7 +635,7 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
                         transition: 'background var(--transition-fast)'
                       }}
                       className="lecture-row"
-                      onClick={() => alert(`Redirecting to related course: ${sab.title}`)}
+                      onClick={() => alert(`Redirecting to related roadmap: ${sab.title}`)}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <img 
@@ -669,14 +656,13 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
                         </div>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.1rem', flexShrink: 0 }}>
-                        <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)' }}>₹{sab.price}</span>
+                        <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-green)' }}>FREE</span>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>₹{sab.originalPrice}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-
             </div>
 
             {/* Right Sticky Purchase Sidebar Column */}
@@ -736,142 +722,69 @@ export default function CourseDetailsModal({ isOpen, onClose, courseId, onAddToC
                   <Play size={24} fill="#000" style={{ marginLeft: '4px' }} />
                 </div>
                 <span style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', color: '#fff', fontSize: '0.75rem', fontWeight: 700, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                  Preview this course
+                  Preview this roadmap
                 </span>
               </div>
 
-              {/* Purchase Options Container */}
+              {/* Free Offer Details Card */}
               <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 
-                {/* Options toggle */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  
-                  {/* Option 1: Subscribe */}
-                  <label 
-                    style={{ 
-                      display: 'flex', 
-                      gap: '0.75rem', 
-                      alignItems: 'flex-start',
-                      cursor: 'pointer',
-                      padding: '0.5rem',
-                      borderRadius: '6px',
-                      border: '1px solid',
-                      borderColor: pricingOption === 'subscribe' ? 'var(--accent-purple)' : 'transparent',
-                      background: pricingOption === 'subscribe' ? 'rgba(79, 70, 229, 0.02)' : 'none'
-                    }}
-                  >
-                    <input 
-                      type="radio" 
-                      name="pricing" 
-                      value="subscribe"
-                      checked={pricingOption === 'subscribe'}
-                      onChange={() => setPricingOption('subscribe')}
-                      style={{ marginTop: '3px' }}
-                    />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Subscribe to Personal Plan</span>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>From ₹350.00/month. Cancel anytime.</span>
-                    </div>
-                  </label>
-
-                  {/* Option 2: Buy Individual */}
-                  <label 
-                    style={{ 
-                      display: 'flex', 
-                      gap: '0.75rem', 
-                      alignItems: 'flex-start',
-                      cursor: 'pointer',
-                      padding: '0.5rem',
-                      borderRadius: '6px',
-                      border: '1px solid',
-                      borderColor: pricingOption === 'buy' ? 'var(--accent-blue)' : 'transparent',
-                      background: pricingOption === 'buy' ? 'rgba(0, 86, 210, 0.02)' : 'none'
-                    }}
-                  >
-                    <input 
-                      type="radio" 
-                      name="pricing" 
-                      value="buy"
-                      checked={pricingOption === 'buy'}
-                      onChange={() => setPricingOption('buy')}
-                      style={{ marginTop: '3px' }}
-                    />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Buy Individual Course</span>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
-                        <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>₹{details.price}</span>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>₹{details.originalPrice}</span>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--accent-green)', fontWeight: 700 }}>({Math.round(((details.originalPrice - details.price) / details.originalPrice) * 100)}% Off)</span>
-                      </div>
-                    </div>
-                  </label>
-
+                <div 
+                  style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '0.5rem',
+                    background: 'rgba(99, 102, 241, 0.04)',
+                    border: '1px solid rgba(99, 102, 241, 0.15)',
+                    borderRadius: '8px',
+                    padding: '1rem'
+                  }}
+                >
+                  <span style={{ fontSize: '0.8rem', color: 'var(--accent-purple)', textTransform: 'uppercase', fontWeight: 700, animation: 'pulse 2s infinite' }}>
+                    🎁 Limited Free Offer
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--accent-green)' }}>
+                      FREE
+                    </span>
+                    <span style={{ fontSize: '0.95rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                      ₹{details.originalPrice}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    Access this premium placement preparation roadmap 100% free.
+                  </span>
                 </div>
 
                 {/* CTAs */}
-                {pricingOption === 'subscribe' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <button
-                    onClick={handleSubscribeClick}
+                    onClick={handleStartLearningClick}
                     style={{
-                      background: 'var(--accent-purple)',
+                      background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)',
                       border: 'none',
                       color: '#fff',
-                      padding: '0.75rem',
+                      padding: '0.8rem',
                       borderRadius: '6px',
                       fontWeight: 700,
-                      fontSize: '0.9rem',
+                      fontSize: '0.95rem',
                       cursor: 'pointer',
                       width: '100%',
-                      boxShadow: '0 4px 10px rgba(79, 70, 229, 0.15)'
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
                     }}
                   >
-                    Start subscription
+                    <CheckCircle2 size={18} />
+                    Start Learning (Free)
                   </button>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <button
-                      onClick={handleAddToCartClick}
-                      style={{
-                        background: 'var(--accent-blue)',
-                        border: 'none',
-                        color: '#fff',
-                        padding: '0.75rem',
-                        borderRadius: '6px',
-                        fontWeight: 700,
-                        fontSize: '0.9rem',
-                        cursor: 'pointer',
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.5rem'
-                      }}
-                    >
-                      <ShoppingCart size={16} />
-                      Add to Cart
-                    </button>
-                    <button
-                      onClick={handleAddToCartClick}
-                      style={{
-                        background: 'none',
-                        border: '1px solid var(--border-color)',
-                        color: 'var(--text-primary)',
-                        padding: '0.7rem',
-                        borderRadius: '6px',
-                        fontWeight: 700,
-                        fontSize: '0.9rem',
-                        cursor: 'pointer',
-                        width: '100%'
-                      }}
-                    >
-                      Buy Now
-                    </button>
-                  </div>
-                )}
+                </div>
 
                 {/* Course features includes list */}
                 <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem', textAlign: 'left' }}>
-                  <h4 style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.5rem' }}>This course includes:</h4>
+                  <h4 style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.5rem' }}>This roadmap includes:</h4>
                   <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                     {details.includes.map((inc, index) => (
                       <li key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>

@@ -207,7 +207,7 @@ export default function Navbar({
             onMouseLeave={() => setIsCoursesOpen(false)}
           >
             <button className="nav-link">
-              <span>Find Courses</span>
+              <span>Explore Roadmaps</span>
               <ChevronDown size={14} style={{ marginTop: '1px' }} />
             </button>
 
