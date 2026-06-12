@@ -323,6 +323,12 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
   const getPdfUrl = (subjectCode, moduleIndex) => {
     const uploaded = uploadedPdfs[subjectCode]?.[moduleIndex];
     if (uploaded) return uploaded.url;
+    if (moduleIndex === 'qp') {
+      return `/pdfs/${subjectCode}_QP.pdf`;
+    }
+    if (moduleIndex === 'solved') {
+      return `/pdfs/${subjectCode}_Solved.pdf`;
+    }
     // Default static file path
     return `/pdfs/${subjectCode}_M${moduleIndex + 1}.pdf`;
   };
@@ -567,13 +573,21 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                         {activeModuleNotes.subjectCode}
                       </span>
                       <h5 style={{ color: '#fff', fontSize: '1.15rem', margin: '0.25rem 0 0 0' }}>
-                        {activeModuleNotes.subjectName} - Module {activeModuleNotes.moduleIndex + 1} notes
+                        {activeModuleNotes.moduleIndex === 'qp' 
+                          ? `${activeModuleNotes.subjectName} - Model Question Paper` 
+                          : activeModuleNotes.moduleIndex === 'solved' 
+                            ? `${activeModuleNotes.subjectName} - Solved Board Paper` 
+                            : `${activeModuleNotes.subjectName} - Module ${activeModuleNotes.moduleIndex + 1} notes`}
                       </h5>
                     </div>
 
                     <a
                       href={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)}
-                      download={`${activeModuleNotes.subjectCode}_M${activeModuleNotes.moduleIndex + 1}.pdf`}
+                      download={activeModuleNotes.moduleIndex === 'qp' 
+                        ? `${activeModuleNotes.subjectCode}_QP.pdf` 
+                        : activeModuleNotes.moduleIndex === 'solved' 
+                          ? `${activeModuleNotes.subjectCode}_Solved.pdf` 
+                          : `${activeModuleNotes.subjectCode}_M${activeModuleNotes.moduleIndex + 1}.pdf`}
                       target="_blank"
                       rel="noreferrer"
                       className="glow-btn"
@@ -615,7 +629,11 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                           </button>
                           <a
                             href={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)}
-                            download={`${activeModuleNotes.subjectCode}_M${activeModuleNotes.moduleIndex + 1}.pdf`}
+                            download={activeModuleNotes.moduleIndex === 'qp' 
+                              ? `${activeModuleNotes.subjectCode}_QP.pdf` 
+                              : activeModuleNotes.moduleIndex === 'solved' 
+                                ? `${activeModuleNotes.subjectCode}_Solved.pdf` 
+                                : `${activeModuleNotes.subjectCode}_M${activeModuleNotes.moduleIndex + 1}.pdf`}
                             target="_blank"
                             rel="noreferrer"
                             style={{
@@ -623,7 +641,7 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                               background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600
                             }}
                           >
-                            <Download size={14} /> Download PDF Notes
+                            <Download size={14} /> Download PDF File
                           </a>
                         </div>
                       </div>
@@ -701,8 +719,8 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                               textAlign: 'left'
                             }}
                           >
-                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block' }}>
-                              Select a module to view notes:
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
+                              📘 Module-wise Notes:
                             </span>
                             
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -791,6 +809,102 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                                   </div>
                                 );
                               })}
+                            </div>
+
+                            <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1rem' }}>
+                              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', display: 'block', marginBottom: '0.75rem' }}>
+                                📝 Question Papers & Solutions:
+                              </span>
+
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                {['qp', 'solved'].map((paperType) => {
+                                  const localFile = uploadedPdfs[subject.code]?.[paperType];
+                                  const displayName = paperType === 'qp' ? "Model Question Paper" : "Solved Previous Year Board Paper";
+                                  const paperIcon = paperType === 'qp' ? <FileText size={12} /> : <Check size={12} />;
+                                  return (
+                                    <div 
+                                      key={paperType}
+                                      style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        padding: '0.75rem 1rem',
+                                        background: 'var(--bg-tertiary)',
+                                        borderRadius: '8px',
+                                        border: '1px solid var(--border-color)',
+                                        flexWrap: 'wrap',
+                                        gap: '0.75rem'
+                                      }}
+                                    >
+                                      <span style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        {paperIcon} {displayName}
+                                      </span>
+
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                        {/* PDF file uploader trigger */}
+                                        <label
+                                          style={{
+                                            background: 'rgba(255, 255, 255, 0.03)',
+                                            border: '1px solid var(--border-color)',
+                                            color: localFile ? 'var(--accent-green)' : 'var(--text-secondary)',
+                                            padding: '0.35rem 0.75rem',
+                                            borderRadius: '15px',
+                                            fontSize: '0.725rem',
+                                            fontWeight: 600,
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.25rem',
+                                            transition: 'all 0.2s'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                                            e.currentTarget.style.color = '#fff';
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.currentTarget.style.borderColor = 'var(--border-color)';
+                                            e.currentTarget.style.color = localFile ? 'var(--accent-green)' : 'var(--text-secondary)';
+                                          }}
+                                        >
+                                          {localFile ? <Check size={12} /> : <Upload size={12} />}
+                                          {localFile ? "PDF Uploaded" : "Upload PDF"}
+                                          <input 
+                                            type="file" 
+                                            accept=".pdf" 
+                                            onChange={(e) => handlePdfUpload(subject.code, paperType, e.target.files[0])}
+                                            style={{ display: 'none' }}
+                                          />
+                                        </label>
+
+                                        {localFile && (
+                                          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            ({localFile.name})
+                                          </span>
+                                        )}
+
+                                        <button
+                                          className="glow-btn"
+                                          onClick={() => setActiveModuleNotes({
+                                            subjectCode: subject.code,
+                                            subjectName: subject.name,
+                                            moduleIndex: paperType
+                                          })}
+                                          style={{
+                                            padding: '0.35rem 0.85rem',
+                                            borderRadius: '15px',
+                                            fontSize: '0.75rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.25rem'
+                                          }}
+                                        >
+                                          View document <ArrowRight size={12} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             </div>
                           </div>
                         )}

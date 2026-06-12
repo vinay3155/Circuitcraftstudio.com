@@ -279,7 +279,18 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
       // Repository details
       const owner = 'vinay3155';
       const repo = 'Circuitcraftstudio.com';
-      const path = `public/pdfs/${subjectCode}_M${moduleIndex + 1}.pdf`;
+      let path = '';
+      let commitMsg = '';
+      if (moduleIndex === 'qp') {
+        path = `public/pdfs/${subjectCode}_QP.pdf`;
+        commitMsg = `Upload model QP: ${subjectCode} (${subjectName})`;
+      } else if (moduleIndex === 'solved') {
+        path = `public/pdfs/${subjectCode}_Solved.pdf`;
+        commitMsg = `Upload solved QP: ${subjectCode} (${subjectName})`;
+      } else {
+        path = `public/pdfs/${subjectCode}_M${Number(moduleIndex) + 1}.pdf`;
+        commitMsg = `Upload notes: ${subjectCode} Module ${Number(moduleIndex) + 1} (${subjectName})`;
+      }
       const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
 
       // 2. Fetch existing file SHA if it exists (needed to replace/overwrite a file)
@@ -313,7 +324,7 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
           'Accept': 'application/vnd.github.v3+json'
         },
         body: JSON.stringify({
-          message: `Upload notes: ${subjectCode} Module ${moduleIndex + 1} (${subjectName})`,
+          message: commitMsg,
           content: fileBase64,
           sha: sha || undefined, // Send sha if updating
           branch: 'main'
@@ -327,7 +338,7 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
 
       setUploadStatus(prev => ({
         ...prev,
-        [key]: { status: 'success', message: 'Notes uploaded successfully! Vercel is now deploying. Visible live in 1-2 mins.' }
+        [key]: { status: 'success', message: 'Document uploaded successfully! Vercel is now deploying. Visible live in 1-2 mins.' }
       }));
       
       // Clean up selected file
@@ -1116,6 +1127,126 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
                                   </div>
                                 );
                               })}
+
+                              {/* Question Papers & Solutions Section */}
+                              <div style={{ marginTop: '1.25rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>
+                                  Question Papers & Solutions (GitHub Commits)
+                                </span>
+
+                                {['qp', 'solved'].map((paperType) => {
+                                  const key = `${subject.code}-${paperType}`;
+                                  const selectedFile = filesToUpload[key];
+                                  const status = uploadStatus[key];
+                                  const displayName = paperType === 'qp' ? "Model Question Paper" : "Solved Previous Year Board Paper";
+
+                                  return (
+                                    <div 
+                                      key={paperType}
+                                      style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        padding: '0.75rem 1rem',
+                                        background: 'var(--bg-tertiary)',
+                                        borderRadius: '8px',
+                                        border: '1px solid var(--border-color)',
+                                        gap: '0.5rem'
+                                      }}
+                                    >
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                        <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600 }}>
+                                          {displayName}
+                                        </span>
+
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                          
+                                          {/* Select file */}
+                                          <label
+                                            style={{
+                                              background: 'rgba(255, 255, 255, 0.02)',
+                                              border: '1px solid var(--border-color)',
+                                              color: selectedFile ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                                              padding: '0.3rem 0.65rem',
+                                              borderRadius: '15px',
+                                              fontSize: '0.7rem',
+                                              fontWeight: 600,
+                                              cursor: 'pointer',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: '4px'
+                                            }}
+                                          >
+                                            <Upload size={12} />
+                                            {selectedFile ? "Change PDF" : "Select PDF"}
+                                            <input 
+                                              type="file" 
+                                              accept=".pdf"
+                                              onChange={(e) => handleFileChange(subject.code, paperType, e.target.files[0])}
+                                              style={{ display: 'none' }}
+                                            />
+                                          </label>
+
+                                          {/* Commit to Github Trigger */}
+                                          {selectedFile && (
+                                            <button
+                                              onClick={() => handleCommitToGithub(subject.code, subject.name, paperType)}
+                                              disabled={status?.status === 'uploading'}
+                                              style={{
+                                                background: 'linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%)',
+                                                border: 'none',
+                                                color: '#000',
+                                                padding: '0.3rem 0.75rem',
+                                                borderRadius: '15px',
+                                                fontSize: '0.7rem',
+                                                fontWeight: 700,
+                                                cursor: status?.status === 'uploading' ? 'not-allowed' : 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px'
+                                              }}
+                                            >
+                                              {status?.status === 'uploading' ? <RefreshCw size={12} className="spin" /> : <ArrowRight size={12} />}
+                                              Commit to GitHub
+                                            </button>
+                                          )}
+
+                                        </div>
+                                      </div>
+
+                                      {/* File Name display */}
+                                      {selectedFile && (
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                          Selected File: <strong style={{ color: 'var(--accent-cyan)' }}>{selectedFile.name}</strong> ({Math.round(selectedFile.size / 1024)} KB)
+                                        </div>
+                                      )}
+
+                                      {/* Upload status responses */}
+                                      {status && status.status !== 'idle' && (
+                                        <div 
+                                          style={{ 
+                                            fontSize: '0.75rem', 
+                                            padding: '0.4rem 0.6rem', 
+                                            borderRadius: '4px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            marginTop: '0.25rem',
+                                            background: status.status === 'uploading' ? 'rgba(0, 229, 255, 0.05)' : status.status === 'success' ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)',
+                                            border: '1px solid',
+                                            borderColor: status.status === 'uploading' ? 'rgba(0, 229, 255, 0.15)' : status.status === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                            color: status.status === 'uploading' ? 'var(--accent-cyan)' : status.status === 'success' ? 'var(--accent-green)' : '#ef4444'
+                                          }}
+                                        >
+                                          {status.status === 'uploading' && <RefreshCw size={12} className="spin" />}
+                                          {status.status === 'success' && <CheckCircle size={12} />}
+                                          {status.status === 'error' && <AlertTriangle size={12} />}
+                                          <span>{status.message}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             </div>
                           )}
                         </div>
