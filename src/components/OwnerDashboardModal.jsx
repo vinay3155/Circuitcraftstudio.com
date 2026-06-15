@@ -491,6 +491,56 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
         { code: "BEE602", name: "CONTROL SYSTEMS (PCC)" },
         { code: "BEE613B", name: "EMBEDDED SYSTEM DESIGN" }
       ]
+    },
+    ME: {
+      3: [
+        { code: "BME301", name: "Thermodynamics" },
+        { code: "BME302", name: "Strength of Materials" },
+        { code: "BME303", name: "Fluid Mechanics" },
+        { code: "BME304", name: "Materials Science and Engineering" }
+      ],
+      4: [
+        { code: "BME401", name: "Applied Thermodynamics" },
+        { code: "BME402", name: "Kinematics of Machines" },
+        { code: "BME403", name: "Manufacturing Process" },
+        { code: "BME404", name: "Mechanical Metrology and Measurements" }
+      ],
+      5: [
+        { code: "BME501", name: "Design of Machine Elements I" },
+        { code: "BME502", name: "Dynamics of Machinery" },
+        { code: "BME503", name: "Turbo Machines" },
+        { code: "BME504", name: "Non-Traditional Machining" }
+      ],
+      6: [
+        { code: "BME601", name: "Design of Machine Elements II" },
+        { code: "BME602", name: "Heat Transfer" },
+        { code: "BME603", name: "Computer Integrated Manufacturing" }
+      ]
+    },
+    CV: {
+      3: [
+        { code: "BCV301", name: "Geotechnical Engineering" },
+        { code: "BCV302", name: "Strength of Materials" },
+        { code: "BCV303", name: "Fluid Mechanics" },
+        { code: "BCV304", name: "Basic Surveying" }
+      ],
+      4: [
+        { code: "BCV401", name: "Analysis of Determinate Structures" },
+        { code: "BCV402", name: "Concrete Technology" },
+        { code: "BCV403", name: "Applied Hydraulics" },
+        { code: "BCV404", name: "Advanced Surveying" }
+      ],
+      5: [
+        { code: "BCV501", name: "Design of RC Structural Elements" },
+        { code: "BCV502", name: "Analysis of Indeterminate Structures" },
+        { code: "BCV503", name: "Municipal Wastewater Engineering" },
+        { code: "BCV504", name: "Highway Engineering" }
+      ],
+      6: [
+        { code: "BCV601", name: "Design of Steel Structural Elements" },
+        { code: "BCV602", name: "Applied Geotechnical Engineering" },
+        { code: "BCV603", name: "Water Resources Engineering" }
+      ]
     }
   };
 
@@ -845,6 +895,8 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
                       <option value="AI">AI (Artificial Intelligence)</option>
                       <option value="ECE">ECE (Electronics & Comm)</option>
                       <option value="EEE">EEE (Electrical & Electronics)</option>
+                      <option value="ME">ME (Mechanical Engineering)</option>
+                      <option value="CV">CV (Civil Engineering)</option>
                     </select>
                   </div>
 

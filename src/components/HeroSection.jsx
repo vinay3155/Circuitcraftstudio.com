@@ -316,6 +316,8 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                   <option value="AI">AI & ML (Artificial Intelligence)</option>
                   <option value="ECE">ECE (Electronics & Comm)</option>
                   <option value="EEE">EEE (Electrical & Electronics)</option>
+                  <option value="ME">ME (Mechanical Engineering)</option>
+                  <option value="CV">CV (Civil Engineering)</option>
                 </select>
               </div>
 
