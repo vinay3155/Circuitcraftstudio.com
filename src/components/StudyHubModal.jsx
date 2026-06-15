@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, BookOpen, FileText, Check, Copy, ExternalLink, Download, Upload, MessageCircle, ArrowRight, Award, Cpu, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, BookOpen, FileText, Check, Copy, ExternalLink, Download, Upload, MessageCircle, ArrowRight, Award, Cpu, Star, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 
 export default function StudyHubModal({ isOpen, onClose, initialBranch, initialSem }) {
   const [activeTab, setActiveTab] = useState('notes'); // 'notes' or 'placement'
@@ -13,6 +13,20 @@ export default function StudyHubModal({ isOpen, onClose, initialBranch, initialS
   // Structure: { [subjectCode]: { [moduleIndex]: { url, name } } }
   const [uploadedPdfs, setUploadedPdfs] = useState({});
 
+  // Helper to get PDF URL
+  const getPdfUrl = (subjectCode, moduleIndex) => {
+    const uploaded = uploadedPdfs[subjectCode]?.[moduleIndex];
+    if (uploaded) return uploaded.url;
+    if (moduleIndex === 'qp') {
+      return `/pdfs/${subjectCode}_QP.pdf`;
+    }
+    if (moduleIndex === 'solved') {
+      return `/pdfs/${subjectCode}_Solved.pdf`;
+    }
+    // Default static file path
+    return `/pdfs/${subjectCode}_M${moduleIndex + 1}.pdf`;
+  };
+
   // Sync selected branch & sem from props on open
   useEffect(() => {
     if (isOpen) {
@@ -20,6 +34,46 @@ export default function StudyHubModal({ isOpen, onClose, initialBranch, initialS
       if (initialSem) setSelectedSem(initialSem);
     }
   }, [isOpen, initialBranch, initialSem]);
+
+  const [pdfExists, setPdfExists] = useState(true);
+  const [checkingPdf, setCheckingPdf] = useState(false);
+
+  useEffect(() => {
+    if (!activeModuleNotes) {
+      setPdfExists(true);
+      return;
+    }
+
+    const checkPdf = async () => {
+      setCheckingPdf(true);
+      const url = getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex);
+      
+      if (url.startsWith('blob:')) {
+        setPdfExists(true);
+        setCheckingPdf(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('text/html')) {
+            setPdfExists(false);
+          } else {
+            setPdfExists(true);
+          }
+        } else {
+          setPdfExists(false);
+        }
+      } catch (err) {
+        setPdfExists(false);
+      }
+      setCheckingPdf(false);
+    };
+
+    checkPdf();
+  }, [activeModuleNotes]);
 
   const modalRef = useRef(null);
 
@@ -377,19 +431,7 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
     { name: "Edit Distance", difficulty: "Hard", dsa: "Dynamic Programming", link: "https://leetcode.com/problems/edit-distance/" }
   ];
 
-  // Helper to get PDF URL
-  const getPdfUrl = (subjectCode, moduleIndex) => {
-    const uploaded = uploadedPdfs[subjectCode]?.[moduleIndex];
-    if (uploaded) return uploaded.url;
-    if (moduleIndex === 'qp') {
-      return `/pdfs/${subjectCode}_QP.pdf`;
-    }
-    if (moduleIndex === 'solved') {
-      return `/pdfs/${subjectCode}_Solved.pdf`;
-    }
-    // Default static file path
-    return `/pdfs/${subjectCode}_M${moduleIndex + 1}.pdf`;
-  };
+
 
   return (
     <div 
@@ -641,36 +683,57 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                       </h5>
                     </div>
 
-                    <a
-                      href={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)}
-                      download={activeModuleNotes.moduleIndex === 'qp' 
-                        ? `${activeModuleNotes.subjectCode}_QP.pdf` 
-                        : activeModuleNotes.moduleIndex === 'solved' 
-                          ? `${activeModuleNotes.subjectCode}_Solved.pdf` 
-                          : `${activeModuleNotes.subjectCode}_M${activeModuleNotes.moduleIndex + 1}.pdf`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="glow-btn"
-                      style={{
-                        padding: '0.45rem 1rem',
-                        borderRadius: '20px',
-                        fontSize: '0.75rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        textDecoration: 'none',
-                        color: '#000',
-                        fontWeight: 700,
-                        boxShadow: 'var(--glow-cyan)'
-                      }}
-                    >
-                      <Download size={14} /> Download PDF
-                    </a>
+                    {pdfExists && !checkingPdf && (
+                      <a
+                        href={getPdfUrl(activeModuleNotes.subjectCode, activeModuleNotes.moduleIndex)}
+                        download={activeModuleNotes.moduleIndex === 'qp' 
+                          ? `${activeModuleNotes.subjectCode}_QP.pdf` 
+                          : activeModuleNotes.moduleIndex === 'solved' 
+                            ? `${activeModuleNotes.subjectCode}_Solved.pdf` 
+                            : `${activeModuleNotes.subjectCode}_M${activeModuleNotes.moduleIndex + 1}.pdf`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="glow-btn"
+                        style={{
+                          padding: '0.45rem 1rem',
+                          borderRadius: '20px',
+                          fontSize: '0.75rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          textDecoration: 'none',
+                          color: '#000',
+                          fontWeight: 700,
+                          boxShadow: 'var(--glow-cyan)'
+                        }}
+                      >
+                        <Download size={14} /> Download PDF
+                      </a>
+                    )}
                   </div>
 
                   {/* Embedded PDF Viewer Frame / Mobile Fallback */}
                   <div style={{ position: 'relative', width: '100%', height: isMobile ? 'auto' : 'calc(100vh - 350px)', minHeight: isMobile ? '320px' : '580px', background: '#111827', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
-                    {isMobile ? (
+                    {checkingPdf ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '2rem', textAlign: 'center', background: 'var(--bg-tertiary)' }}>
+                        <RefreshCw size={36} className="spin" style={{ color: 'var(--accent-cyan)', marginBottom: '1rem' }} />
+                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Verifying document availability...</span>
+                      </div>
+                    ) : !pdfExists ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '3rem 2rem', textAlign: 'center', background: '#0a0e17' }}>
+                        <img 
+                          src="/coming-soon.png" 
+                          alt="Coming Soon" 
+                          style={{ maxWidth: '240px', width: '100%', height: 'auto', marginBottom: '1.5rem', borderRadius: '10px', border: '1px solid var(--border-color)' }} 
+                        />
+                        <h6 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.5rem', fontWeight: 700 }}>
+                          Notes are coming soon!
+                        </h6>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', maxWidth: '350px', margin: '0 auto', lineHeight: '1.6' }}>
+                          Our subject matter experts are currently uploading and reviewing this document. It will be available shortly!
+                        </p>
+                      </div>
+                    ) : isMobile ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '2rem', textAlign: 'center', background: 'var(--bg-tertiary)' }}>
                         <FileText size={48} style={{ color: 'var(--accent-cyan)', marginBottom: '1.25rem' }} />
                         <h6 style={{ color: '#fff', fontSize: '1.05rem', marginBottom: '0.5rem', fontWeight: 700 }}>
