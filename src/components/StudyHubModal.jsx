@@ -703,7 +703,7 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                       </span>
                       <h5 style={{ color: '#fff', fontSize: '1.15rem', margin: '0.25rem 0 0 0' }}>
                         {activeModuleNotes.moduleIndex === 'qp' 
-                          ? `${activeModuleNotes.subjectName} - Model Question Paper` 
+                          ? `${activeModuleNotes.subjectName} - Previous Year Question Paper` 
                           : activeModuleNotes.moduleIndex === 'solved' 
                             ? `${activeModuleNotes.subjectName} - Solved Board Paper` 
                             : `${activeModuleNotes.subjectName} - Module ${activeModuleNotes.moduleIndex + 1} notes`}
@@ -1033,10 +1033,10 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                                 }}
                               >
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                  {['qp', 'solved'].map((paperType) => {
+                                  {['qp'].map((paperType) => {
                                     const localFile = uploadedPdfs[subject.code]?.[paperType];
-                                    const displayName = paperType === 'qp' ? "Model Question Paper" : "Solved Previous Year Board Paper";
-                                    const paperIcon = paperType === 'qp' ? <FileText size={12} /> : <Check size={12} />;
+                                    const displayName = "Previous Year Question Paper";
+                                    const paperIcon = <FileText size={12} />;
                                     return (
                                       <div 
                                         key={paperType}
