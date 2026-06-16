@@ -281,11 +281,7 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
       const repo = 'Circuitcraftstudio.com';
       let path = '';
       let commitMsg = '';
-      if (typeof moduleIndex === 'string' && moduleIndex.endsWith('-semqp')) {
-        const sem = moduleIndex.split('-')[0];
-        path = `public/pdfs/${subjectCode}_Sem${sem}_QP.pdf`;
-        commitMsg = `Upload combined sem QP: ${subjectCode} Semester ${sem}`;
-      } else if (moduleIndex === 'qp') {
+      if (moduleIndex === 'qp') {
         path = `public/pdfs/${subjectCode}_QP.pdf`;
         commitMsg = `Upload model QP: ${subjectCode} (${subjectName})`;
       } else if (moduleIndex === 'solved') {
@@ -1013,106 +1009,6 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
 
                 {/* List and Actions */}
                 <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
-                  
-                  {/* Branch & Semester Combined QP Upload Section */}
-                  <div 
-                    className="glass-panel"
-                    style={{
-                      padding: '1.25rem',
-                      background: 'rgba(0, 229, 255, 0.02)',
-                      border: '1px solid rgba(0, 229, 255, 0.15)',
-                      borderRadius: '12px',
-                      marginBottom: '1.5rem',
-                      textAlign: 'left'
-                    }}
-                  >
-                    <h5 style={{ color: 'var(--accent-cyan)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <FileText size={16} /> Combined Semester Question Paper Upload
-                    </h5>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '1rem' }}>
-                      Upload the single consolidated Previous Year Question Paper PDF for <strong>{selectedBranch} - Semester {selectedSem}</strong>.
-                    </p>
-                    
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                      <label
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.03)',
-                          border: '1px solid var(--border-color)',
-                          color: filesToUpload[`${selectedBranch}-${selectedSem}-semqp`] ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                          padding: '0.45rem 1rem',
-                          borderRadius: '20px',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px'
-                        }}
-                      >
-                        <Upload size={14} />
-                        {filesToUpload[`${selectedBranch}-${selectedSem}-semqp`] ? "Change PDF" : "Select QP PDF"}
-                        <input 
-                          type="file" 
-                          accept=".pdf"
-                          onChange={(e) => handleFileChange(selectedBranch, `${selectedSem}-semqp`, e.target.files[0])}
-                          style={{ display: 'none' }}
-                        />
-                      </label>
-
-                      {filesToUpload[`${selectedBranch}-${selectedSem}-semqp`] && (
-                        <button
-                          onClick={() => handleCommitToGithub(selectedBranch, `${selectedSem} Sem QP Bundle`, `${selectedSem}-semqp`)}
-                          disabled={uploadStatus[`${selectedBranch}-${selectedSem}-semqp`]?.status === 'uploading'}
-                          style={{
-                            background: 'linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%)',
-                            border: 'none',
-                            color: '#000',
-                            padding: '0.45rem 1.25rem',
-                            borderRadius: '20px',
-                            fontSize: '0.75rem',
-                            fontWeight: 700,
-                            cursor: uploadStatus[`${selectedBranch}-${selectedSem}-semqp`]?.status === 'uploading' ? 'not-allowed' : 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px'
-                          }}
-                        >
-                          {uploadStatus[`${selectedBranch}-${selectedSem}-semqp`]?.status === 'uploading' ? <RefreshCw size={14} className="spin" /> : <ArrowRight size={14} />}
-                          Commit to GitHub
-                        </button>
-                      )}
-
-                      {filesToUpload[`${selectedBranch}-${selectedSem}-semqp`] && (
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                          Selected: <strong>{filesToUpload[`${selectedBranch}-${selectedSem}-semqp`].name}</strong>
-                        </span>
-                      )}
-                    </div>
-
-                    {uploadStatus[`${selectedBranch}-${selectedSem}-semqp`] && uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status !== 'idle' && (
-                      <div 
-                        style={{ 
-                          fontSize: '0.75rem', 
-                          padding: '0.5rem 0.75rem', 
-                          borderRadius: '6px',
-                          marginTop: '0.75rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          background: uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status === 'uploading' ? 'rgba(0, 229, 255, 0.05)' : uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status === 'success' ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)',
-                          border: '1px solid',
-                          borderColor: uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status === 'uploading' ? 'rgba(0, 229, 255, 0.15)' : uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                          color: uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status === 'uploading' ? 'var(--accent-cyan)' : uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status === 'success' ? 'var(--accent-green)' : '#ef4444'
-                        }}
-                      >
-                        {uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status === 'uploading' && <RefreshCw size={12} className="spin" />}
-                        {uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status === 'success' && <CheckCircle size={12} />}
-                        {uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].status === 'error' && <AlertTriangle size={12} />}
-                        <span>{uploadStatus[`${selectedBranch}-${selectedSem}-semqp`].message}</span>
-                      </div>
-                    )}
-                  </div>
-
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {currentSubjects.map((subject) => {
                       const isSubjectExpanded = expandedSubject === subject.code;
