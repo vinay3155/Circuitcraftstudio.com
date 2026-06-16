@@ -1186,11 +1186,11 @@ export default function OwnerDashboardModal({ isOpen, onClose, unlockedRoadmaps 
                                   Question Papers & Solutions (GitHub Commits)
                                 </span>
 
-                                {['qp'].map((paperType) => {
+                                {['qp', 'solved'].map((paperType) => {
                                   const key = `${subject.code}-${paperType}`;
                                   const selectedFile = filesToUpload[key];
                                   const status = uploadStatus[key];
-                                  const displayName = "Previous Year Question Paper";
+                                  const displayName = paperType === 'qp' ? "Model Question Paper" : "Solved Previous Year Board Paper";
 
                                   return (
                                     <div 
