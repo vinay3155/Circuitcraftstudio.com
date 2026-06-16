@@ -455,7 +455,7 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
             </div>
           </div>
 
-          {/* Right Column: High Tech Loop Video Card */}
+          {/* Right Column: Hero Illustration Card */}
           <div 
             style={{
               position: 'relative',
@@ -470,14 +470,11 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
               justifyContent: 'center',
               width: '100%'
             }}
-            className="hero-video-container"
+            className="hero-image-container"
           >
-            <video
-              src="https://assets.mixkit.co/videos/preview/mixkit-circuit-board-microchip-of-a-computer-close-up-41584-large.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
+            <img
+              src="/hero-illustration.png"
+              alt="CircuitCraft Hero Illustration"
               style={{
                 width: '100%',
                 height: '100%',
