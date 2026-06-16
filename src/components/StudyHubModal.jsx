@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, BookOpen, FileText, Check, Copy, ExternalLink, Download, Upload, MessageCircle, ArrowRight, Award, Cpu, Star, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 
-export default function StudyHubModal({ isOpen, onClose, initialBranch, initialSem }) {
-  const [activeTab, setActiveTab] = useState('notes'); // 'notes' or 'placement'
+export default function StudyHubModal({ isOpen, onClose, initialBranch, initialSem, initialTab }) {
+  const [activeTab, setActiveTab] = useState('notes'); // 'notes', 'papers' or 'placement'
   const [selectedBranch, setSelectedBranch] = useState('CSE');
   const [selectedSem, setSelectedSem] = useState('3');
   const [expandedSubjectNotes, setExpandedSubjectNotes] = useState(null); // track expanded subject code for notes
@@ -28,13 +28,14 @@ export default function StudyHubModal({ isOpen, onClose, initialBranch, initialS
     return `/pdfs/${subjectCode}_M${moduleIndex + 1}.pdf`;
   };
 
-  // Sync selected branch & sem from props on open
+  // Sync selected branch, sem, & tab from props on open
   useEffect(() => {
     if (isOpen) {
       if (initialBranch) setSelectedBranch(initialBranch);
       if (initialSem) setSelectedSem(initialSem);
+      if (initialTab) setActiveTab(initialTab);
     }
-  }, [isOpen, initialBranch, initialSem]);
+  }, [isOpen, initialBranch, initialSem, initialTab]);
 
   const [pdfExists, setPdfExists] = useState(true);
   const [checkingPdf, setCheckingPdf] = useState(false);
@@ -540,6 +541,29 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
               VTU Subject Notes
             </button>
             <button
+              onClick={() => {
+                setActiveTab('papers');
+                setActiveModuleNotes(null);
+              }}
+              style={{
+                padding: '1rem 1.5rem',
+                background: 'none',
+                border: 'none',
+                borderBottom: '2px solid',
+                borderColor: activeTab === 'papers' ? 'var(--accent-cyan)' : 'transparent',
+                color: activeTab === 'papers' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s'
+              }}
+            >
+              <FileText size={16} />
+              Previous Year QPs
+            </button>
+            <button
               onClick={() => setActiveTab('placement')}
               style={{
                 padding: '1rem 1.5rem',
@@ -556,7 +580,7 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                 transition: 'all 0.2s'
               }}
             >
-              <FileText size={16} />
+              <Star size={16} />
               Placement Support Prep
             </button>
           </div>
@@ -565,8 +589,8 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
         {/* Content Area */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
           
-          {/* TAB 1: VTU NOTES PORTAL */}
-          {activeTab === 'notes' && (
+          {/* TAB 1: VTU NOTES / PAPERS PORTAL */}
+          {(activeTab === 'notes' || activeTab === 'papers') && (
             <div>
               {/* Selectors Bar */}
               <div 
@@ -786,7 +810,8 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                 /* Subjects List view divided into two sections */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                   {/* SECTION 1: MODULE NOTES */}
-                  <div>
+                  {activeTab === 'notes' && (
+                    <div>
                     <h5 style={{ color: 'var(--accent-cyan)', fontSize: '1.05rem', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
                       <BookOpen size={18} style={{ color: 'var(--accent-cyan)' }} /> 📘 Course Module-wise Notes
                     </h5>
@@ -942,9 +967,11 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                       })}
                     </div>
                   </div>
+                  )}
 
                   {/* SECTION 2: QUESTION PAPERS */}
-                  <div>
+                  {activeTab === 'papers' && (
+                    <div>
                     <h5 style={{ color: 'var(--accent-cyan)', fontSize: '1.05rem', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
                       <FileText size={18} style={{ color: 'var(--accent-cyan)' }} /> 📝 Previous Year Question Papers & Solutions
                     </h5>
@@ -1101,6 +1128,7 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                       })}
                     </div>
                   </div>
+                  )}
                 </div>
               )}
             </div>

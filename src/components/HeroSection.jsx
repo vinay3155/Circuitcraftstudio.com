@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, StarHalf, BookOpen, Clock, Search, Sparkles, ShoppingCart, Check, Flame, Award, Cpu, Layers } from 'lucide-react';
+import { Star, StarHalf, BookOpen, Clock, Search, Sparkles, ShoppingCart, Check, Flame, Award, Cpu, Layers, FileText } from 'lucide-react';
 
 // Component to render star ratings dynamically
 function StarRating({ rating }) {
@@ -267,8 +267,14 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                   gap: 1rem !important;
                   padding: 1.25rem !important;
                 }
+                .hero-notes-actions-container {
+                  width: 100% !important;
+                  flex-direction: column !important;
+                  align-self: stretch !important;
+                }
                 .hero-notes-widget button {
                   align-self: stretch !important;
+                  width: 100% !important;
                   margin-top: 0.5rem;
                 }
               }
@@ -352,31 +358,59 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                 </select>
               </div>
 
-              <button
-                onClick={() => onOpenStudyHub(heroBranch, heroSem)}
-                className="glow-btn"
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '10px',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  alignSelf: 'flex-end',
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  whiteSpace: 'nowrap'
+              <div 
+                className="hero-notes-actions-container"
+                style={{ 
+                  display: 'flex', 
+                  gap: '0.5rem', 
+                  alignSelf: 'flex-end'
                 }}
               >
-                <BookOpen size={16} /> Get Notes & Papers
-              </button>
+                <button
+                  onClick={() => onOpenStudyHub(heroBranch, heroSem, 'notes')}
+                  className="glow-btn"
+                  style={{
+                    padding: '0.75rem 1.25rem',
+                    borderRadius: '10px',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <BookOpen size={16} /> Get Notes
+                </button>
+                <button
+                  onClick={() => onOpenStudyHub(heroBranch, heroSem, 'papers')}
+                  className="glow-btn"
+                  style={{
+                    padding: '0.75rem 1.25rem',
+                    borderRadius: '10px',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap',
+                    background: 'linear-gradient(135deg, var(--accent-cyan) 0%, #0284c7 100%)',
+                    boxShadow: '0 2px 4px rgba(2, 132, 199, 0.1)'
+                  }}
+                >
+                  <FileText size={16} /> Get QPs
+                </button>
+              </div>
             </div>
 
             {/* Buttons Row */}
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
               <button
-                onClick={() => onOpenStudyHub(heroBranch, heroSem)}
+                onClick={() => onOpenStudyHub(heroBranch, heroSem, 'notes')}
                 style={{
                   padding: '0.75rem 1.75rem',
                   borderRadius: '30px',
@@ -393,6 +427,34 @@ export default function HeroSection({ onRoadmapClick, onExploreCatalog, onOpenSt
                 onMouseLeave={(e) => e.currentTarget.style.background = '#0056d2'}
               >
                 VTU Study Hub
+              </button>
+              
+              <button
+                onClick={() => onOpenStudyHub(heroBranch, heroSem, 'papers')}
+                style={{
+                  padding: '0.75rem 1.75rem',
+                  borderRadius: '30px',
+                  background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(0, 86, 210, 0.08) 100%)',
+                  border: '1px solid rgba(2, 132, 199, 0.25)',
+                  color: 'var(--accent-cyan)',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  transition: 'all var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(0, 86, 210, 0.15) 100%)';
+                  e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(0, 86, 210, 0.08) 100%)';
+                  e.currentTarget.style.borderColor = 'rgba(2, 132, 199, 0.25)';
+                }}
+              >
+                <FileText size={16} /> Previous Year QPs
               </button>
               
               <button

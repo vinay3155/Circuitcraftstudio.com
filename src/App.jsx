@@ -29,6 +29,14 @@ export default function App() {
   const [isStudyHubOpen, setIsStudyHubOpen] = useState(false);
   const [studyHubInitialBranch, setStudyHubInitialBranch] = useState('CSE');
   const [studyHubInitialSem, setStudyHubInitialSem] = useState('3');
+  const [studyHubInitialTab, setStudyHubInitialTab] = useState('notes');
+
+  const handleOpenStudyHub = (branch, sem, tab = 'notes') => {
+    if (branch) setStudyHubInitialBranch(branch);
+    if (sem) setStudyHubInitialSem(sem);
+    if (tab) setStudyHubInitialTab(tab);
+    setIsStudyHubOpen(true);
+  };
   const [isOwnerDashboardOpen, setIsOwnerDashboardOpen] = useState(false);
   const [isMyBundlesOpen, setIsMyBundlesOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -245,7 +253,7 @@ export default function App() {
         toggleCart={() => setIsCartOpen(!isCartOpen)} 
         activeTab={activeTab}
         setActiveTab={scrollToSection}
-        onOpenStudyHub={() => setIsStudyHubOpen(true)}
+        onOpenStudyHub={() => handleOpenStudyHub(null, null, 'notes')}
         onOpenMyBundles={() => setIsMyBundlesOpen(true)}
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthOpen(true)}
@@ -261,11 +269,7 @@ export default function App() {
         <HeroSection 
           onRoadmapClick={handleHeroRoadmapClick} 
           onExploreCatalog={() => scrollToSection('projects')} 
-          onOpenStudyHub={(branch, sem) => {
-            if (branch) setStudyHubInitialBranch(branch);
-            if (sem) setStudyHubInitialSem(sem);
-            setIsStudyHubOpen(true);
-          }}
+          onOpenStudyHub={handleOpenStudyHub}
           currentUser={currentUser}
           onAddToCart={handleAddToCart}
           onOpenCourseDetails={(courseId) => setSelectedCourseDetailsId(courseId)}
@@ -369,6 +373,7 @@ export default function App() {
         onClose={() => setIsStudyHubOpen(false)} 
         initialBranch={studyHubInitialBranch}
         initialSem={studyHubInitialSem}
+        initialTab={studyHubInitialTab}
       />
 
       {/* Owner Dashboard Modal Portal */}
