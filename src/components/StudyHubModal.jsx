@@ -783,162 +783,323 @@ Bachelor of Engineering in Computer Science \\hfill CGPA: 8.5 / 10 | 2022 - 2026
                   </div>
                 </div>
               ) : (
-                /* Subjects List view showing only Question Papers */
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <h5 style={{ color: 'var(--accent-cyan)', fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
-                    <FileText size={18} style={{ color: 'var(--accent-cyan)' }} /> 📝 Previous Year Question Papers & Solutions
-                  </h5>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {currentSubjects.map((subject) => {
-                      const isSubjectExpanded = expandedSubjectNotes === subject.code;
-                      return (
-                        <div 
-                          key={subject.code}
-                          className="glass-panel"
-                          style={{
-                            padding: '1rem 1.25rem',
-                            transition: 'all 0.25s',
-                            borderLeft: isSubjectExpanded ? '3px solid var(--accent-cyan)' : '1px solid var(--border-color)',
-                            background: 'rgba(255,255,255,0.01)'
-                          }}
-                        >
-                          {/* Subject card toggle trigger */}
+                /* Subjects List view divided into two sections */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                  {/* SECTION 1: MODULE NOTES */}
+                  <div>
+                    <h5 style={{ color: 'var(--accent-cyan)', fontSize: '1.05rem', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
+                      <BookOpen size={18} style={{ color: 'var(--accent-cyan)' }} /> 📘 Course Module-wise Notes
+                    </h5>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {currentSubjects.map((subject) => {
+                        const isSubjectExpanded = expandedSubjectNotes === subject.code;
+                        const modulesList = [0, 1, 2, 3, 4];
+                        return (
                           <div 
-                            onClick={() => setExpandedSubjectNotes(isSubjectExpanded ? null : subject.code)}
+                            key={`notes-${subject.code}`}
+                            className="glass-panel"
                             style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              cursor: 'pointer'
+                              padding: '1rem 1.25rem',
+                              transition: 'all 0.25s',
+                              borderLeft: isSubjectExpanded ? '3px solid var(--accent-cyan)' : '1px solid var(--border-color)',
+                              background: 'rgba(255,255,255,0.01)'
                             }}
                           >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left' }}>
-                              <span 
-                                style={{
-                                  fontSize: '0.7rem',
-                                  fontWeight: 700,
-                                  padding: '0.2rem 0.5rem',
-                                  borderRadius: '4px',
-                                  background: 'rgba(0, 229, 255, 0.1)',
-                                  border: '1px solid rgba(0, 229, 255, 0.2)',
-                                  color: 'var(--accent-cyan)'
-                                }}
-                              >
-                                {subject.code}
-                              </span>
-                              <span style={{ fontWeight: 600, color: '#fff', fontSize: '1.05rem' }}>{subject.name}</span>
-                            </div>
-                            <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
-                              {isSubjectExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                            </button>
-                          </div>
-
-                          {isSubjectExpanded && (
+                            {/* Subject card toggle trigger */}
                             <div 
-                              style={{ 
-                                marginTop: '1rem', 
-                                paddingTop: '1rem', 
-                                borderTop: '1px solid rgba(255,255,255,0.05)',
+                              onClick={() => setExpandedSubjectNotes(isSubjectExpanded ? null : subject.code)}
+                              style={{
                                 display: 'flex',
-                                flexDirection: 'column',
-                                gap: '0.75rem',
-                                textAlign: 'left'
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                cursor: 'pointer'
                               }}
                             >
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                {['qp', 'solved'].map((paperType) => {
-                                  const localFile = uploadedPdfs[subject.code]?.[paperType];
-                                  const displayName = paperType === 'qp' ? "Model Question Paper" : "Solved Previous Year Board Paper";
-                                  const paperIcon = paperType === 'qp' ? <FileText size={12} /> : <Check size={12} />;
-                                  return (
-                                    <div 
-                                      key={paperType}
-                                      style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        padding: '0.6rem 0.85rem',
-                                        background: 'var(--bg-tertiary)',
-                                        borderRadius: '6px',
-                                        border: '1px solid var(--border-color)',
-                                        flexWrap: 'wrap',
-                                        gap: '0.5rem'
-                                      }}
-                                    >
-                                      <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                        {paperIcon} {displayName}
-                                      </span>
-
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                                        {/* PDF file uploader trigger */}
-                                        <label
-                                          style={{
-                                            background: 'rgba(255, 255, 255, 0.03)',
-                                            border: '1px solid var(--border-color)',
-                                            color: localFile ? 'var(--accent-green)' : 'var(--text-secondary)',
-                                            padding: '0.3rem 0.6rem',
-                                            borderRadius: '12px',
-                                            fontSize: '0.7rem',
-                                            fontWeight: 600,
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.2rem',
-                                            transition: 'all 0.2s'
-                                          }}
-                                          onMouseEnter={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--accent-cyan)';
-                                            e.currentTarget.style.color = '#fff';
-                                          }}
-                                          onMouseLeave={(e) => {
-                                            e.currentTarget.style.borderColor = 'var(--border-color)';
-                                            e.currentTarget.style.color = localFile ? 'var(--accent-green)' : 'var(--text-secondary)';
-                                          }}
-                                        >
-                                          {localFile ? <Check size={10} /> : <Upload size={10} />}
-                                          {localFile ? "PDF Uploaded" : "Upload"}
-                                          <input 
-                                            type="file" 
-                                            accept=".pdf" 
-                                            onChange={(e) => handlePdfUpload(subject.code, paperType, e.target.files[0])}
-                                            style={{ display: 'none' }}
-                                          />
-                                        </label>
-
-                                        {localFile && (
-                                          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            ({localFile.name})
-                                          </span>
-                                        )}
-
-                                        <button
-                                          className="glow-btn"
-                                          onClick={() => setActiveModuleNotes({
-                                            subjectCode: subject.code,
-                                            subjectName: subject.name,
-                                            moduleIndex: paperType
-                                          })}
-                                          style={{
-                                            padding: '0.3rem 0.75rem',
-                                            borderRadius: '12px',
-                                            fontSize: '0.7rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.2rem'
-                                          }}
-                                        >
-                                          View document <ArrowRight size={10} />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left' }}>
+                                <span 
+                                  style={{
+                                    fontSize: '0.7rem',
+                                    fontWeight: 700,
+                                    padding: '0.2rem 0.5rem',
+                                    borderRadius: '4px',
+                                    background: 'rgba(0, 229, 255, 0.1)',
+                                    border: '1px solid rgba(0, 229, 255, 0.2)',
+                                    color: 'var(--accent-cyan)'
+                                  }}
+                                >
+                                  {subject.code}
+                                </span>
+                                <span style={{ fontWeight: 600, color: '#fff', fontSize: '1rem' }}>{subject.name}</span>
                               </div>
+                              <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
+                                {isSubjectExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                              </button>
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
+
+                            {isSubjectExpanded && (
+                              <div 
+                                style={{ 
+                                  marginTop: '1rem', 
+                                  paddingTop: '1rem', 
+                                  borderTop: '1px solid rgba(255,255,255,0.05)',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '0.75rem',
+                                  textAlign: 'left'
+                                }}
+                              >
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                  {modulesList.map((mIndex) => {
+                                    const localFile = uploadedPdfs[subject.code]?.[mIndex];
+                                    return (
+                                      <div 
+                                        key={mIndex}
+                                        style={{
+                                          display: 'flex',
+                                          justifyContent: 'space-between',
+                                          alignItems: 'center',
+                                          padding: '0.6rem 0.85rem',
+                                          background: 'var(--bg-tertiary)',
+                                          borderRadius: '6px',
+                                          border: '1px solid var(--border-color)',
+                                          flexWrap: 'wrap',
+                                          gap: '0.5rem'
+                                        }}
+                                      >
+                                        <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600 }}>
+                                          Module {mIndex + 1}
+                                        </span>
+                                        
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                          {/* PDF file uploader trigger */}
+                                          <label
+                                            style={{
+                                              background: 'rgba(255, 255, 255, 0.03)',
+                                              border: '1px solid var(--border-color)',
+                                              color: localFile ? 'var(--accent-green)' : 'var(--text-secondary)',
+                                              padding: '0.3rem 0.6rem',
+                                              borderRadius: '12px',
+                                              fontSize: '0.7rem',
+                                              fontWeight: 600,
+                                              cursor: 'pointer',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: '0.2rem',
+                                              transition: 'all 0.2s'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                              e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                                              e.currentTarget.style.color = '#fff';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                              e.currentTarget.style.borderColor = 'var(--border-color)';
+                                              e.currentTarget.style.color = localFile ? 'var(--accent-green)' : 'var(--text-secondary)';
+                                            }}
+                                          >
+                                            {localFile ? <Check size={10} /> : <Upload size={10} />}
+                                            {localFile ? "PDF Uploaded" : "Upload"}
+                                            <input 
+                                              type="file" 
+                                              accept=".pdf" 
+                                              onChange={(e) => handlePdfUpload(subject.code, mIndex, e.target.files[0])}
+                                              style={{ display: 'none' }}
+                                            />
+                                          </label>
+
+                                          {localFile && (
+                                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                              ({localFile.name})
+                                            </span>
+                                          )}
+
+                                          <button
+                                            className="glow-btn"
+                                            onClick={() => setActiveModuleNotes({
+                                              subjectCode: subject.code,
+                                              subjectName: subject.name,
+                                              moduleIndex: mIndex
+                                            })}
+                                            style={{
+                                              padding: '0.3rem 0.75rem',
+                                              borderRadius: '12px',
+                                              fontSize: '0.7rem',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: '0.2rem'
+                                            }}
+                                          >
+                                            View notes <ArrowRight size={10} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* SECTION 2: QUESTION PAPERS */}
+                  <div>
+                    <h5 style={{ color: 'var(--accent-cyan)', fontSize: '1.05rem', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
+                      <FileText size={18} style={{ color: 'var(--accent-cyan)' }} /> 📝 Previous Year Question Papers & Solutions
+                    </h5>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {currentSubjects.map((subject) => {
+                        const isSubjectExpanded = expandedSubjectPapers === subject.code;
+                        return (
+                          <div 
+                            key={`papers-${subject.code}`}
+                            className="glass-panel"
+                            style={{
+                              padding: '1rem 1.25rem',
+                              transition: 'all 0.25s',
+                              borderLeft: isSubjectExpanded ? '3px solid var(--accent-cyan)' : '1px solid var(--border-color)',
+                              background: 'rgba(255,255,255,0.01)'
+                            }}
+                          >
+                            {/* Subject card toggle trigger */}
+                            <div 
+                              onClick={() => setExpandedSubjectPapers(isSubjectExpanded ? null : subject.code)}
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left' }}>
+                                <span 
+                                  style={{
+                                    fontSize: '0.7rem',
+                                    fontWeight: 700,
+                                    padding: '0.2rem 0.5rem',
+                                    borderRadius: '4px',
+                                    background: 'rgba(0, 229, 255, 0.1)',
+                                    border: '1px solid rgba(0, 229, 255, 0.2)',
+                                    color: 'var(--accent-cyan)'
+                                  }}
+                                >
+                                  {subject.code}
+                                </span>
+                                <span style={{ fontWeight: 600, color: '#fff', fontSize: '1rem' }}>{subject.name}</span>
+                              </div>
+                              <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
+                                {isSubjectExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                              </button>
+                            </div>
+
+                            {isSubjectExpanded && (
+                              <div 
+                                style={{ 
+                                  marginTop: '1rem', 
+                                  paddingTop: '1rem', 
+                                  borderTop: '1px solid rgba(255,255,255,0.05)',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '0.75rem',
+                                  textAlign: 'left'
+                                }}
+                              >
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                  {['qp', 'solved'].map((paperType) => {
+                                    const localFile = uploadedPdfs[subject.code]?.[paperType];
+                                    const displayName = paperType === 'qp' ? "Model Question Paper" : "Solved Previous Year Board Paper";
+                                    const paperIcon = paperType === 'qp' ? <FileText size={12} /> : <Check size={12} />;
+                                    return (
+                                      <div 
+                                        key={paperType}
+                                        style={{
+                                          display: 'flex',
+                                          justifyContent: 'space-between',
+                                          alignItems: 'center',
+                                          padding: '0.6rem 0.85rem',
+                                          background: 'var(--bg-tertiary)',
+                                          borderRadius: '6px',
+                                          border: '1px solid var(--border-color)',
+                                          flexWrap: 'wrap',
+                                          gap: '0.5rem'
+                                        }}
+                                      >
+                                        <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                          {paperIcon} {displayName}
+                                        </span>
+
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                          {/* PDF file uploader trigger */}
+                                          <label
+                                            style={{
+                                              background: 'rgba(255, 255, 255, 0.03)',
+                                              border: '1px solid var(--border-color)',
+                                              color: localFile ? 'var(--accent-green)' : 'var(--text-secondary)',
+                                              padding: '0.3rem 0.6rem',
+                                              borderRadius: '12px',
+                                              fontSize: '0.7rem',
+                                              fontWeight: 600,
+                                              cursor: 'pointer',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: '0.2rem',
+                                              transition: 'all 0.2s'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                              e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+                                              e.currentTarget.style.color = '#fff';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                              e.currentTarget.style.borderColor = 'var(--border-color)';
+                                              e.currentTarget.style.color = localFile ? 'var(--accent-green)' : 'var(--text-secondary)';
+                                            }}
+                                          >
+                                            {localFile ? <Check size={10} /> : <Upload size={10} />}
+                                            {localFile ? "PDF Uploaded" : "Upload"}
+                                            <input 
+                                              type="file" 
+                                              accept=".pdf" 
+                                              onChange={(e) => handlePdfUpload(subject.code, paperType, e.target.files[0])}
+                                              style={{ display: 'none' }}
+                                            />
+                                          </label>
+
+                                          {localFile && (
+                                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                              ({localFile.name})
+                                            </span>
+                                          )}
+
+                                          <button
+                                            className="glow-btn"
+                                            onClick={() => setActiveModuleNotes({
+                                              subjectCode: subject.code,
+                                              subjectName: subject.name,
+                                              moduleIndex: paperType
+                                            })}
+                                            style={{
+                                              padding: '0.3rem 0.75rem',
+                                              borderRadius: '12px',
+                                              fontSize: '0.7rem',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: '0.2rem'
+                                            }}
+                                          >
+                                            View document <ArrowRight size={10} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
